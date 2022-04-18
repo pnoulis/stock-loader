@@ -7,7 +7,7 @@ object frmLoader: TfrmLoader
   BorderStyle = Single
   Caption = 'stockLoader'
   ClientHeight = 800
-  ClientWidth = 800
+  ClientWidth = 900
   Fill.Color = claWhitesmoke
   Fill.Kind = Solid
   Padding.Left = 10.000000000000000000
@@ -30,7 +30,7 @@ object frmLoader: TfrmLoader
     ClipParent = True
     Position.X = 10.000000000000000000
     Position.Y = 10.000000000000000000
-    Size.Width = 790.000000000000000000
+    Size.Width = 890.000000000000000000
     Size.Height = 70.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
@@ -57,7 +57,7 @@ object frmLoader: TfrmLoader
     HitTest = False
     Position.X = 10.000000000000000000
     Position.Y = 80.000000000000000000
-    Size.Width = 790.000000000000000000
+    Size.Width = 890.000000000000000000
     Size.Height = 70.000000000000000000
     Size.PlatformDefault = False
     Visible = False
@@ -70,71 +70,105 @@ object frmLoader: TfrmLoader
       Anchors = []
       Cursor = crHandPoint
       StyledSettings = [FontColor]
-      Size.Width = 113.000000000000000000
+      Size.Width = 90.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
       Text = #922#945#964#945#967#969#961#953#963#951
       TextSettings.Font.Family = 'Comic Sans MS'
-      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
     end
     object btnCancelLoad: TButton
       Cursor = crHandPoint
       StyledSettings = [FontColor]
-      Position.X = 133.000000000000000000
-      Size.Width = 113.000000000000000000
+      Position.X = 110.000000000000000000
+      Size.Width = 90.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       Text = #913#954#965#961#969#963#951
       TextSettings.Font.Family = 'Comic Sans MS'
-      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       OnClick = btnCancelLoadClick
     end
     object btnEditStock: TButton
       Cursor = crHandPoint
       StyledSettings = [FontColor]
-      Position.X = 266.000000000000000000
-      Size.Width = 113.000000000000000000
+      Position.X = 220.000000000000000000
+      Size.Width = 90.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
       Text = #917#960#949#958#949#961#947#945#963#953#945
       TextSettings.Font.Family = 'Comic Sans MS'
-      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
     end
     object btnRemoveStock: TButton
       Cursor = crHandPoint
       StyledSettings = [FontColor]
-      Position.X = 399.000000000000000000
-      Size.Width = 113.000000000000000000
+      Position.X = 330.000000000000000000
+      Size.Width = 90.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
       Text = #916#953#945#947#961#945#966#951
       TextSettings.Font.Family = 'Comic Sans MS'
-      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
     end
-    object addddd: TButton
-      Position.X = 532.000000000000000000
-      TabOrder = 4
-      Text = 'addddd'
-      OnClick = adddddClick
-    end
     object Label1: TLabel
-      Align = MostRight
-      Position.X = 632.000000000000000000
-      Size.Width = 120.000000000000000000
+      Align = Horizontal
+      Position.X = 440.000000000000000000
+      Size.Width = 409.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TextSettings.HorzAlign = Trailing
-      TextSettings.VertAlign = Leading
       Text = 'arithmos'
-      TabOrder = 5
+      TabOrder = 4
+    end
+  end
+  object layoutStockHeaders: TLayout
+    Align = Top
+    Padding.Left = 100.000000000000000000
+    Padding.Right = 100.000000000000000000
+    Margins.Top = 30.000000000000000000
+    Position.X = 10.000000000000000000
+    Position.Y = 110.000000000000000000
+    Size.Width = 790.000000000000000000
+    Size.Height = 70.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    TabOrder = 3
+    object lblCodeHeader: TLabel
+      Align = Left
+      StyledSettings = [FontColor]
+      Position.X = 100.000000000000000000
+      Size.Width = 120.000000000000000000
+      Size.Height = 70.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 20.000000000000000000
+      TextSettings.Font.StyleExt = {04040000000000000004000000}
+      TextSettings.HorzAlign = Center
+      Text = #922#969#948#953#954#959#962
+      TabOrder = 0
+    end
+    object lblAmountHeader: TLabel
+      Align = Right
+      StyledSettings = [FontColor]
+      Position.X = 570.000000000000000000
+      Size.Width = 120.000000000000000000
+      Size.Height = 70.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 20.000000000000000000
+      TextSettings.Font.StyleExt = {04040000000000000004000000}
+      TextSettings.HorzAlign = Center
+      Text = #928#959#963#959#964#951#964#945
+      TabOrder = 1
     end
   end
 end

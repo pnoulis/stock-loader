@@ -28,7 +28,9 @@ type
     btnCancelLoad: TButton;
     btnEditStock: TButton;
     btnRemoveStock: TButton;
-    addddd: TButton;
+    layoutStockHeaders: TLayout;
+    lblCodeHeader: TLabel;
+    lblAmountHeader: TLabel;
     Label1: TLabel;
 
     { Design Time Event Handlers }
@@ -60,6 +62,7 @@ end;
 procedure TfrmLoader.btnCancelLoadClick(Sender: TObject);
 begin
   layoutCommitLoad.visible := false;
+  layoutStockHeaders.visible := false;
   layoutNewLoad.visible := true;
   FContainer.handleCancelLoad;
 end;
@@ -68,6 +71,7 @@ procedure TfrmLoader.btnNewLoadClick(Sender: TObject);
 begin
   layoutNewLoad.visible := false;
   layoutCommitLoad.visible := true;
+  layoutStockHeaders.visible := true;
   FContainer.handleNewLoad;
 
   // when 2nd layout becomes visible delphi draws lines

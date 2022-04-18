@@ -8,18 +8,21 @@ uses
   System.Variants,
   System.Classes,
   System.Contnrs,
+  System.UITypes,
   {FMX Units}
   FMX.Layouts,
   FMX.Dialogs,
   FMX.Types,
   FMX.Edit,
   FMX.Forms,
+  FMX.Graphics,
+  FMX.Objects,
+  FMX.StdCtrls,
   {Local Units}
   untStock,
   untTypes;
 
 type
-
   TContainer = class(TVertScrollBox)
   public
     PDimensions: untTypes.TDimensions;
@@ -39,11 +42,11 @@ begin
   inherited Create(AOwner);
   PDimensions := pDimens;
   Align := TAlignLayout.Client;
-  Margins.Top := 50.0;
   Margins.Bottom := 10.0;
   Padding.Left := PDimensions.clientWidth - PDimensions.clientWidth / 1.05;
   Padding.Right := PDimensions.clientWidth - PDimensions.clientWidth / 1.05;
   Enabled := true;
+
 end; { TContainer.Create end }
 
 procedure TContainer.handleEditStock(Sender: TObject);
@@ -79,6 +82,10 @@ var
   stock: untStock.TStock;
 begin
   stock := TStock.Create(self);
+  stock.onStockLoaded := procedure
+  begin
+   self.addStock;
+  end;
   self.AddObject(stock);
   // Delphi does not know how to position
   // dynamically added components into a tvertscrollbox.
@@ -96,17 +103,6 @@ begin
 
   stock.waitForInput;
 
-  {
-    for var i := 0 to 3 do
-    begin
-    stock := TStock.Create(self);
-    stock.edtStockName.Text := i.toString;
-    self.AddObject(stock);
-
-
-    stock.Position.Y := self.ComponentCount * 70.0;
-    end;
-  }
 end; { TContainer.addStock end }
 
 end.
