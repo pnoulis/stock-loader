@@ -22,16 +22,23 @@ interface
   untTypes;
 
  type
-  TStockLoaded = reference to procedure;
+  TProduceCached = reference to procedure;
+  TCB = reference to procedure;
 
   TStockName = class(TEdit)
    public
     constructor Create(AOwner: TComponent);override;
+     procedure handleKey(Sender: TObject;var key: Word;var keyChar: Char;
+     Shift: TShiftState);
+
   end;
 
-  TStockValue = class(TLabel)
+  TStockValue = class(TEdit)
    public
     constructor Create(AOwner: TComponent);override;
+         procedure handleKey(Sender: TObject;var key: Word;var keyChar: Char;
+     Shift: TShiftState);
+
   end;
 
   TDisplayError = class(TLabel)
@@ -42,27 +49,33 @@ interface
   TStock = class(FMX.TRectangle)
    private
     edtStockName: TStockName;
-    lblStockValue: TStockValue;
+    edtStockValue: TStockValue;
     lblError: TDisplayError;
-    procedure fetchStock;
-    procedure displayError(const errMsg: string);
-    procedure askAmount;
-   public
-    FIsSelected: Boolean;
     FStockExists: Boolean;
     FInputCompleted: Boolean;
+    FProduceCached: Boolean;
+    FIsSelected: Boolean;
+
+    procedure displayError(const errMsg: string);
+    procedure askProduceName;
+    procedure fetchProduce;
+    procedure cacheCurrentProduce;
+    procedure askProduceQuantity;
+    procedure cacheUpdatedProduce;
+    procedure commitProduce;
+
+   public
     constructor Create(AOwner: TComponent);override;
-    procedure setFocus;
-    procedure waitForInput;
+    procedure waitForProduce;
+    procedure setFocus(target: TControl = nil);
+
     { event handlers }
     procedure handleStockClick(Sender: TObject);
-    procedure handleKey(Sender: TObject;var key: Word;var keyChar: Char;
-     Shift: TShiftState);
-
     { event emitter }
-   var
-    onStockLoaded: TStockLoaded;
-
+    var
+    onProduceCached: TProduceCached;
+    { properties }
+    property isSelected: Boolean read FIsSelected;
   end;
 
 implementation
@@ -93,18 +106,44 @@ implementation
    TextSettings.Font.Size := 18.0;
   end; { TStockName.Create end }
 
+  procedure TStockName.handleKey(Sender: TObject; var key: Word; var keyChar: Char;
+  Shift: TShiftState);
+  begin
+  if not (key.toString = '13') then exit;
+  OnKeyUp := nil;
+  ReadOnly := true;
+  // do input validation here
+  // if input valid then fetchstock
+  // otherwise produre error
+  end; { TStockName.handleKey end }
+
  constructor TStockValue.Create(AOwner: TComponent);
   begin
    inherited Create(AOwner);
+   StyleLookup := 'transparentedit';
    StyledSettings := [];
    TextSettings.Font.Family := 'Comic Sans MS';
    align := TAlignLayout.Right;
    TextSettings.Font.Size := 18.0;
    TextSettings.HorzAlign := TTextAlign.Trailing;
-   AutoSize := true;
+   //AutoSize := true;
    Text := '0';
-   Visible := false;
+   //Visible := false;
   end; { TStockValue.create end }
+
+
+  procedure TStockValue.handleKey(Sender: TObject; var key: Word; var keyChar: Char;
+  Shift: TShiftState);
+  begin
+  if not (key.toString = '13') then exit;
+  OnKeyUp := nil;
+  ReadOnly := true;
+  // do input validation here
+  // if input valid then stock has been loaded
+  // otherwise produre error
+  // cache product should be done here
+  end; { TStockName.handleKey end }
+
 
  constructor TStock.Create(AOwner: TComponent);
   begin
@@ -136,9 +175,9 @@ implementation
    self.AddObject(edtStockName);
 
    // instantiate label
-   lblStockValue := TStockValue.Create(self);
-   lblStockValue.OnClick := self.handleStockClick;
-   self.AddObject(lblStockValue);
+   edtStockValue := TStockValue.Create(self);
+   edtStockValue.OnClick := self.handleStockClick;
+   self.AddObject(edtStockValue);
 
    // instantiate error display label
    lblError := TDisplayError.Create(self);
@@ -160,7 +199,7 @@ implementation
     end;
   end; { Tstock.handleStockClick end }
 
- procedure TStock.setFocus;
+ procedure TStock.setFocus(target: TControl = nil);
   begin
    TThread.CreateAnonymousThread(
      procedure
@@ -169,50 +208,67 @@ implementation
       TThread.Synchronize(nil,
         procedure
         begin
-         self.edtStockName.setFocus;
-         self.edtStockName.SelStart := Length(self.edtStockName.GetText);
+        if not assigned(target) then self.edtStockName.setFocus
+         else target.SetFocus;
+//         self.edtStockName.setFocus;
+//         self.edtStockName.SelStart := Length(self.edtStockName.GetText);
         end);
      end).Start;
   end; { TStock.setFocus end }
 
- procedure TStock.waitForInput;
+  procedure TStock.waitForProduce;
+  begin
+  if FProduceCached then askProduceQuantity
+  else askProduceName;
+  end; { TStock.waitForProduce end }
+
+  procedure TStock.askProduceName;
   begin
   edtStockName.ReadOnly := false;
-   edtStockName.OnKeyUp := handleKey;
-   self.setFocus;
-   // askStockName
-   // askStockIncrBy
-  end; { TStock.waitForInput end }
+  edtSTockName.Text := '';
+  edtStockName.OnKeyUp := edtStockName.handleKey;
+  setFocus(edtStockName);
+  end; { TStock.askProduceName end }
 
- procedure TStock.handleKey(Sender: TObject;var key: Word;var keyChar: Char;
- Shift: TShiftState);
+  procedure TStock.fetchProduce;
   begin
-   if not(key.ToString = '13') then
-    exit;
-   if self.edtStockName.Text = '' then
-    exit;
+     // get database info from here
+     var fetched: Boolean := true;
+     if fetched then
+     begin
+      cacheCurrentProduce;
+      askProduceQuantity;
+     end
+     else
+     begin
+     displayError(edtStockName.Text + ' does not exist!');
+     waitForProduce;
+     end;
+  end; { TStock.fetchProduce end }
 
-   self.edtStockName.OnKeyUp := nil;
-   self.fetchStock;
-  end; { TStock.handleKey end }
-
- procedure TStock.fetchStock;
+  procedure TStock.cacheCurrentProduce;
   begin
-   var
-    fetched: Boolean := true;
+  showMessage('i should be doing something');
+  end; { TStock.cacheCurrentProduce end }
 
-   if fetched then
-    begin
-    self.edtStockName.ReadOnly := true;
-     self.askAmount;
-    end
-   else
-    begin
-     self.displayError(self.edtStockName.Text + ' does not exist!');
-     self.waitForInput;
-    end;
 
-  end; { TStock.fetchStock end }
+  procedure TStock.askProduceQuantity;
+  begin
+  edtStockValue.ReadOnly := false;
+  edtStockValue.Text := '';
+  edtStockValue.OnKeyUp := edtStockValue.handleKey;
+  setFocus(edtStockValue);
+  end; { TStock.askProduceQuantity end }
+
+  procedure TStock.cacheUpdatedProduce;
+  begin
+  showMessage('i should be doing something');
+  end; { Tstock.cacheUpdatedProduce end }
+
+  procedure TStock.commitProduce;
+  begin
+  showMessage('i should be doing something');
+  end; { TStock.commitProduce end }
 
  procedure TStock.displayError(const errMsg: string);
   begin
@@ -224,21 +280,5 @@ implementation
    lblError.Visible := true;
    self.Margins.Bottom := self.Margins.Bottom + 20.0;
   end; { TStock.displayError end }
-
- procedure TStock.askAmount;
-  begin
-  var gotAmount: Boolean := true;
-  if gotAmount then
-  begin
-  self.FInputCompleted := true;
-  self.onStockLoaded();
-  end
-  else
-  begin
-    self.displayError('only numbers allowed in amount');
-    self.waitForInput;
-  end;
-
-  end; { TStock.askAmount end }
 
 end.

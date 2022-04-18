@@ -60,7 +60,7 @@ var
 begin
   // downto 1 because components[0] is the actuall scrollbars
   for i := self.ComponentCount - 1 downto 1 do
-    if TStock(components[i]).FIsSelected then
+    if TStock(components[i]).isSelected then
       components[i].Free;
 
   TStock(self.components[self.ComponentCount - 1]).SetFocus;
@@ -82,7 +82,7 @@ var
   stock: untStock.TStock;
 begin
   stock := TStock.Create(self);
-  stock.onStockLoaded := procedure
+  stock.onProduceCached := procedure
   begin
    self.addStock;
   end;
@@ -101,7 +101,7 @@ begin
   stock.Position.Y := self.ComponentCount *
     (stock.Size.Height + stock.Margins.Bottom);
 
-  stock.waitForInput;
+  stock.waitForProduce;
 
 end; { TContainer.addStock end }
 
