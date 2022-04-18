@@ -1,0 +1,11 @@
+# emacs auto-save files
+*#
+
+build/
+
+# RAD studio files
+__history
+__recovery
+*.dproj.local
+*.identcache
+*.delphilsp.json
