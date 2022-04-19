@@ -16,7 +16,7 @@ uses
   FMX.Objects,
   {Local Units}
   untKitchen,
-  untTypes;
+  untTypes, FMX.Menus;
 
 type
 
@@ -110,6 +110,8 @@ begin
   btnRemoveStock.OnClick := FKitchen.handleCancelProduce;
 
   self.AddObject(FKitchen);
-end; { TFrmLoader.FormCreate end }
+end;
+
+{ TFrmLoader.FormCreate end }
 
 end.

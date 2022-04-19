@@ -51,6 +51,7 @@ begin
   Padding.Left := PDimensions.clientWidth - PDimensions.clientWidth / 1.05;
   Padding.Right := PDimensions.clientWidth - PDimensions.clientWidth / 1.05;
   Enabled := true;
+  self.PopupMenu := nil;
 
 end; { TKitchen.Create end }
 
@@ -99,6 +100,13 @@ procedure TKitchen.addProduce;
 var
   produce: untProduce.TProduce;
 begin
+  if (Self.ComponentCount > 2) and not
+  (TProduce(Components[componentCount - 1]).isCached) then
+  begin
+    TProduce(Components[componentCount - 1]).setFocus;
+    exit;
+  end;
+
   produce := TProduce.Create(self);
   produce.onProduceCached := procedure
     begin

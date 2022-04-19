@@ -18,6 +18,7 @@ uses
   FMX.StdCtrls,
   FMX.Forms,
   FMX.Graphics,
+  FMX.Menus,
   {Local Units}
   untTypes;
 
@@ -25,12 +26,19 @@ type
   TProduceCached = reference to procedure;
   TCB = reference to procedure;
 
+  TPopupMenu = class(FMX.Menus.TPopupMenu)
+   private
+   FEnabled: Boolean;
+   public
+   procedure Popup(X, Y: Single); override;
+   property Enabled: Boolean read FEnabled write FEnabled;
+  end;
+
   TProduceName = class(TEdit)
   public
     constructor Create(AOwner: TComponent); override;
     procedure handleKey(Sender: TObject; var key: Word; var keyChar: Char;
       Shift: TShiftState);
-
   var
     onValidatedInput: TCB;
   end; { TProduceName end }
@@ -40,7 +48,6 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure handleKey(Sender: TObject; var key: Word; var keyChar: Char;
       Shift: TShiftState);
-
   var
     onValidatedInput: TCB;
   end; { TProduceIncrBy end }
@@ -55,7 +62,9 @@ type
     edtProduceName: TProduceName;
     edtProduceIncrBy: TProduceIncrBy;
     lblError: TDisplayError;
-    FProduceCached: Boolean;
+
+    // Flags
+    FIsCached: Boolean;
     FIsSelected: Boolean;
 
     procedure askProduceName;
@@ -63,6 +72,8 @@ type
     procedure recordCurrentStockLevels;
     procedure askNewStockToBeAdded;
     procedure cacheUpdatedStocklevels;
+    procedure enableInteractivity(Target: TEdit);
+    procedure disableInteractivity(Target: TEdit);
     procedure commitUpdatedStocklevels;
     procedure displayError(const errMsg: string);
 
@@ -75,10 +86,16 @@ type
   var
     onProduceCached: TProduceCached; // cb
     property isSelected: Boolean read FIsSelected;
+    property isCached: Boolean read FIsCached;
 
   end; { TProduce end }
 
 implementation
+
+procedure TPopupMenu.popup(X, Y: Single);
+begin
+onPopup(self);
+end;
 
 constructor TDisplayError.Create(AOwner: TComponent);
 begin
@@ -113,6 +130,7 @@ begin
     exit;
   OnKeyUp := nil;
   ReadOnly := true;
+  self.Cursor := TCursor(crHandPoint);
   onValidatedInput();
   // do input validation here
   // if input valid then fetchstock
@@ -129,6 +147,7 @@ begin
   TextSettings.Font.Size := 18.0;
   TextSettings.HorzAlign := TTextAlign.Leading;
   Text := '0';
+  ReadOnly := true;
 end; { TProduceIncrBy.create end }
 
 procedure TProduceIncrBy.handleKey(Sender: TObject; var key: Word;
@@ -138,6 +157,7 @@ begin
     exit;
   OnKeyUp := nil;
   ReadOnly := true;
+  Cursor := TCursor(crHandPoint);
   onValidatedInput();
   // do input validation here
   // if input valid then stock has been loaded
@@ -159,41 +179,46 @@ begin
   Sides := [];
   Stroke.Color := TAlphaColorRec.White;
   Stroke.Thickness := 0.0;
-  Cursor := TCursor(crHandPoint);
+  Cursor := TCursor(crIBeam);
   Fill.Color := TAlphaColorRec.White;
+  self.PopupMenu := nil;
 
   // events
-  self.OnClick := self.handleProduceSelected;
+  self.onClick := handleProduceSelected;
 
   // instantiate edit #1
   edtProduceName := TProduceName.Create(self);
   edtProduceName.Text := 'haha';
-  edtProduceName.OnClick := self.handleProduceSelected;
+  //edtProduceName.onClick := handleProduceSelected;
   edtProduceName.onValidatedInput := procedure
     begin
       fetchProduce;
     end;
-  self.AddObject(edtProduceName);
+  AddObject(edtProduceName);
 
   // instantiate edit #2
   edtProduceIncrBy := TProduceIncrBy.Create(self);
-  edtProduceIncrBy.OnClick := self.handleProduceSelected;
+  //edtProduceIncrBy.onClick := self.handleProduceSelected;
   edtProduceIncrBy.onValidatedInput := procedure
     begin
       cacheUpdatedStocklevels;
     end;
-  self.AddObject(edtProduceIncrBy);
+  AddObject(edtProduceIncrBy);
 
   // instantiate error display label
   lblError := TDisplayError.Create(self);
-  self.AddObject(lblError);
+  AddObject(lblError);
 
 end; { TProduce.Create end }
 
 procedure TProduce.handleProduceSelected(Sender: TObject);
 begin
-  if not FProduceCached then
+   if not FIsCached then exit;
+   if Sender.Classname = 'TPopupMenu' then
+   begin
+    waitForProduce;
     exit;
+   end;
 
   if FIsSelected then
   begin
@@ -228,7 +253,7 @@ end; { TProduce.setFocus end }
 
 procedure TProduce.waitForProduce;
 begin
-  if FProduceCached then
+  if FIsCached then
     askNewStockToBeAdded
   else
     askProduceName;
@@ -236,6 +261,8 @@ end; { TProduce.waitForProduce end }
 
 procedure TProduce.askProduceName;
 begin
+showMessage('ask produce name');
+  disableInteractivity(edtProduceName);
   edtProduceName.ReadOnly := false;
   edtProduceName.Text := '';
   edtProduceName.OnKeyUp := edtProduceName.handleKey;
@@ -245,6 +272,7 @@ end; { TProduce.askProduceName end }
 procedure TProduce.fetchProduce;
 begin
   // get database info from here
+  showMessage('fetch produce');
   var
     fetched: Boolean := true;
   if fetched then
@@ -266,6 +294,7 @@ end; { TProduce.recordCurrentStockLevels end }
 
 procedure TProduce.askNewStockToBeAdded;
 begin
+showMessage('ask new stock to be added');
   edtProduceIncrBy.ReadOnly := false;
   edtProduceIncrBy.Text := '';
   edtProduceIncrBy.OnKeyUp := edtProduceIncrBy.handleKey;
@@ -275,9 +304,27 @@ end; { TProduce.askProduceQuantity end }
 procedure TProduce.cacheUpdatedStocklevels;
 begin
   showMessage('i should be doing something');
-  FProduceCached := true;
+  Cursor := TCursor(crHandPoint);
+  FIsCached := true;
   onProduceCached();
+  enableInteractivity(edtProduceName);
+  enableInteractivity(edtProduceIncrBy);
 end; { Tstock.cacheUpdatedStocklevels end }
+
+procedure  TProduce.enableInteractivity(Target: TEdit);
+var popup: TPopupMenu;
+begin
+  Target.onClick := handleProduceSelected;
+  popup := TPopupMenu.Create(Target);
+  popup.OnPopup := handleProduceSelected;
+  Target.PopupMenu := popup;
+end; { TProduce.enableInteractivity end }
+
+procedure TProduce.disableInteractivity(Target: TEdit);
+begin
+  Target.OnClick := nil;
+  target.PopupMenu.Free;
+end; { TProduce.disableInteractivity end }
 
 procedure TProduce.commitUpdatedStocklevels;
 begin
