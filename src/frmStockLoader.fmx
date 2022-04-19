@@ -129,15 +129,21 @@ object frmLoader: TfrmLoader
       Text = 'arithmos'
       TabOrder = 4
     end
+    object add: TButton
+      Position.Y = 70.000000000000000000
+      TabOrder = 5
+      Text = 'add'
+      OnClick = addClick
+    end
   end
   object layoutStockHeaders: TLayout
     Align = Top
-    Padding.Left = 100.000000000000000000
-    Padding.Right = 100.000000000000000000
+    Padding.Left = 70.000000000000000000
+    Padding.Right = 80.000000000000000000
     Margins.Top = 30.000000000000000000
     Position.X = 10.000000000000000000
     Position.Y = 110.000000000000000000
-    Size.Width = 790.000000000000000000
+    Size.Width = 890.000000000000000000
     Size.Height = 70.000000000000000000
     Size.PlatformDefault = False
     Visible = False
@@ -145,7 +151,7 @@ object frmLoader: TfrmLoader
     object lblCodeHeader: TLabel
       Align = Left
       StyledSettings = [FontColor]
-      Position.X = 100.000000000000000000
+      Position.X = 70.000000000000000000
       Size.Width = 120.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
@@ -159,7 +165,7 @@ object frmLoader: TfrmLoader
     object lblAmountHeader: TLabel
       Align = Right
       StyledSettings = [FontColor]
-      Position.X = 570.000000000000000000
+      Position.X = 690.000000000000000000
       Size.Width = 120.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False

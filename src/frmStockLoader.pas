@@ -13,9 +13,10 @@ uses
   {FMX Units}
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.Edit,
+  FMX.Objects,
   {Local Units}
   untLoader,
-  untTypes, FMX.Objects;
+  untTypes;
 
 type
 
@@ -32,18 +33,19 @@ type
     lblCodeHeader: TLabel;
     lblAmountHeader: TLabel;
     Label1: TLabel;
+    add: TButton;
 
     { Design Time Event Handlers }
     procedure FormCreate(Sender: TObject);
     procedure btnNewLoadClick(Sender: TObject);
     procedure btnCancelLoadClick(Sender: TObject);
-    procedure adddddClick(Sender: TObject);
+    procedure addClick(Sender: TObject);
 
     { Run Time Managed Components }
   private
     FIsInitFreakout: Boolean;
   public
-    FContainer: untLoader.TContainer;
+    FKitchen: untLoader.TKitchen;
     FDimensions: untTypes.TDimensions;
   end; { TFrmLoader end }
 
@@ -54,9 +56,9 @@ implementation
 
 {$R *.fmx}
 
-procedure TfrmLoader.adddddClick(Sender: TObject);
+procedure TfrmLoader.addClick(Sender: TObject);
 begin
-self.FContainer.addStock;
+self.FKitchen.handleNewOrder;
 end;
 
 procedure TfrmLoader.btnCancelLoadClick(Sender: TObject);
@@ -64,7 +66,7 @@ begin
   layoutCommitLoad.visible := false;
   layoutStockHeaders.visible := false;
   layoutNewLoad.visible := true;
-  FContainer.handleCancelLoad;
+  FKitchen.handleCancelOrder;
 end;
 
 procedure TfrmLoader.btnNewLoadClick(Sender: TObject);
@@ -72,7 +74,7 @@ begin
   layoutNewLoad.visible := false;
   layoutCommitLoad.visible := true;
   layoutStockHeaders.visible := true;
-  FContainer.handleNewLoad;
+  FKitchen.handleNewOrder;
 
   // when 2nd layout becomes visible delphi draws lines
   // where it shouldnt. Thread is instructed to redraw the
@@ -101,13 +103,13 @@ begin
   FDimensions.clientHeight := clientHeight;
 
   // Initializing Container
-  FContainer := TContainer.Create(self, FDimensions);
+  FKitchen := TKitchen.Create(self, FDimensions);
 
   // Events
-  btnEditStock.OnClick := FContainer.handleEditStock;
-  btnRemoveStock.OnClick := FContainer.handleRemoveStock;
+  btnEditStock.OnClick := FKitchen.handleEditProduce;
+  btnRemoveStock.OnClick := FKitchen.handleCancelProduce;
 
-  self.AddObject(FContainer);
+  self.AddObject(FKitchen);
 end; { TFrmLoader.FormCreate end }
 
 end.
