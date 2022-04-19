@@ -15,7 +15,7 @@ uses
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.Edit,
   FMX.Objects,
   {Local Units}
-  untLoader,
+  untKitchen,
   untTypes;
 
 type
@@ -45,7 +45,7 @@ type
   private
     FIsInitFreakout: Boolean;
   public
-    FKitchen: untLoader.TKitchen;
+    FKitchen: untKitchen.TKitchen;
     FDimensions: untTypes.TDimensions;
   end; { TFrmLoader end }
 

@@ -248,8 +248,8 @@
         <DCCReference Include="frmStockLoader.pas">
             <Form>frmLoader</Form>
         </DCCReference>
-        <DCCReference Include="untStock.pas"/>
-        <DCCReference Include="untLoader.pas"/>
+        <DCCReference Include="untProduce.pas"/>
+        <DCCReference Include="untKitchen.pas"/>
         <DCCReference Include="untTypes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

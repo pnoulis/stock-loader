@@ -1,4 +1,4 @@
-﻿unit untLoader;
+﻿unit untKitchen;
 
 interface
 
@@ -19,10 +19,10 @@ uses
   FMX.Objects,
   FMX.StdCtrls,
   {Local Units}
-  untStock,
+  untProduce,
   untTypes;
 
-type
+  type
   TKitchen = class(TVertScrollBox)
   private
     FContentHeight: double;
@@ -97,7 +97,7 @@ end; { TKitchen.handleNewOrder end }
 
 procedure TKitchen.addProduce;
 var
-  produce: untStock.TProduce;
+  produce: untProduce.TProduce;
 begin
   produce := TProduce.Create(self);
   produce.onProduceCached := procedure

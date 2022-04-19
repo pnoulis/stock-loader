@@ -1,5 +1,7 @@
 # emacs auto-save files
 *#
+# emacs undo tree
+*~undo-tree~
 
 build/
 
