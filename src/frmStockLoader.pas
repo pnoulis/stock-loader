@@ -35,6 +35,7 @@ type
     lblAmountHeader: TLabel;
     Label1: TLabel;
     add: TButton;
+    inputValidation: TButton;
 
     { Design Time Event Handlers }
     procedure FormCreate(Sender: TObject);
@@ -111,8 +112,7 @@ begin
   btnRemoveStock.OnClick := FKitchen.handleCancelProduce;
 
   self.AddObject(FKitchen);
-end;
+end; { TFrmLoader.FormCreate end }
 
-{ TFrmLoader.FormCreate end }
 
 end.

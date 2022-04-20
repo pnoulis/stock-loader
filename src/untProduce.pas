@@ -91,6 +91,39 @@ type
   end; { TProduce end }
 
 implementation
+uses
+untInputValidation,
+System.Generics.Collections;
+
+type
+GCB = reference to function(const input: string): string;
+
+const
+validations: array[0..1] of string = (
+'!num', '!rnum'
+);
+
+function generateValidationCallbacks: TDictionary<string, GCB>;
+var
+regexpObjects: TListInputValidations;
+begin
+result := TDictionary<string, GCB>.Create;
+// make produce name
+regexpObjects := generateInputValidations(['!num']);
+result.Add('produceName', function(const input: string): string
+begin
+for var regexp in regexpObjects do
+begin
+
+end;
+end);
+
+// make produce incrBy
+regexpObjects := generateInputValidations(['!rnum']);
+
+
+
+end;
 
 procedure TPopupMenu.popup(X, Y: Single);
 begin
@@ -341,5 +374,9 @@ begin
   lblError.Visible := true;
   self.Margins.Bottom := self.Margins.Bottom + 20.0;
 end; { TProduce.displayError end }
+
+initialization
+begin
+end;
 
 end.

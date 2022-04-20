@@ -1,42 +1,70 @@
 unit untInputValidation;
 
 interface
-uses
+ uses
+ System.Generics.Collections,
   System.RegularExpressionsCore;
 
-type
-  TListInputValidations = TArray<TPerlRegEx>;
+ type
+  TDictNameToRegexp = TDictionary<string, TPerlRegEx>;
 
-function generateInputValidations(keys: array of string): TListInputValidations;
+ function generateInputValidations(keys: array of string)
+   : TDictNameToRegexp;
 
 implementation
-uses
-  System.Generics.Collections,
+ uses
   System.sysUtils;
 
-var
-  mapRegexp: TDictionary<string, string>;
-
-function generateInputValidations(keys: array of string): TListInputValidations;
-begin
-
-if length(keys) = 0 then
-setLength(result, length(keys));
-
-  for var i := low(keys) to high(keys) do
-  begin
-
+ type
+  regexp = record
+   key,value: string;
   end;
 
-end; { generateInputValidations end }
+ const
+  mapRegexp: array [0 .. 2] of regexp = (
+  (key: '!alnum' ; value: '[^[:alnum:]]'), // not alphanumeric
+  (key: '!realNumb' ; value: '[^[:digit:],.]'), // not real number plus needed punctuation
+  (key: '!IntNumb' ; value: '[^[:digit:]]')
+  );
 
-initialization
+ function getRegexp(const key: string): string;
+  begin
+   for var candidate in mapRegexp do
+    if key = candidate.key then
+     exit(candidate.value);
 
-mapRegexp := TDictionary<string, string>.Create(1);
-mapRegexp.Add('nonAlnum', '^[:alnum:]]');
+   raise Exception.CreateFmt('No match for candidate key: %s',[key]);
+  end;
 
-finalization
+ // generate input validations
+ function generateInputValidations(keys: array of string)
+   : TDictNameToRegexp;
+  begin
+   var
+   i := length(keys);
 
-freeAndNil(mapRegexp);
+   if i = 0 then
+    raise EArgumentOutOfRangeException.Create('Not enough actual parameters');
+
+   result := TDictNameToRegexp.Create(i);
+   i := 0;
+
+   try
+    for var key in keys do
+     begin
+      result[key] := TPerlRegEx.Create;
+      result[key].RegEx := getRegexp(key);
+      result[key].Study;
+     end;
+   except
+    on Exception do
+     begin
+//     for var value in result.TValueCollection do
+      freeAndNil(result);
+      raise
+     end;
+   end;
+
+  end; { generateInputValidations end }
 
 end.
