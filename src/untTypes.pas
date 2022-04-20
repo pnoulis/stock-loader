@@ -2,6 +2,10 @@ unit untTypes;
 
 interface
 
+uses
+  System.RegularExpressionsCore,
+  System.Generics.Collections;
+
 type
   TDimensions = record
     width: single;

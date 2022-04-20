@@ -6,7 +6,8 @@ uses
   frmStockLoader in 'frmStockLoader.pas' {frmLoader},
   untProduce in 'untProduce.pas',
   untKitchen in 'untKitchen.pas',
-  untTypes in 'untTypes.pas';
+  untTypes in 'untTypes.pas',
+  untInputValidation in 'untInputValidation.pas';
 
 {$R *.res}
 

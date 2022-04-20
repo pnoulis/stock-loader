@@ -32,7 +32,7 @@ type
    public
    procedure Popup(X, Y: Single); override;
    property Enabled: Boolean read FEnabled write FEnabled;
-  end;
+  end; { TProduceCached end }
 
   TProduceName = class(TEdit)
   public
@@ -126,11 +126,10 @@ end; { TProduceName.Create end }
 procedure TProduceName.handleKey(Sender: TObject; var key: Word;
   var keyChar: Char; Shift: TShiftState);
 begin
-  if not(key.toString = '13') then
+  if not (key.toString = '13') then
     exit;
-  OnKeyUp := nil;
   ReadOnly := true;
-  self.Cursor := TCursor(crHandPoint);
+  OnKeyUp := nil;
   onValidatedInput();
   // do input validation here
   // if input valid then fetchstock
@@ -153,11 +152,10 @@ end; { TProduceIncrBy.create end }
 procedure TProduceIncrBy.handleKey(Sender: TObject; var key: Word;
   var keyChar: Char; Shift: TShiftState);
 begin
-  if not(key.toString = '13') then
+  if not (key.toString = '13') then
     exit;
-  OnKeyUp := nil;
   ReadOnly := true;
-  Cursor := TCursor(crHandPoint);
+  OnKeyUp := nil;
   onValidatedInput();
   // do input validation here
   // if input valid then stock has been loaded
@@ -245,14 +243,14 @@ begin
             self.edtProduceName.setFocus
           else
             target.setFocus;
-          // self.edtProduceName.setFocus;
-          // self.edtProduceName.SelStart := Length(self.edtProduceName.GetText);
         end);
     end).Start;
 end; { TProduce.setFocus end }
 
 procedure TProduce.waitForProduce;
 begin
+  disableInteractivity(edtProduceName);
+  disableInteractivity(edtProduceIncrBy);
   if FIsCached then
     askNewStockToBeAdded
   else
@@ -262,7 +260,6 @@ end; { TProduce.waitForProduce end }
 procedure TProduce.askProduceName;
 begin
 showMessage('ask produce name');
-  disableInteractivity(edtProduceName);
   edtProduceName.ReadOnly := false;
   edtProduceName.Text := '';
   edtProduceName.OnKeyUp := edtProduceName.handleKey;
@@ -295,8 +292,8 @@ end; { TProduce.recordCurrentStockLevels end }
 procedure TProduce.askNewStockToBeAdded;
 begin
 showMessage('ask new stock to be added');
-  edtProduceIncrBy.ReadOnly := false;
   edtProduceIncrBy.Text := '';
+  edtProduceIncrBy.ReadOnly := false;
   edtProduceIncrBy.OnKeyUp := edtProduceIncrBy.handleKey;
   setFocus(edtProduceIncrBy);
 end; { TProduce.askProduceQuantity end }
@@ -304,16 +301,17 @@ end; { TProduce.askProduceQuantity end }
 procedure TProduce.cacheUpdatedStocklevels;
 begin
   showMessage('i should be doing something');
-  Cursor := TCursor(crHandPoint);
   FIsCached := true;
   onProduceCached();
   enableInteractivity(edtProduceName);
   enableInteractivity(edtProduceIncrBy);
-end; { Tstock.cacheUpdatedStocklevels end }
+end; { TProduce.cacheUpdatedStocklevels end }
 
 procedure  TProduce.enableInteractivity(Target: TEdit);
 var popup: TPopupMenu;
 begin
+  self.Cursor := TCursor(crHandPoint);
+  Target.Cursor := TCursor(crHandPoint);
   Target.onClick := handleProduceSelected;
   popup := TPopupMenu.Create(Target);
   popup.OnPopup := handleProduceSelected;
@@ -322,6 +320,8 @@ end; { TProduce.enableInteractivity end }
 
 procedure TProduce.disableInteractivity(Target: TEdit);
 begin
+  self.Cursor := TCursor(crIBeam);
+  Target.Cursor := TCursor(crIBeam);
   Target.OnClick := nil;
   target.PopupMenu.Free;
 end; { TProduce.disableInteractivity end }

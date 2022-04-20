@@ -22,11 +22,12 @@ uses
   untProduce,
   untTypes;
 
-  type
+type
   TKitchen = class(TVertScrollBox)
   private
     FContentHeight: double;
     FProduceHeight: double;
+
   public
     PDimensions: untTypes.TDimensions;
     constructor Create(AOwner: TComponent; pDimens: TDimensions);
@@ -51,7 +52,6 @@ begin
   Padding.Left := PDimensions.clientWidth - PDimensions.clientWidth / 1.05;
   Padding.Right := PDimensions.clientWidth - PDimensions.clientWidth / 1.05;
   Enabled := true;
-  self.PopupMenu := nil;
 
 end; { TKitchen.Create end }
 
@@ -100,10 +100,14 @@ procedure TKitchen.addProduce;
 var
   produce: untProduce.TProduce;
 begin
-  if (Self.ComponentCount > 2) and not
-  (TProduce(Components[componentCount - 1]).isCached) then
+
+  // Kitchen is only allowed to add a produce if the last one
+  // has been cached. ( TKitchen 1st element is TScrollContent )
+  if (self.ComponentCount > 1) and not
+  (TProduce(components[ComponentCount - 1]).isCached)
+  then
   begin
-    TProduce(Components[componentCount - 1]).setFocus;
+    TProduce(components[ComponentCount - 1]).SetFocus;
     exit;
   end;
 
@@ -113,6 +117,7 @@ begin
       self.addProduce;
     end;
   self.AddObject(produce);
+
   // Delphi does not know how to position
   // dynamically added components into a tvertscrollbox.
   // By default it will insert the objects inverted such as:
@@ -124,11 +129,6 @@ begin
   // https://stackoverflow.com/questions/62259407/
   // delphi-fmx-how-to-add-a-dynamically-created-top-aligned-component-under-all-pre
   // stock.align := top (at constructor)
-  {
-    produce.Position.Y := self.ComponentCount *
-    (produce.Size.Height + produce.Margins.Bottom);
-  }
-
   if FProduceHeight = 0 then
     FProduceHeight := produce.Size.Height + produce.Margins.Height;
 
