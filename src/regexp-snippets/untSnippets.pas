@@ -2,16 +2,15 @@ unit untSnippets;
 
 interface
 type
-  snippet = record
+  TSnippet = record
     key: string;
     value: string;
   end;
 
 const
   COUNT_SNIPPET = 6;
-  LIST_SNIPPET: array[0..COUNT_SNIPPET - 1] of snippet = (
-    // anything
-    (key: 'any'; value: '.'),
+  LIST_SNIPPET: array[0..COUNT_SNIPPET - 1] of TSnippet = (
+    (key: 'any'; value: '.*'),
     // anything other than an alphanumeric character
     (key: '!alnum'; value: '[^[:alnum:]]'), // not alphanumeric
     // anything other than the syntax of a real number
@@ -24,7 +23,7 @@ const
     (key: 'iNum'; value: '[[:digit:]]')
   );
 
-
+implementation
 begin
 end.
 

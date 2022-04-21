@@ -251,7 +251,13 @@
         <DCCReference Include="untProduce.pas"/>
         <DCCReference Include="untKitchen.pas"/>
         <DCCReference Include="untTypes.pas"/>
-        <DCCReference Include="untInputValidation.pas"/>
+        <DCCReference Include="regexp-snippets\untTRegexpSnippets.pas"/>
+        <DCCReference Include="regexp-snippets\untSnippets.pas">
+            <Form>$R *.res</Form>
+        </DCCReference>
+        <DCCReference Include="untInput.pas">
+            <Form>$R *.res</Form>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

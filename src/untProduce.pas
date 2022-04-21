@@ -8,6 +8,7 @@ uses
   System.UITypes,
   System.SysUtils,
   System.Threading,
+  System.Generics.Collections,
   {FMX Units}
   FMX.Objects,
   FMX.Dialogs,
@@ -20,11 +21,16 @@ uses
   FMX.Graphics,
   FMX.Menus,
   {Local Units}
+  untTRegexpSnippets,
   untTypes;
 
 type
   TProduceCached = reference to procedure;
   TCB = reference to procedure;
+  TErrors = array of string;
+  TOnInputValidationSuccess = procedure(const caller: string) of object;
+  TOnInputValidationFailure = procedure(const caller: string;
+    errors: TErrors) of object;
 
   TPopupMenu = class(FMX.Menus.TPopupMenu)
    private
@@ -35,21 +41,37 @@ type
   end; { TProduceCached end }
 
   TProduceName = class(TEdit)
+  private
+  FSnippets: TRegexpSnippets;
+  FErrors: TErrors;
+  procedure validate;
+  procedure handleInputSuccess;
+  procedure handleInputFailure;
   public
     constructor Create(AOwner: TComponent); override;
     procedure handleKey(Sender: TObject; var key: Word; var keyChar: Char;
       Shift: TShiftState);
-  var
+  var { event emitters }
     onValidatedInput: TCB;
+    onInputSuccess: TOnInputValidationSuccess;
+    onInputFailure: TOnInputValidationFailure;
   end; { TProduceName end }
 
   TProduceIncrBy = class(TEdit)
+  private
+  FSnippets: TRegexpSnippets;
+  FErrors: TErrors;
+  procedure validate;
+  procedure handleInputSuccess;
+  procedure handleInputFailure;
   public
     constructor Create(AOwner: TComponent); override;
     procedure handleKey(Sender: TObject; var key: Word; var keyChar: Char;
       Shift: TShiftState);
-  var
+  var { event emitters }
     onValidatedInput: TCB;
+    onInputSuccess: TOnInputValidationSuccess;
+    onInputFailure: TOnInputValidationFailure;
   end; { TProduceIncrBy end }
 
   TDisplayError = class(TLabel)
@@ -81,58 +103,24 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure waitForProduce;
     procedure setFocus(target: TControl = nil);
+
+    { event handlers }
     procedure handleProduceSelected(Sender: TObject);
+    procedure handleInputSuccess(const caller: string);
+    procedure handleInputFailure(const caller: string; errors: TErrors);
 
   var
+    { event emitters }
     onProduceCached: TProduceCached; // cb
+    { properties }
     property isSelected: Boolean read FIsSelected;
     property isCached: Boolean read FIsCached;
 
   end; { TProduce end }
 
 implementation
-uses
-untInputValidation,
-System.Generics.Collections;
-
-type
-GCB = reference to function(const input: string): string;
-GDictCB = TDictionary<string, GCB>;
-
 var
-inputValidations: GDictCB;
-regexpObjects: TDictNameToRegexp;
-
-function generateValidationCallbacks: GDictCB;
-begin
-result := GDictCB.Create;
-try
-//regexpObjects := generateInputValidations(['!iNum', '!rNum']);
-regexpObjects := generateInputValidations(['any']);
-except
-  on E: Exception do showMessage(E.Message);
-end;
-
-for var key in regexpObjects.Keys.ToArray do
-showMessage(key);
-
-// make produceName
-result.Add('produceName', function(const input: string): string
-begin
-regexpObjects['any'].Subject := input;
-if regexpObjects['any'].Match then
-result := 'Wrong input! produce name only accepts integers';
-end);
-
-// make produceIncrBy
-result.Add('produceIncrBy', function(const input: string): string
-begin
-regexpObjects['any'].Subject := input;
-if regexpObjects['any'].Match then
-result := 'Wrong input! incrBy only accepts real and integer numbers';
-end);
-
-end; { generate validation callbacks end }
+regexpSnippets: untTRegexpSnippets.TRegexpSnippets;
 
 procedure TPopupMenu.popup(X, Y: Single);
 begin
@@ -163,6 +151,7 @@ begin
   align := TAlignLayout.Client;
   Enabled := true;
   TextSettings.Font.Size := 18.0;
+  FSnippets := regexpSnippets;
 end; { TProduceName.Create end }
 
 procedure TProduceName.handleKey(Sender: TObject; var key: Word;
@@ -170,6 +159,8 @@ procedure TProduceName.handleKey(Sender: TObject; var key: Word;
 begin
   if not (key.toString = '13') then
     exit;
+  showMessage('validating' + ' ' + self.validate);
+  validate;
   ReadOnly := true;
   OnKeyUp := nil;
   onValidatedInput();
@@ -177,6 +168,27 @@ begin
   // if input valid then fetchstock
   // otherwise produre error
 end; { TProduceName.handleKey end }
+
+procedure TProduceName.validate;
+begin
+var errors: TErrors;
+setLength(errors, 2);
+FSnippets['!iNum'].subject := text;
+if FSnippets['!iNum'].match then
+begin
+errors[0] := 'Wrong input! Name only accepts integers';
+end;
+end; { TProduceName.validate end }
+
+procedure TProduceName.handleInputSuccess;
+begin
+
+end;
+
+procedure TProduceName.handleInputFailure;
+begin
+
+end;
 
 constructor TProduceIncrBy.Create(AOwner: TComponent);
 begin
@@ -189,6 +201,7 @@ begin
   TextSettings.HorzAlign := TTextAlign.Leading;
   Text := '0';
   ReadOnly := true;
+  FSnippets := regexpSnippets;
 end; { TProduceIncrBy.create end }
 
 procedure TProduceIncrBy.handleKey(Sender: TObject; var key: Word;
@@ -204,6 +217,24 @@ begin
   // otherwise produre error
   // cache product should be done here
 end; { TProduceName.handleKey end }
+
+procedure TProduceIncrBy.validate;
+begin
+FSnippets['any'].subject := Text;
+if FSnippets['any'].match then
+result := 'Wrong Input! Amount only accepts real or integer values';
+end; { TProduceIncrBy.validate end }
+
+
+procedure TProduceIncrBy.handleInputSuccess;
+begin
+
+end;
+
+procedure TProduceIncrBy.handleInputFailure;
+begin
+
+end;
 
 constructor TProduce.Create(AOwner: TComponent);
 begin
@@ -230,6 +261,13 @@ begin
   edtProduceName := TProduceName.Create(self);
   edtProduceName.Text := 'haha';
   //edtProduceName.onClick := handleProduceSelected;
+  edtProduceName.onInputSuccess := handleInputSuccess;
+  edtProduceName.onInputFailure := handleInputFailure;
+  edtProduceName.onInputSuccess := procedure
+  begin
+   fetchProduce;
+  end;
+
   edtProduceName.onValidatedInput := procedure
     begin
       fetchProduce;
@@ -271,6 +309,16 @@ begin
     FIsSelected := true;
   end;
 end; { Tstock.handleProduceSelected end }
+
+procedure TProduce.handleInputSuccess(const caller: string);
+begin
+
+end; { TProduce.handleInputSuccess end }
+
+procedure TProduce.handleInputFailure(const caller: string; errors: TErrors);
+begin
+
+end; { TProduce.handleInputFailure end }
 
 procedure TProduce.setFocus(target: TControl = nil);
 begin
@@ -384,57 +432,20 @@ begin
   self.Margins.Bottom := self.Margins.Bottom + 20.0;
 end; { TProduce.displayError end }
 
-
-procedure handleDictionaryRemoval(Sender: TObject; item: GCB;
-action: TCollectionNotification);
-begin
-  if action = cnRemoved then item := nil;
-end;
-
 initialization
 begin
-inputValidations := generateValidationCallbacks;
-showMessage('finished generating callbacks');
+try
+regexpSnippets := TRegexpSnippets.Create;
+regexpSnippets.compileSnippets(['!iNum', 'any']);
+except
+on E: Exception do
+showMessage(E.message);
 end;
+
+end; { initialization end }
 
 finalization
 begin
-
-showMessage('freeing callbacks');
-inputValidations.Clear;
-inputvalidations.Free;
-{
-for var key in inputValidations.Keys.ToArray do
-begin
-showMessage(key);
-showMessage(inputValidations[key]('oeueou'));
-inputValidations[key] := nil;
-//inputValidations[key] := nil;
-//inputValidations.ExtractPair(key);
-//inputValidations.TrimExcess;
+regexpSnippets.free;
 end;
-}
-
-showMessage('freeing objects');
-//regexpObjects.OnValueNotify := @handleDictionaryRemoval;
-regexpObjects.Clear;
-showMessage('made regexps free');
-exit;
-
-for var key in regexpObjects.Keys.ToArray do
-begin
-showMessage(regexpObjects[key].RegEx);
-freeAndNil(regexpObjects[key]);
-end;
-
-showMessage('checking if regexp objects have been nilled');
-for var value in regexpObjects.values.toArray do
-begin
-if assigned(value) then showMessage(value.Subject)
-else showMessage('have not been freed');
-end;
-
-freeAndNil(regexpObjects);
-end;
-
 end.

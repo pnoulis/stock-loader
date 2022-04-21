@@ -7,7 +7,9 @@ uses
   untProduce in 'untProduce.pas',
   untKitchen in 'untKitchen.pas',
   untTypes in 'untTypes.pas',
-  untInputValidation in 'untInputValidation.pas';
+  untTRegexpSnippets in 'regexp-snippets\untTRegexpSnippets.pas',
+  untSnippets in 'regexp-snippets\untSnippets.pas',
+  untInput in 'untInput.pas';
 
 {$R *.res}
 

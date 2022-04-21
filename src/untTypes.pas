@@ -22,6 +22,8 @@ type
     lmargin: single;
   end;
 
+  TErrors = array of string;
+
 implementation
 
 end.
