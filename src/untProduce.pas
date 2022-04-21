@@ -97,38 +97,47 @@ System.Generics.Collections;
 
 type
 GCB = reference to function(const input: string): string;
+GDictCB = TDictionary<string, GCB>;
 
-const
-validations: array[0..1] of string = (
-'!num', '!rnum'
-);
-
-function generateValidationCallbacks: TDictionary<string, GCB>;
 var
-regexpObjects: TListInputValidations;
+inputValidations: GDictCB;
+regexpObjects: TDictNameToRegexp;
+
+function generateValidationCallbacks: GDictCB;
 begin
-result := TDictionary<string, GCB>.Create;
-// make produce name
-regexpObjects := generateInputValidations(['!num']);
+result := GDictCB.Create;
+try
+//regexpObjects := generateInputValidations(['!iNum', '!rNum']);
+regexpObjects := generateInputValidations(['any']);
+except
+  on E: Exception do showMessage(E.Message);
+end;
+
+for var key in regexpObjects.Keys.ToArray do
+showMessage(key);
+
+// make produceName
 result.Add('produceName', function(const input: string): string
 begin
-for var regexp in regexpObjects do
-begin
-
-end;
+regexpObjects['any'].Subject := input;
+if regexpObjects['any'].Match then
+result := 'Wrong input! produce name only accepts integers';
 end);
 
-// make produce incrBy
-regexpObjects := generateInputValidations(['!rnum']);
+// make produceIncrBy
+result.Add('produceIncrBy', function(const input: string): string
+begin
+regexpObjects['any'].Subject := input;
+if regexpObjects['any'].Match then
+result := 'Wrong input! incrBy only accepts real and integer numbers';
+end);
 
-
-
-end;
+end; { generate validation callbacks end }
 
 procedure TPopupMenu.popup(X, Y: Single);
 begin
 onPopup(self);
-end;
+end; { TPopupMenu.popup end }
 
 constructor TDisplayError.Create(AOwner: TComponent);
 begin
@@ -375,8 +384,57 @@ begin
   self.Margins.Bottom := self.Margins.Bottom + 20.0;
 end; { TProduce.displayError end }
 
+
+procedure handleDictionaryRemoval(Sender: TObject; item: GCB;
+action: TCollectionNotification);
+begin
+  if action = cnRemoved then item := nil;
+end;
+
 initialization
 begin
+inputValidations := generateValidationCallbacks;
+showMessage('finished generating callbacks');
+end;
+
+finalization
+begin
+
+showMessage('freeing callbacks');
+inputValidations.Clear;
+inputvalidations.Free;
+{
+for var key in inputValidations.Keys.ToArray do
+begin
+showMessage(key);
+showMessage(inputValidations[key]('oeueou'));
+inputValidations[key] := nil;
+//inputValidations[key] := nil;
+//inputValidations.ExtractPair(key);
+//inputValidations.TrimExcess;
+end;
+}
+
+showMessage('freeing objects');
+//regexpObjects.OnValueNotify := @handleDictionaryRemoval;
+regexpObjects.Clear;
+showMessage('made regexps free');
+exit;
+
+for var key in regexpObjects.Keys.ToArray do
+begin
+showMessage(regexpObjects[key].RegEx);
+freeAndNil(regexpObjects[key]);
+end;
+
+showMessage('checking if regexp objects have been nilled');
+for var value in regexpObjects.values.toArray do
+begin
+if assigned(value) then showMessage(value.Subject)
+else showMessage('have not been freed');
+end;
+
+freeAndNil(regexpObjects);
 end;
 
 end.
