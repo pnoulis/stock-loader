@@ -33,8 +33,6 @@ type
     lblCodeHeader: TLabel;
     lblAmountHeader: TLabel;
     Label1: TLabel;
-    add: TButton;
-    inputValidation: TButton;
 
     { Design Time Event Handlers }
     procedure FormCreate(Sender: TObject);

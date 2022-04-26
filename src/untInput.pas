@@ -1,76 +1,77 @@
 ﻿unit untInput;
 
 interface
-uses
-System.Classes,
-FMX.Edit,
-untTypes,
-untTRegexpSnippets;
 
-type
+ uses
+  System.SysUtils,
+  System.Classes,
+  FMX.Edit,
+  FMX.Menus,
+  untTypes,
+  untTRegexpSnippets;
 
-TInputText = class(TEdit)
- { types }
  type
- TOnInputValidationSuccess = procedure(const caller: string) of object;
- TOnInputValidationFailure = procedure(const caller: string;
- errors: TErrors) of object;
+  TPopupMenu = class(FMX.Menus.TPopupMenu)
+   private
+    FEnabled: Boolean;
+   public
+    procedure Popup(X,Y: Single);override;
+    property Enabled: Boolean read FEnabled write FEnabled;
+  end; { TProduceCached end }
 
- { state }
- private
- FSnippets: TRegexpSnippets;
- FErrors: TErrors;
+  TInputText = class(TEdit)
+    { Interface }
+   public
+    constructor Create(AOwner: TComponent;
+     var snippets: untTRegexpSnippets.TRegexpSnippets);
+    destructor Destroy; override;
+    procedure handleKey(Sender: TObject;var key: Word;var keyChar: Char;
+     Shift: TShiftState);
 
- procedure validate;
- procedure handleInputSuccess;
- procedure handleInputFailure;
+   var // event emitters
+    onInputSuccess: procedure(sender: TInputText) of object;
+    onInputFailure: procedure(sender: TInputText) of object;
 
- { Interface }
- public
- constructor Create(AOwner: TComponent); override;
- procedure handleKey(Sender: TObject; var key: Word; var keyChar: Char;
- Shift: TShiftState);
 
- var  // event emitters
- onInputSuccess: TOnInputValidationSuccess;
- onInputFailure: TOnInputValidationFailure;
-end;
+    FSnippets: TRegexpSnippets;
+    isValid: Boolean;
+    validate: procedure(sender: TInputText);
+    FErrors: TErrors;
+  end;
 
 implementation
-const KEY_ENTER = 13;
 
-constructor TInputText.Create(AOwner: TComponent);
-begin
+ const
+  KEY_ENTER: Word = 13;
 
-end; { TInputText.Create end }
+ procedure TPopupMenu.Popup(X,Y: Single);
+  begin
+   onPopup(self);
+  end; { TPopupMenu.popup end }
 
-procedure TInputText.handleKey(Sender: TObject; var key: Word;
- var keyChar: Char; Shift: TShiftState);
-begin
-if not Key = KEY_ENTER then exit;
-{
-  showMessage('validating' + ' ' + self.validate);
-  validate;
-  ReadOnly := true;
-  OnKeyUp := nil;
-  onValidatedInput();
-  }
-end; { TInputText.handleKey end }
+ constructor TInputText.Create(AOwner: TComponent;
+  var snippets: untTRegexpSnippets.TRegexpSnippets);
+  begin
+   inherited Create(AOwner);
+   FSnippets := snippets;
+  end; { TInputText.Create end }
 
-procedure TInputText.validate;
-begin
+ destructor TInputText.Destroy;
+  begin
+   setLength(FErrors,0);
+   inherited;
+  end;
 
-end; { TInputText.validate end }
+ procedure TInputText.handleKey(Sender: TObject;var key: Word;var keyChar: Char;
+  Shift: TShiftState);
+  begin
+   if not(key = KEY_ENTER) then
+    exit;
+   isValid := true;
+   validate(self);
+   if isValid then onInputSuccess(self)
+   else onInputFailure(self);
 
-procedure TInputText.handleInputSuccess;
-begin
-
-end; { TInputText.handleInputFailure end }
-
-
-procedure TInputText.handleInputFailure;
-begin
-
-end; { TInputText.handleInputFailure end }
+  end; { TInputText.handleKey end }
 
 end.
