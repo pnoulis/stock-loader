@@ -1,0 +1,13 @@
+# emacs random files
+*~undo-tree~
+*#
+
+# delphi rad studio files
+*.delphilsp.json
+*.local
+*.identcache
+__history
+__recovery
+
+# delphi compiler output dir
+build/
