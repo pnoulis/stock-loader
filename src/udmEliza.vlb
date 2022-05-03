@@ -1,0 +1,10 @@
+﻿[driverMSSQL]
+Coordinates=90,1,79,33
+
+[]
+Coordinates=220,10,77,285
+Visible=True
+
+[connection]
+Coordinates=200,1,90,33
+

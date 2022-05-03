@@ -2,7 +2,7 @@
 
 interface
 
-uses
+ uses
   {System Units}
   System.SysUtils,
   System.Types,
@@ -14,102 +14,157 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.Edit,
   FMX.Objects,
+  {Libraries}
+  uDBConnect,
+  uFilesystem,
   {Local Units}
+  udmEliza,
+  uListOrders,
   untKitchen,
   untTypes;
 
-type
+ type
 
   TfrmLoader = class(TForm)
-    { Design Time Visual Components }
-    layoutNewLoad: TLayout;
-    btnNewLoad: TButton;
-    layoutCommitLoad: TFlowLayout;
-    btnCommitLoad: TButton;
-    btnCancelLoad: TButton;
-    btnEditStock: TButton;
-    btnRemoveStock: TButton;
-    layoutStockHeaders: TLayout;
-    lblCodeHeader: TLabel;
-    lblAmountHeader: TLabel;
-    Label1: TLabel;
+   { Design Time Visual Components }
+   layoutNewLoad: TLayout;
+   btnNewLoad: TButton;
+   layoutCommitLoad: TFlowLayout;
+   btnCommitLoad: TButton;
+   btnCancelLoad: TButton;
+   btnEditStock: TButton;
+   btnRemoveStock: TButton;
+   layoutStockHeaders: TLayout;
+   lblCodeHeader: TLabel;
+   lblAmountHeader: TLabel;
+   btnConnect: TButton;
+   lblOrderID: TLabel;
 
-    { Design Time Event Handlers }
-    procedure FormCreate(Sender: TObject);
-    procedure btnNewLoadClick(Sender: TObject);
-    procedure btnCancelLoadClick(Sender: TObject);
-    procedure addClick(Sender: TObject);
+   { Design Time Event Handlers }
+   procedure FormCreate(Sender: TObject);
+   procedure btnNewLoadClick(Sender: TObject);
+   procedure btnCancelLoadClick(Sender: TObject);
+   procedure addClick(Sender: TObject);
+   procedure btnConnectClick(Sender: TObject);
 
-    { Run Time Managed Components }
-  private
+   procedure connectDatabase;
+
+   { Run Time Managed Components }
+   private
     FIsInitFreakout: Boolean;
-  public
+   public
+    listOrder: uListOrders.TListOrders;
     FKitchen: untKitchen.TKitchen;
     FDimensions: untTypes.TDimensions;
   end; { TFrmLoader end }
 
-var
+ var
   frmLoader: TfrmLoader;
 
 implementation
 
-{$R *.fmx}
+ {$R *.fmx}
 
-procedure TfrmLoader.addClick(Sender: TObject);
-begin
-self.FKitchen.handleNewOrder;
-end;
+ procedure TfrmLoader.addClick(Sender: TObject);
+  begin
+   // self.FKitchen.handleNewOrder;
+  end;
 
-procedure TfrmLoader.btnCancelLoadClick(Sender: TObject);
-begin
-  layoutCommitLoad.visible := false;
-  layoutStockHeaders.visible := false;
-  layoutNewLoad.visible := true;
-  FKitchen.handleCancelOrder;
-end;
+ procedure TfrmLoader.btnCancelLoadClick(Sender: TObject);
+  begin
+   layoutCommitLoad.visible := false;
+   layoutStockHeaders.visible := false;
+   layoutNewLoad.visible := true;
+   FKitchen.handleCancelOrder;
+   self.listOrder := uListOrders.TListOrders.Create(frmLoader);
+   frmLoader.AddObject(listOrder);
+   listOrder.fill;
+  end;
 
-procedure TfrmLoader.btnNewLoadClick(Sender: TObject);
-begin
-  layoutNewLoad.visible := false;
-  layoutCommitLoad.visible := true;
-  layoutStockHeaders.visible := true;
-  FKitchen.handleNewOrder;
+ procedure TfrmLoader.btnConnectClick(Sender: TObject);
+  begin
+   {
+     try
+     except
+     on E: Exception do
+     showMessage(E.message);
+     end;
+   }
+   self.listOrder := uListOrders.TListOrders.Create(frmLoader);
+   frmLoader.AddObject(listOrder);
+   listOrder.fill;
+  end;
 
-  // when 2nd layout becomes visible delphi draws lines
-  // where it shouldnt. Thread is instructed to redraw the
-  // canvas. Why not redraw it from within the event?
-  // Because lovely click event blocks redrawing.
-  // After initial fix delphi seems to deal with it.
-  if not FIsInitFreakout then
+ procedure TfrmLoader.btnNewLoadClick(Sender: TObject);
+  begin
+   layoutNewLoad.visible := false;
+   layoutCommitLoad.visible := true;
+   layoutStockHeaders.visible := true;
+   listOrder.Free;
+   FKitchen.handleNewOrder(dmEliza.currentOrderID);
+   self.lblOrderID.Text := 'arithmos:' + (dmEliza.currentOrderID + 1).tostring;
+
+   // when 2nd layout becomes visible delphi draws lines
+   // where it shouldnt. Thread is instructed to redraw the
+   // canvas. Why not redraw it from within the event?
+   // Because lovely click event blocks redrawing.
+   // After initial fix delphi seems to deal with it.
+   if not FIsInitFreakout then
     TThread.CreateAnonymousThread(
       procedure
       begin
-      sleep(100);
-        TThread.Synchronize(nil,
-          procedure
-          begin
-            self.Recreate;
-          end);
+       sleep(100);
+       TThread.Synchronize(nil,
+         procedure
+         begin
+          self.Recreate;
+         end);
       end).Start;
 
-  FIsInitFreakout := true;
-end;
+   FIsInitFreakout := true;
+  end;
 
-procedure TfrmLoader.FormCreate(Sender: TObject);
-begin
-  // Initializing Dimenions
-  FDimensions.clientWidth := clientWidth;
-  FDimensions.clientHeight := clientHeight;
+ procedure TfrmLoader.FormCreate(Sender: TObject);
+  begin
+   // Initializing Dimenions
+   FDimensions.clientWidth := clientWidth;
+   FDimensions.clientHeight := clientHeight;
 
-  // Initializing Container
-  FKitchen := TKitchen.Create(self, FDimensions);
+   // Initializing Container
+   FKitchen := TKitchen.Create(self, FDimensions);
 
-  // Events
-  btnEditStock.OnClick := FKitchen.handleEditProduce;
-  btnRemoveStock.OnClick := FKitchen.handleCancelProduce;
+   // Events
+   btnEditStock.OnClick := FKitchen.handleEditProduce;
+   btnRemoveStock.OnClick := FKitchen.handleCancelProduce;
 
-  self.AddObject(FKitchen);
-end; { TFrmLoader.FormCreate end }
+   self.AddObject(FKitchen);
+   // connect to database
+   try
+    self.connectDatabase;
+   except
+    on E: Exception do
+     showMessage(E.message);
+   end;
+  end; { TFrmLoader.FormCreate end }
 
+ procedure TfrmLoader.connectDatabase;
+  begin
+   if not Assigned(udmEliza.dmEliza) then
+    TThread.CreateAnonymousThread(
+     procedure
+      begin
+       sleep(1000);
+       TThread.Synchronize(nil,
+         procedure
+         begin
+          frmLoader.connectDatabase;
+         end);
+      end).Start
+   else
+    udmEliza.dmEliza.connect;
+  end;
+
+ begin
+  uFilesystem.anchorProjectRoot('stock-loader');
 
 end.

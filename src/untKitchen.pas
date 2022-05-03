@@ -36,7 +36,7 @@ type
     procedure handleEditProduce(Sender: TObject);
     procedure handleCancelProduce(Sender: TObject);
     procedure handleCancelOrder;
-    procedure handleNewOrder;
+    procedure handleNewOrder(const orderID: uInt32);
   end; { TKitchen end }
 
 implementation
@@ -91,7 +91,7 @@ begin
     self.components[i].Free;
 end; { TKitchen.handleCancelOrder end }
 
-procedure TKitchen.handleNewOrder;
+procedure TKitchen.handleNewOrder(const orderID: uInt32);
 begin
   addProduce;
 end; { TKitchen.handleNewOrder end }

@@ -1,0 +1,7 @@
+* DONE connect to database
+CLOSED: [2022-05-03 Tue 12:11]
+if some error occurs then user should be notified.
+means read a configuration file
+
+* have the ability to select an order to fullfill
+* create a tabbed ui where each order new or old fill a new tab
