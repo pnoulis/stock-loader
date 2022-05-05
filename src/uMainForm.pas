@@ -12,9 +12,11 @@ interface
   TmainForm = class(TForm)
    GridLayout1: TGridLayout;
    btnTestUDBConnection: TMemo;
-    btnTestUFilesystem: TMemo;
+   btnTestUFilesystem: TMemo;
+   btnTestUTabs: TMemo;
    procedure btnTestUDBConnectionClick(Sender: TObject);
-    procedure btnTestUFilesystemClick(Sender: TObject);
+   procedure btnTestUFilesystemClick(Sender: TObject);
+   procedure btnTestUTabsClick(Sender: TObject);
    private
     { Private declarations }
    public
@@ -25,20 +27,27 @@ interface
   mainForm: TmainForm;
 
 implementation
+
  uses
+  test.uTabs,
   test.uDBConnect,
   test.uFilesystem;
  {$R *.fmx}
 
  procedure TmainForm.btnTestUDBConnectionClick(Sender: TObject);
   begin
-  test.uDBConnect.testUDBconnect.Show;
+   test.uDBConnect.testUDBconnect.Show;
   end;
 
-procedure TmainForm.btnTestUFilesystemClick(Sender: TObject);
-begin
+ procedure TmainForm.btnTestUFilesystemClick(Sender: TObject);
+  begin
 
-test.uFilesystem.testUFilesystem.Show;
-end;
+   test.uFilesystem.testUFilesystem.Show;
+  end;
+
+ procedure TmainForm.btnTestUTabsClick(Sender: TObject);
+  begin
+   test.uTabs.testUTabs.Show;
+  end;
 
 end.
