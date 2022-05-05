@@ -1,11 +1,12 @@
 object TStyleContainer
   object TLayout
-    StyleName = 'TabItemStyle'
+    StyleName = 'tabItemClose'
     Align = Center
     Cursor = crHandPoint
     Size.Width = 69.000000000000000000
     Size.Height = 26.000000000000000000
     Size.PlatformDefault = False
+    Visible = False
     TabOrder = 63
     object TTabStyleObject
       StyleName = 'top'
