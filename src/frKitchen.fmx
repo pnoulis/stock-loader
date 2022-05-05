@@ -1,0 +1,33 @@
+object kitchen: Tkitchen
+  Align = Client
+  Size.Width = 555.000000000000000000
+  Size.Height = 519.000000000000000000
+  Size.PlatformDefault = False
+  object passTab: TTabControl
+    Align = Client
+    Size.Width = 555.000000000000000000
+    Size.Height = 519.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = PlatformDefault
+    Sizes = (
+      555s
+      493s)
+    object passLog: TTabItem
+      Cursor = crHandPoint
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 89.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = #928#945#961#945#947#954#949#955#953#949#962
+      ExplicitSize.cx = 89.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+    end
+  end
+end

@@ -1,0 +1,36 @@
+object mainForm: TmainForm
+  Left = 0
+  Top = 0
+  Caption = 'stockLoader'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Layout1: TLayout
+    Align = Horizontal
+    Position.Y = 130.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Label1: TLabel
+      Align = Client
+      Size.Width = 640.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'Loading'
+      TabOrder = 0
+    end
+  end
+  object AniIndicator1: TAniIndicator
+    Align = Center
+    Enabled = True
+    Size.Width = 113.000000000000000000
+    Size.Height = 103.000000000000000000
+    Size.PlatformDefault = False
+  end
+end

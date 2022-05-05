@@ -21,7 +21,7 @@ interface
   udmEliza,
   uListOrders,
   untKitchen,
-  untTypes;
+  untTypes, FMX.TabControl;
 
  type
 
@@ -39,6 +39,18 @@ interface
    lblAmountHeader: TLabel;
    btnConnect: TButton;
    lblOrderID: TLabel;
+    StyleBook1: TStyleBook;
+    TabControl1: TTabControl;
+    TabItem1: TTabItem;
+    Layout1: TLayout;
+    Button1: TButton;
+    FlowLayout1: TFlowLayout;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    Button5: TButton;
+    Label1: TLabel;
+    btnShowFrame: TButton;
 
    { Design Time Event Handlers }
    procedure FormCreate(Sender: TObject);
@@ -46,8 +58,6 @@ interface
    procedure btnCancelLoadClick(Sender: TObject);
    procedure addClick(Sender: TObject);
    procedure btnConnectClick(Sender: TObject);
-
-   procedure connectDatabase;
 
    { Run Time Managed Components }
    private
@@ -138,31 +148,7 @@ implementation
    btnRemoveStock.OnClick := FKitchen.handleCancelProduce;
 
    self.AddObject(FKitchen);
-   // connect to database
-   try
-    self.connectDatabase;
-   except
-    on E: Exception do
-     showMessage(E.message);
-   end;
   end; { TFrmLoader.FormCreate end }
-
- procedure TfrmLoader.connectDatabase;
-  begin
-   if not Assigned(udmEliza.dmEliza) then
-    TThread.CreateAnonymousThread(
-     procedure
-      begin
-       sleep(1000);
-       TThread.Synchronize(nil,
-         procedure
-         begin
-          frmLoader.connectDatabase;
-         end);
-      end).Start
-   else
-    udmEliza.dmEliza.connect;
-  end;
 
  begin
   uFilesystem.anchorProjectRoot('stock-loader');

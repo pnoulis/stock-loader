@@ -1,0 +1,63 @@
+object Pass: TPass
+  Size.Width = 533.000000000000000000
+  Size.Height = 454.000000000000000000
+  Size.PlatformDefault = False
+  object Layout1: TLayout
+    Align = Top
+    ClipChildren = True
+    ClipParent = True
+    Size.Width = 533.000000000000000000
+    Size.Height = 62.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object Button1: TButton
+      Align = Left
+      AutoTranslate = False
+      Cursor = crHandPoint
+      EnableDragHighlight = False
+      StyledSettings = [FontColor]
+      Size.Width = 113.000000000000000000
+      Size.Height = 62.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = #925#949#945' '#917#947#947#961#945#966#951
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+    end
+  end
+  object Button2: TButton
+    Position.X = 384.000000000000000000
+    Position.Y = 22.000000000000000000
+    TabOrder = 2
+    Text = 'Button2'
+    OnClick = Button2Click
+  end
+  object Layout2: TLayout
+    Align = Top
+    Position.Y = 62.000000000000000000
+    Size.Width = 533.000000000000000000
+    Size.Height = 59.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object Label1: TLabel
+      Align = Left
+      Size.Width = 153.000000000000000000
+      Size.Height = 59.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'arithmos paragkelias'
+      TabOrder = 0
+    end
+    object Label2: TLabel
+      Align = Right
+      Position.X = 352.000000000000000000
+      Size.Width = 181.000000000000000000
+      Size.Height = 59.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'imerominia ekdosis'
+      TabOrder = 1
+    end
+  end
+end

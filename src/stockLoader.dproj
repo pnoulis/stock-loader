@@ -245,29 +245,41 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="frmStockLoader.pas">
-            <Form>frmLoader</Form>
-        </DCCReference>
         <DCCReference Include="untProduce.pas"/>
         <DCCReference Include="untKitchen.pas"/>
         <DCCReference Include="untTypes.pas"/>
         <DCCReference Include="regexp-snippets\untTRegexpSnippets.pas"/>
-        <DCCReference Include="regexp-snippets\untSnippets.pas">
-            <Form>,
-  untInput in &apos;untInput.pas&apos;,
-  uDBConnect in &apos;..\lib\delphi-utils\src\uDBConnect.pas&apos;,
-  uFilesystem in &apos;..\lib\delphi-utils\src\uFilesystem.pas&apos;,
-  udmEliza in &apos;udmEliza.pas&apos; {dmEliza</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
+        <DCCReference Include="regexp-snippets\untSnippets.pas"/>
         <DCCReference Include="untInput.pas"/>
         <DCCReference Include="..\lib\delphi-utils\src\uDBConnect.pas"/>
         <DCCReference Include="..\lib\delphi-utils\src\uFilesystem.pas"/>
+        <DCCReference Include="uListOrders.pas"/>
+        <DCCReference Include="frmStockLoader.pas">
+            <Form>frmLoader</Form>
+        </DCCReference>
         <DCCReference Include="udmEliza.pas">
             <Form>dmEliza</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="uListOrders.pas"/>
+        <DCCReference Include="frPass.pas">
+            <Form>Pass</Form>
+            <FormType>fmx</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="foMain.pas">
+            <Form>mainForm</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="frKitchen.pas">
+            <Form>kitchen</Form>
+            <FormType>fmx</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="frOrder.pas">
+            <Form>Order</Form>
+            <FormType>fmx</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

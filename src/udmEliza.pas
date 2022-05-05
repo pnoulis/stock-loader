@@ -17,6 +17,8 @@ type
    moveDate: string;
   end;
 
+  TOnConnected = reference to procedure;
+
   TListOrder = array of TOrder;
 
   TdmEliza = class(TDataModule)
@@ -28,8 +30,11 @@ type
   public
     { Public declarations }
     currentOrderID: uint32;
-    procedure connect;
+    procedure connect(cb: TOnConnected);
     function getOrders: TListOrder;
+  var
+  isConnected: Boolean;
+
   end;
 
 var
@@ -41,14 +46,18 @@ implementation
 
 {$R *.dfm}
 
-procedure TdmEliza.connect;
+procedure TdmEliza.connect(cb: TOnConnected);
 begin
- if connection.Connected then exit;
+ if connection.Connected then begin
+ cb();
+ exit;
+ end;
+
  try
  uDBConnect.setupDBconn(connection, 'DBCONN_MSSQL', '.\config\config.ini');
 // tableStockMovesLog.IndexFieldNames := 'moveDate:D';
 // tableStockMovesLog.Active := true;
- showMessage('database connected');
+ cb();
  except
  raise;
  end;
