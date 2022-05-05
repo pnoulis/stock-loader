@@ -40,8 +40,8 @@ object mainForm: TmainForm
       Size.PlatformDefault = False
       TabOrder = 2
       OnClick = btnTestUDBConnectionClick
-      Viewport.Width = 200.000000000000000000
-      Viewport.Height = 80.000000000000000000
+      Viewport.Width = 196.000000000000000000
+      Viewport.Height = 76.000000000000000000
     end
     object btnTestUFilesystem: TMemo
       Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
@@ -65,8 +65,8 @@ object mainForm: TmainForm
       Size.PlatformDefault = False
       TabOrder = 1
       OnClick = btnTestUFilesystemClick
-      Viewport.Width = 200.000000000000000000
-      Viewport.Height = 80.000000000000000000
+      Viewport.Width = 196.000000000000000000
+      Viewport.Height = 76.000000000000000000
     end
     object btnTestUTabs: TMemo
       Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
@@ -90,8 +90,8 @@ object mainForm: TmainForm
       Size.PlatformDefault = False
       TabOrder = 0
       OnClick = btnTestUTabsClick
-      Viewport.Width = 200.000000000000000000
-      Viewport.Height = 80.000000000000000000
+      Viewport.Width = 196.000000000000000000
+      Viewport.Height = 76.000000000000000000
     end
   end
 end
