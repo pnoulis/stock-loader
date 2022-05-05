@@ -29,25 +29,29 @@ object testUTabs: TtestUTabs
         item
         end>
       IsSelected = False
-      Size.Width = 149.000000000000000000
+      Size.Width = 69.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'TabItem1Style1'
       TabOrder = 0
       Text = 'TabItem1'
       OnMouseUp = TabItem1MouseUp
+      ExplicitSize.cx = 149.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
     end
     object TabItem2: TTabItem
       CustomIcon = <
         item
         end>
       IsSelected = True
-      Size.Width = 149.000000000000000000
+      Size.Width = 69.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
-      StyleLookup = ''
+      StyleLookup = 'tabItemClose'
       TabOrder = 0
       Text = 'TabItem2'
+      ExplicitSize.cx = 149.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
     end
   end
   object btnAddTab: TButton
@@ -65,9 +69,9 @@ object testUTabs: TtestUTabs
       item
         Platform = 'Windows 10 Desktop'
         ResourcesBin = {
-          464D585F5354594C4520322E3501060C5461624974656D5374796C6503E22A00
-          5450463007544C61796F757400095374796C654E616D65060C5461624974656D
-          5374796C6505416C69676E070643656E74657206437572736F72070B63724861
+          464D585F5354594C4520322E3501060C7461624974656D436C6F736503E22A00
+          5450463007544C61796F757400095374796C654E616D65060C7461624974656D
+          436C6F736505416C69676E070643656E74657206437572736F72070B63724861
           6E64506F696E740A53697A652E576964746805000000000000008A05400B5369
           7A652E4865696768740500000000000000D003401453697A652E506C6174666F
           726D44656661756C7408085461624F72646572023F000F545461625374796C65
