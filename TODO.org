@@ -5,3 +5,8 @@ means read a configuration file
 
 * have the ability to select an order to fullfill
 * create a tabbed ui where each order new or old fill a new tab
+the first tab cannot be closed and always displays the same body
+every tab that opens is attached with event handlers to delete the tab
+a tab can only be deleted if all of its produce has been commited
+a tab that displays a yesterday's order cannot have its produce edited.
+If a tab displayes a todays order it can be edited.

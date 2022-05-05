@@ -260,6 +260,11 @@
             <Form>testUFilesystem</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="uTabs.pas"/>
+        <DCCReference Include="..\tests\test.uTabs.pas">
+            <Form>testUTabs</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

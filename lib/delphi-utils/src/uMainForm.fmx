@@ -38,7 +38,7 @@ object mainForm: TmainForm
       Size.Width = 200.000000000000000000
       Size.Height = 80.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
+      TabOrder = 2
       OnClick = btnTestUDBConnectionClick
       Viewport.Width = 200.000000000000000000
       Viewport.Height = 80.000000000000000000
@@ -63,8 +63,33 @@ object mainForm: TmainForm
       Size.Width = 200.000000000000000000
       Size.Height = 80.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 0
+      TabOrder = 1
       OnClick = btnTestUFilesystemClick
+      Viewport.Width = 200.000000000000000000
+      Viewport.Height = 80.000000000000000000
+    end
+    object btnTestUTabs: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Lines.Strings = (
+        'test'
+        'uTabs')
+      ReadOnly = True
+      ShowScrollBars = False
+      StyledSettings = [FontColor]
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      Align = Contents
+      Cursor = crHandPoint
+      EnabledScroll = False
+      Size.Width = 200.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      OnClick = btnTestUTabsClick
       Viewport.Width = 200.000000000000000000
       Viewport.Height = 80.000000000000000000
     end
