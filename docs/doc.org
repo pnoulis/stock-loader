@@ -1,9 +1,9 @@
 * Architecture
 mainForm
 kitchen
-pass
-order
-produce
+Pass
+Order
+Produce
 
 ** Kitchen
 Kitchen is the central interface by means of which the program can perform its
@@ -15,17 +15,16 @@ As such it is the one that enables events stemming from one component to flow
 through its subcomponent tree to any possible listeners and achive the intented
 effect.
 
-Its functions are:
+Its functions are amongst others:
 
-1) To monitor the creation of orders served or to be served and the various
-   conditions that should be met.
-2) To make sure that the application is safely closed and opens 
+1) To *monitor* the creation of orders served or currently being served and the
+   various *conditions* that should be met.
+2) To make sure that the application is terminated under a *satisfactory state*
       
-** pass
-pass serves 3 main functions.
+** Pass
+pass serves 3 main functions:
 
-1) To *list* all orders; served and currently served orders as a means of having
-   a quick summary of the state of the kitchen.
+1) To *list* all orders; served and currently being served orders as a means of
+   having a quick summary of the state of the kitchen.
 2) To *generate* new orders
 3) To *inspect* served and currently being served orders.
-

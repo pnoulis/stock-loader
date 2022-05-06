@@ -27,8 +27,10 @@ interface
     frmKichen: frKitchen.Tkitchen;
     kitchen: frKitchen.Tkitchen;
     procedure handleDBConnected;
+    procedure handleDBConnectionError(const errMsg: string);
   end;
 
+  TCB = procedure;
  var
   mainForm: TmainForm;
 
@@ -41,9 +43,9 @@ implementation
    TThread.CreateAnonymousThread(
      procedure
      begin
-      // sleep(3000);
-      // label1.Text := 'Connected !!!';
-      // sleep(3000);
+      {$IFDEF RELEASE}
+      sleep(3000);
+      {$ENDIF}
       TThread.Synchronize(nil,
         procedure
         begin
@@ -56,13 +58,22 @@ implementation
      end).Start;
   end;
 
- procedure TmainForm.FormCreate(Sender: TObject);
+procedure TmainForm.handleDBConnectionError(const errMsg: string);
+begin
+label1.Text := 'Failed to connect to database';
+AniIndicator1.enabled := false;
+aniindicator1.Visible := false;
+showMessage(errMsg);
+end;
+
+procedure TmainForm.FormCreate(Sender: TObject);
   begin
    if not assigned(udmEliza.dmEliza) then
     udmEliza.dmEliza := udmEliza.TdmEliza.Create(self);
-
+    dmEliza.onConnected := self.handleDBConnected;
+    dmEliza.onConnectionError := self.handleDBConnectionError;
+    dmEliza.connect;
    try
-    dmEliza.connect(handleDBConnected);
    except
     on E: Exception do
      showMessage(E.message);

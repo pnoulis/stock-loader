@@ -3,6 +3,7 @@ unit untTypes;
 interface
 
 uses
+  System.Threading,
   System.RegularExpressionsCore,
   System.Generics.Collections;
 
@@ -23,7 +24,29 @@ type
   end;
 
   TErrors = array of string;
+  TAsyncCB = reference to procedure;
+
+procedure runAsync(const cb: TAsyncCB; const delay: UInt32 = 0);
 
 implementation
+
+uses
+  System.SysUtils,
+  System.Classes;
+
+procedure runAsync(const cb: TAsyncCB; const delay: UInt32 = 0);
+begin
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+      if delay > 0 then
+        sleep(delay);
+        cb();
+      TThread.Synchronize(nil,
+        procedure
+        begin
+        end);
+    end).Start;
+end;
 
 end.

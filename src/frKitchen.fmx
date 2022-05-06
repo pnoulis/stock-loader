@@ -1,19 +1,19 @@
 object kitchen: Tkitchen
   Align = Client
-  Size.Width = 555.000000000000000000
-  Size.Height = 519.000000000000000000
+  Size.Width = 556.000000000000000000
+  Size.Height = 520.000000000000000000
   Size.PlatformDefault = False
   object passTab: TTabControl
     Align = Client
-    Size.Width = 555.000000000000000000
-    Size.Height = 519.000000000000000000
+    Size.Width = 556.000000000000000000
+    Size.Height = 520.000000000000000000
     Size.PlatformDefault = False
     TabIndex = 0
     TabOrder = 0
     TabPosition = PlatformDefault
     Sizes = (
-      555s
-      493s)
+      556s
+      494s)
     object passLog: TTabItem
       Cursor = crHandPoint
       CustomIcon = <
