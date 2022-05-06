@@ -18,7 +18,7 @@ interface
   uDBConnect,
   uFilesystem,
   {Local Units}
-  udmEliza,
+  udmServerMSSQL,
   uListOrders,
   untKitchen,
   untTypes, FMX.TabControl;
@@ -111,8 +111,8 @@ implementation
    layoutCommitLoad.visible := true;
    layoutStockHeaders.visible := true;
    listOrder.Free;
-   FKitchen.handleNewOrder(dmEliza.currentOrderID);
-   self.lblOrderID.Text := 'arithmos:' + (dmEliza.currentOrderID + 1).tostring;
+   FKitchen.handleNewOrder(db.currentOrderID);
+   self.lblOrderID.Text := 'arithmos:' + (db.currentOrderID + 1).tostring;
 
    // when 2nd layout becomes visible delphi draws lines
    // where it shouldnt. Thread is instructed to redraw the

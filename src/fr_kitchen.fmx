@@ -1,0 +1,6 @@
+object frKitchen: TfrKitchen
+  Align = Client
+  Size.Width = 556.000000000000000000
+  Size.Height = 520.000000000000000000
+  Size.PlatformDefault = False
+end

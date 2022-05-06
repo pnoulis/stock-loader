@@ -20,7 +20,7 @@ interface
   FMX.Graphics,
   FMX.Menus,
   {Local Units}
-  udmEliza;
+  udmServerMSSQL;
 
  type
   TListOrders = class(TVertScrollBox)
@@ -97,7 +97,7 @@ implementation
    aOrder: TRectangle;
   begin
    var
-   orders := udmEliza.dmEliza.getOrders;
+   orders := udmServerMSSQL.db.getOrders;
    var
    i := 1;
 

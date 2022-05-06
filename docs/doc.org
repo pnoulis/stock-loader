@@ -1,26 +1,55 @@
 * Architecture
-mainForm
+MainForm
 kitchen
 Pass
 Order
 Produce
 
+** MainForm
+The MainForm is responsible for bootstrapping the application.
+
+Bootstrapping in this programs case primarily means to connect to a database and
+manage any other such dependency.
+
+The application has provisions in place to manage both a production and
+development environvment which delphi names *DEBUG* and *RELEASE*.
+
+If the production database fails to connect for any reason the application
+allows the user to use the development database for the current session.
+
+The development database is itself a docker image.
+
+The database saves its state after every session and will only flush its
+contents and start fresh after user instruction.
+
+If the application is succefull at establishing a connection with the database
+either development or production it will submit control over to Kitchen which is
+a TFrame.
+
 ** Kitchen
 Kitchen is the central interface by means of which the program can perform its
 tasks.
 
-It is the root of all other compnoents other than the mainForm.
-
-As such it is the one that enables events stemming from one component to flow
-through its subcomponent tree to any possible listeners and achive the intented
-effect.
+It is the root of all other compnoents.
 
 Its functions are amongst others:
 
 1) To *monitor* the creation of orders served or currently being served and the
    various *conditions* that should be met.
 2) To make sure that the application is terminated under a *satisfactory state*
-      
+
+The kitchen it divided into two main components. A TFrame and a TTabControl.
+Respectively named frKitchen and TKitchen.
+
+frKitchen is used primarily as storage of styles and other supplementary
+material.
+
+TKitchen is the main controller of the application. It controls interaction
+between the various components directing events back and forth between them.
+
+Its first task is to fetch persisted orders from the database after which the
+*Pass* will be rendered provided with any required data.
+
 ** Pass
 pass serves 3 main functions:
 
@@ -28,3 +57,12 @@ pass serves 3 main functions:
    having a quick summary of the state of the kitchen.
 2) To *generate* new orders
 3) To *inspect* served and currently being served orders.
+** Order
+Orders can be in 3 states as far as parent components are concerned such as
+*Pass* and *Kitchen*.
+
+1) served orders
+2) commited orders
+3) scratchpad orders
+
+** Produce

@@ -1,22 +1,21 @@
-object dmEliza: TdmEliza
-  Height = 600
-  Width = 800
-  PixelsPerInch = 120
+object dmServerMSSQL: TdmServerMSSQL
+  Height = 480
+  Width = 640
   object connection: TFDConnection
     LoginPrompt = False
-    Left = 40
-    Top = 20
+    Left = 32
+    Top = 16
   end
   object driverMSSQL: TFDPhysMSSQLDriverLink
-    Left = 40
-    Top = 110
+    Left = 32
+    Top = 88
   end
   object tableStockMovesLog: TFDTable
     Connection = connection
     FetchOptions.AssignedValues = [evRecordCountMode]
     FetchOptions.RecordCountMode = cmTotal
     TableName = 'eliza.dbo.stockMovesLog'
-    Left = 210
-    Top = 20
+    Left = 168
+    Top = 16
   end
 end
