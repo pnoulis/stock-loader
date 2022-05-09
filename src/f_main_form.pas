@@ -16,6 +16,9 @@ interface
    Layout1: TLayout;
    AniIndicator1: TAniIndicator;
    Label1: TLabel;
+    Button1: TButton;
+    StyleBook1: TStyleBook;
+    Panel1: TPanel;
    procedure FormCreate(Sender: TObject);
    private
     procedure connectDB;

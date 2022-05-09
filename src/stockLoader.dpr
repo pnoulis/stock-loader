@@ -9,7 +9,6 @@ uses
   untInput in 'untInput.pas',
   uDBConnect in '..\lib\delphi-utils\src\uDBConnect.pas',
   uFilesystem in '..\lib\delphi-utils\src\uFilesystem.pas',
-  uListOrders in 'uListOrders.pas',
   System.StartUpCopy,
   FMX.Forms,
   frmStockLoader in 'frmStockLoader.pas' {frmLoader},
@@ -18,7 +17,8 @@ uses
   f_main_form in 'f_main_form.pas' {mainForm},
   fr_kitchen in 'fr_kitchen.pas' {frKitchen: TFrame},
   fr_order in 'fr_order.pas' {Order: TFrame},
-  u_kitchen in 'u_kitchen.pas';
+  u_kitchen in 'u_kitchen.pas',
+  u_order in 'u_order.pas';
 
 {$R *.res}
 

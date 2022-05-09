@@ -19,7 +19,6 @@ interface
   uFilesystem,
   {Local Units}
   udmServerMSSQL,
-  uListOrders,
   untKitchen,
   untTypes, FMX.TabControl;
 
@@ -63,7 +62,6 @@ interface
    private
     FIsInitFreakout: Boolean;
    public
-    listOrder: uListOrders.TListOrders;
     FKitchen: untKitchen.TKitchen;
     FDimensions: untTypes.TDimensions;
   end; { TFrmLoader end }
@@ -86,9 +84,6 @@ implementation
    layoutStockHeaders.visible := false;
    layoutNewLoad.visible := true;
    FKitchen.handleCancelOrder;
-   self.listOrder := uListOrders.TListOrders.Create(frmLoader);
-   frmLoader.AddObject(listOrder);
-   listOrder.fill;
   end;
 
  procedure TfrmLoader.btnConnectClick(Sender: TObject);
@@ -100,9 +95,6 @@ implementation
      showMessage(E.message);
      end;
    }
-   self.listOrder := uListOrders.TListOrders.Create(frmLoader);
-   frmLoader.AddObject(listOrder);
-   listOrder.fill;
   end;
 
  procedure TfrmLoader.btnNewLoadClick(Sender: TObject);
@@ -110,7 +102,6 @@ implementation
    layoutNewLoad.visible := false;
    layoutCommitLoad.visible := true;
    layoutStockHeaders.visible := true;
-   listOrder.Free;
    FKitchen.handleNewOrder(db.currentOrderID);
    self.lblOrderID.Text := 'arithmos:' + (db.currentOrderID + 1).tostring;
 

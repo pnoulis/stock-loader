@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls;
 
 type
-  TOrder = class(TFrame)
+  FOrder = class(TFrame)
   private
     { Private declarations }
   public

@@ -1,5 +1,10 @@
 object Order: TOrder
-  Size.Width = 320.000000000000000000
-  Size.Height = 240.000000000000000000
-  Size.PlatformDefault = False
+  Left = 0
+  Top = 0
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  DesignerMasterStyle = 0
 end

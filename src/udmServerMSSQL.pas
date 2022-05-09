@@ -3,7 +3,6 @@
 interface
 
 uses
- untTypes,
  FMX.Forms,
  uDBConnect,
  FMX.dialogs,
@@ -33,16 +32,9 @@ uses
  FireDAC.Phys.MSSQL,
  FireDAC.VCLUI.Wait;
 
-type
- TOrder = record
-  moveID: uint32;
-  moveDate: string;
- end;
-
+ type
  TOnConnected = reference to procedure;
  TOnConnectionError = procedure(const errMsg: string) of object;
-
- TListOrder = array of TOrder;
 
  TdmServerMSSQL = class(TDataModule)
   connection: TFDConnection;
@@ -54,7 +46,6 @@ type
   onConnectionError: TOnConnectionError;
   currentOrderID: uint32;
   procedure connect;
-  function getOrders: TListOrder;
  end;
 
 var
@@ -117,43 +108,6 @@ procedure TdmServerMSSQL.connect;
        end);
 
     end).Start;
- end;
-
-function TdmServerMSSQL.getOrders: TListOrder;
- begin
-  var
-   today: string;
-  var
-   orders: TListOrder;
-  var
-   i: uint32 := 0;
-
-  tableStockMovesLog.IndexFieldNames := 'moveDate:D';
-  tableStockMovesLog.Active := true;
-  setLength(orders, tableStockMovesLog.RecordCount);
-  // dateTimeToString(today, 'yyyy-mm-dd', system.sysutils.date);
-  // var formatedToday: string;
-  // dateTimeToString(formatedToday, 'dddddd', system.sysutils.date);
-  // showMessage(today + ' ');
-  // showMessage(tableStockMovesLog.RecordCount.toString);
-
-  for var field in tableStockMovesLog.fields do
-   begin
-    showMessage(field.FullName);
-    // showMessage(field.AsString);
-    showMessage(field.Value);
-   end;
-
-  while not tableStockMovesLog.eof do
-   begin
-    orders[i].moveID := tableStockMovesLog.FieldByName('moveID').Value;
-    orders[i].moveDate := tableStockMovesLog.FieldByName('moveDate').Value;
-    tableStockMovesLog.Next;
-    Inc(i);
-   end;
-  self.currentOrderID := length(orders);
-  tableStockMovesLog.Close;
-  result := orders;
  end;
 
 begin
