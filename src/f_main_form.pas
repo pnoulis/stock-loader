@@ -9,7 +9,8 @@ interface
   system.Threading, system.SysUtils, system.Types,
   system.UITypes, system.Classes, system.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts;
+  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.Memo.Types,
+  FMX.ScrollBox, FMX.Memo;
 
  type
   TmainForm = class(TForm)
@@ -19,6 +20,7 @@ interface
     Button1: TButton;
     StyleBook1: TStyleBook;
     Panel1: TPanel;
+    Memo1: TMemo;
    procedure FormCreate(Sender: TObject);
    private
     procedure connectDB;

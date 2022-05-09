@@ -66,3 +66,5 @@ Orders can be in 3 states as far as parent components are concerned such as
 3) scratchpad orders
 
 ** Produce
+* color
+#FFE0E0E0

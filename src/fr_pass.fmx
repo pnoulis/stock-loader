@@ -1,32 +1,32 @@
 object Pass: TPass
-  Size.Width = 752.000000000000000000
-  Size.Height = 648.000000000000000000
+  Size.Width = 851.000000000000000000
+  Size.Height = 689.000000000000000000
   Size.PlatformDefault = False
   object Rectangle2: TRectangle
     Align = Client
-    Fill.Color = claLightgray
     Padding.Top = 15.000000000000000000
+    Padding.Bottom = 20.000000000000000000
     Sides = []
-    Size.Width = 752.000000000000000000
-    Size.Height = 648.000000000000000000
+    Size.Width = 851.000000000000000000
+    Size.Height = 689.000000000000000000
     Size.PlatformDefault = False
     Stroke.Kind = None
     object layoutActions: TLayout
       Align = Top
       Position.Y = 15.000000000000000000
-      Size.Width = 752.000000000000000000
+      Size.Width = 851.000000000000000000
       Size.Height = 58.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       object Rectangle1: TRectangle
         Align = Client
         EnableDragHighlight = False
-        Fill.Color = claLightgray
         Padding.Left = 20.000000000000000000
-        Size.Width = 752.000000000000000000
+        Size.Width = 851.000000000000000000
         Size.Height = 58.000000000000000000
         Size.PlatformDefault = False
         Stroke.Color = claLightgray
+        Stroke.Thickness = 0.000000000000000000
         object btnNewOrder: TButton
           Align = Left
           AutoTranslate = False
@@ -66,13 +66,14 @@ object Pass: TPass
       Align = Top
       Margins.Top = 30.000000000000000000
       Position.Y = 103.000000000000000000
-      Size.Width = 752.000000000000000000
+      Size.Width = 851.000000000000000000
       Size.Height = 59.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
       object lblOrderID: TLabel
         StyledSettings = [FontColor]
-        Position.X = 64.000000000000000000
+        Position.X = 80.000000000000000000
+        Position.Y = -2.000000000000000000
         Size.Width = 217.000000000000000000
         Size.Height = 57.000000000000000000
         Size.PlatformDefault = False
@@ -85,7 +86,8 @@ object Pass: TPass
       end
       object lblOrderDate: TLabel
         StyledSettings = [FontColor]
-        Position.X = 424.000000000000000000
+        Position.X = 496.000000000000000000
+        Position.Y = -2.000000000000000000
         Size.Width = 217.000000000000000000
         Size.Height = 57.000000000000000000
         Size.PlatformDefault = False
@@ -102,13 +104,13 @@ object Pass: TPass
       Padding.Left = 30.000000000000000000
       Padding.Right = 30.000000000000000000
       Margins.Top = 20.000000000000000000
-      Size.Width = 752.000000000000000000
-      Size.Height = 466.000000000000000000
+      Size.Width = 851.000000000000000000
+      Size.Height = 487.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
-      Viewport.Width = 752.000000000000000000
-      Viewport.Height = 466.000000000000000000
-      object panelOrder: TPanel
+      Viewport.Width = 851.000000000000000000
+      Viewport.Height = 487.000000000000000000
+      object panelOrderTemplate: TPanel
         Align = Horizontal
         Cursor = crHandPoint
         EnableDragHighlight = False

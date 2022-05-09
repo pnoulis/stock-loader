@@ -4,6 +4,7 @@ interface
 
 uses
  FMX.Forms,
+ u_order,
  uDBConnect,
  FMX.dialogs,
  System.Variants,
@@ -32,7 +33,7 @@ uses
  FireDAC.Phys.MSSQL,
  FireDAC.VCLUI.Wait;
 
- type
+type
  TOnConnected = reference to procedure;
  TOnConnectionError = procedure(const errMsg: string) of object;
 
@@ -40,12 +41,15 @@ uses
   connection: TFDConnection;
   driverMSSQL: TFDPhysMSSQLDriverLink;
   tableStockMovesLog: TFDTable;
+  queryStockMoves: TFDQuery;
+  FDStoredProc1: TFDStoredProc;
  private
  public
   onConnected: TOnConnected;
   onConnectionError: TOnConnectionError;
   currentOrderID: uint32;
   procedure connect;
+  function fetchOrders: TListOrders;
  end;
 
 var
@@ -108,6 +112,25 @@ procedure TdmServerMSSQL.connect;
        end);
 
     end).Start;
+ end;
+
+function TdmServerMSSQL.fetchOrders: TListOrders;
+var i: Cardinal;
+ begin
+  i := 0;
+
+  tableStockMovesLog.IndexFieldNames := 'moveDate:D';
+  tableStockMovesLog.active := true;
+  setLength(result, tableStockMovesLog.RecordCount);
+
+  while not tableStockMovesLog.Eof do
+   begin
+    result[i] := TOrder.Create(tableStockMovesLog.FieldByName('moveID').Value,
+        tableStockMovesLog);
+    tableStockMovesLog.Next;
+    inc(i);
+   end;
+
  end;
 
 begin

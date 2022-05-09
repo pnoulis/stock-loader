@@ -39,16 +39,6 @@ interface
    btnConnect: TButton;
    lblOrderID: TLabel;
     StyleBook1: TStyleBook;
-    TabControl1: TTabControl;
-    TabItem1: TTabItem;
-    Layout1: TLayout;
-    Button1: TButton;
-    FlowLayout1: TFlowLayout;
-    Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
-    Label1: TLabel;
     btnShowFrame: TButton;
 
    { Design Time Event Handlers }
