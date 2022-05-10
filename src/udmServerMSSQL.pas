@@ -3,60 +3,61 @@
 interface
 
 uses
-  FMX.Forms,
-  u_order,
-  u_produce,
-  untTypes,
-  uDBConnect,
-  FMX.dialogs,
-  System.Variants,
-  System.DateUtils,
-  System.SysUtils,
-  System.Classes,
-  FireDAC.Stan.Intf,
-  FireDAC.Stan.Option,
-  FireDAC.Stan.Error,
-  FireDAC.UI.Intf,
-  FireDAC.Phys.Intf,
-  FireDAC.Stan.Def,
-  FireDAC.Stan.Pool,
-  FireDAC.Stan.Async,
-  FireDAC.Phys,
-  FireDAC.FMXUI.Wait,
-  FireDAC.Stan.Param,
-  FireDAC.DatS,
-  FireDAC.DApt.Intf,
-  FireDAC.DApt,
-  Data.DB,
-  FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client,
-  FireDAC.Phys.MSSQLDef,
-  FireDAC.Phys.ODBCBase,
-  FireDAC.Phys.MSSQL,
-  FireDAC.VCLUI.Wait;
+ FMX.Forms,
+ u_order,
+ u_produce,
+ untTypes,
+ uDBConnect,
+ FMX.dialogs,
+ System.Variants,
+ System.DateUtils,
+ System.SysUtils,
+ System.Classes,
+ FireDAC.Stan.Intf,
+ FireDAC.Stan.Option,
+ FireDAC.Stan.Error,
+ FireDAC.UI.Intf,
+ FireDAC.Phys.Intf,
+ FireDAC.Stan.Def,
+ FireDAC.Stan.Pool,
+ FireDAC.Stan.Async,
+ FireDAC.Phys,
+ FireDAC.FMXUI.Wait,
+ FireDAC.Stan.Param,
+ FireDAC.DatS,
+ FireDAC.DApt.Intf,
+ FireDAC.DApt,
+ Data.DB,
+ FireDAC.Comp.DataSet,
+ FireDAC.Comp.Client,
+ FireDAC.Phys.MSSQLDef,
+ FireDAC.Phys.ODBCBase,
+ FireDAC.Phys.MSSQL,
+ FireDAC.VCLUI.Wait;
 
 type
-  TOnConnected = reference to procedure;
-  TOnConnectionError = procedure(const errMsg: string) of object;
+ TOnConnected = reference to procedure;
+ TOnConnectionError = procedure(const errMsg: string) of object;
 
-  TdmServerMSSQL = class(TDataModule)
-    connection: TFDConnection;
-    driverMSSQL: TFDPhysMSSQLDriverLink;
-    tableStockOrders: TFDTable;
-    queryStockMoves: TFDQuery;
-    FDStoredProc1: TFDStoredProc;
-  private
-  public
-    onConnected: TOnConnected;
-    onConnectionError: TOnConnectionError;
-    currentOrderID: uint32;
-    procedure connect;
-    function fetchOrders: TListOrders;
-    function fetchProduce(const orderStatus: EStatusOrder; const orderID: cardinal): TArray<TFields>;
-  end;
+ TdmServerMSSQL = class(TDataModule)
+  connection: TFDConnection;
+  driverMSSQL: TFDPhysMSSQLDriverLink;
+  tableStockOrders: TFDTable;
+  queryStockMoves: TFDQuery;
+  FDStoredProc1: TFDStoredProc;
+ private
+ public
+  onConnected: TOnConnected;
+  onConnectionError: TOnConnectionError;
+  currentOrderID: uint32;
+  procedure connect;
+  function fetchOrders: TListOrders;
+  function fetchProduce(const orderStatus: EStatusOrder;
+   const orderID: cardinal): TFDQuery;
+ end;
 
 var
-  DB: TdmServerMSSQL;
+ DB: TdmServerMSSQL;
 
 procedure initialize;
 
@@ -64,103 +65,93 @@ implementation
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
 {$R *.dfm}
-
 const
-  DBCONN_CONFIG_FILEPATH = './config/config.ini';
-  DBCONN_CONFIG_INI_SECTION =
+ DBCONN_CONFIG_FILEPATH = './config/config.ini';
+ DBCONN_CONFIG_INI_SECTION =
 {$IFDEF RELEASE}
-    'DBCONN_MSSQL_RELEASE';
+     'DBCONN_MSSQL_RELEASE';
 {$ELSEIF defined(BRATNET)}
-  'DBCONN_MSSQL_RELEASE';
+    'DBCONN_MSSQL_DEBUG_BRATNET';
 {$ELSE}
-  'DBCONN_MSSQL_DEBUG';
+    'DBCONN_MSSQL_DEBUG';
 {$IFEND}
-
 var
-  connected: Boolean;
-  errMsg: string;
+ connected: Boolean;
+ errMsg: string;
 
 procedure initialize;
-begin
+ begin
   if not assigned(DB) then
-    Application.CreateForm(TdmServerMSSQL, DB);
-end;
+   Application.CreateForm(TdmServerMSSQL, DB);
+ end;
 
 procedure TdmServerMSSQL.connect;
-begin
+ begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-      if not connected then
+     if not connected then
       begin
 
-        try
-          uDBConnect.setupDBconn(connection, DBCONN_CONFIG_INI_SECTION,
-            DBCONN_CONFIG_FILEPATH);
-          connected := true;
-        except
-          on E: Exception do
-            errMsg := E.Message;
-        end;
+       try
+        uDBConnect.setupDBconn(connection, DBCONN_CONFIG_INI_SECTION,
+         DBCONN_CONFIG_FILEPATH);
+        connected := true;
+       except
+        on E: Exception do
+         errMsg := E.Message;
+       end;
 
       end;
 
-      TThread.Synchronize(nil,
-        procedure
-        begin
+     TThread.Synchronize(nil,
+       procedure
+       begin
 
-          if connected then
-            onConnected()
-          else
-            onConnectionError(errMsg);
+        if connected then
+         onConnected()
+        else
+         onConnectionError(errMsg);
 
-        end);
+       end);
 
     end).Start;
-end;
+ end;
 
 function TdmServerMSSQL.fetchOrders: TListOrders;
-begin
+ begin
   const
-    table = tableStockOrders;
+   table = tableStockOrders;
   var
-    i: cardinal := 0;
+   i: cardinal := 0;
 
   table.IndexFieldNames := 'moveDate:D';
   table.active := true;
   setLength(result, table.RecordCount);
 
   while not table.Eof do
-  begin
+   begin
     result[i] := TOrder.Create(table.FieldByName('stockOrderID').Value, table);
     table.Next;
     inc(i);
-  end;
+   end;
 
-end;
+ end;
 
-function TdmServerMSSQL.fetchProduce(const orderStatus: EStatusOrder; const orderID: cardinal): TArray<TFields>;
-begin
+function TdmServerMSSQL.fetchProduce(const orderStatus: EStatusOrder;
+const orderID: cardinal): TFDQuery;
+ begin
   const
-    query = queryStockMoves;
+   query = queryStockMoves;
   var
-    i: cardinal := 0;
+   i: cardinal := 0;
 
-  query.active := false;
-  query.Open('select * from stockMoves where stockOrderID = ' +
-    orderID.ToString);
-  setLength(result, query.RecordCount);
-
-  while not query.Eof do
-  begin
-    result[i] := query.Fields;
-    query.Next;
-    inc(i);
-  end;
-
-end;
+  result := querystockMoves;
+  result.Active := false;
+  result.Open('select * from stockMoves where stockOrderID = ' + orderID.ToString);
+ end;
 
 begin
-  connected := false;
+ connected := false;
 
 end.

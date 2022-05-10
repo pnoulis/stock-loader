@@ -72,7 +72,7 @@ procedure TKitchen.handleCancelOrderClick(FOrder: TFOrder);
 begin
 
   if (FOrder.Order.status = EStatusOrder.scratch) then
-    freeAndNil(newOrders[FOrder.tabIndex - 1])
+    freeAndNil(newOrders[TTabItem(FOrder.TagObject).Index])
   else
     FOrder.Order.isDisplayed := false;
 
@@ -123,7 +123,6 @@ begin
       //Order := TOrder.Create(nextID);
       Order := TOrder.Create(0);
       Order.onOrderDblClick := handleOrderDblClick;
-
       newOrders[tabGap] := Order;
     end;
 
@@ -141,7 +140,6 @@ begin
   end;
 
   FOrder := TFOrder.Create(tab, Order);
-  FOrder.tabIndex := tab.index;
   FOrder.TagObject := tab;
   FOrder.onCancelOrderClick := handleCancelOrderClick;
   tab.AddObject(FOrder);
@@ -172,7 +170,6 @@ begin
   end;
 
   FOrder := TFOrder.Create(tab, AOrder);
-  FOrder.tabIndex := tab.index;
   FOrder.TagObject := tab;
   FOrder.onCancelOrderClick := handleCancelOrderClick;
   tab.AddObject(FOrder);

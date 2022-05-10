@@ -1593,7 +1593,7 @@ object mainForm: TmainForm
     Size.PlatformDefault = False
     StyleLookup = 'Memo1Style1'
     TabOrder = 5
-    Viewport.Width = 115.000000000000000000
-    Viewport.Height = 137.000000000000000000
+    Viewport.Width = 111.000000000000000000
+    Viewport.Height = 133.000000000000000000
   end
 end

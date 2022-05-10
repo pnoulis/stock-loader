@@ -192,17 +192,17 @@ implementation
    Fill.Color := TAlphaColorRec.White;
 
    // instantiate edit #1
-   edtProduceName := TInputText.Create(self,regexpSnippets);
+   edtProduceName := TInputText.Create(self);
    styleProduceName(edtProduceName);
-   edtProduceName.validate := @validateProduceName;
+//   edtProduceName.validate := validateProduceName;
    edtProduceName.onInputSuccess := handleInputSuccess;
    edtProduceName.onInputFailure := handleInputFailure;
    AddObject(edtProduceName);
 
    // instantiate edit #2
-   edtProduceIncrBy := TInputText.Create(self,regexpSnippets);
+   edtProduceIncrBy := TInputText.Create(self);
    styleProduceIncrBy(edtProduceIncrBy);
-   edtProduceIncrBy.validate := @validateProduceIncrBy;
+  // edtProduceIncrBy.validate := @validateProduceIncrBy;
    edtProduceIncrBy.onInputSuccess := handleInputSuccess;
    edtProduceIncrBy.onInputFailure := handleInputFailure;
    AddObject(edtProduceIncrBy);

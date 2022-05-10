@@ -2,76 +2,80 @@
 
 interface
 
- uses
-  System.SysUtils,
-  System.Classes,
-  FMX.Edit,
-  FMX.Menus,
-  untTypes,
-  untTRegexpSnippets;
+uses
+ System.SysUtils,
+ System.Classes,
+ FMX.Edit,
+ FMX.Menus,
+ untTypes,
+ untTRegexpSnippets;
 
- type
-  TPopupMenu = class(FMX.Menus.TPopupMenu)
-   private
-    FEnabled: Boolean;
-   public
-    procedure Popup(X,Y: Single);override;
-    property Enabled: Boolean read FEnabled write FEnabled;
-  end; { TProduceCached end }
+type
+ TPopupMenu = class(FMX.Menus.TPopupMenu)
+ private
+  FEnabled: Boolean;
+ public
+  procedure Popup(X, Y: Single); override;
+  property Enabled: Boolean read FEnabled write FEnabled;
+ end; { TProduceCached end }
 
-  TInputText = class(TEdit)
-    { Interface }
-   public
-    constructor Create(AOwner: TComponent;
-     var snippets: untTRegexpSnippets.TRegexpSnippets);
-    destructor Destroy; override;
-    procedure handleKey(Sender: TObject;var key: Word;var keyChar: Char;
-     Shift: TShiftState);
+ TInputText = class(TEdit)
+  { Interface }
+ public
+  constructor Create(AOwner: TComponent); override;
+  destructor Destroy; override;
+  procedure handleKey(Sender: TObject; var key: Word; var keyChar: Char;
+   Shift: TShiftState);
 
-   var // event emitters
-    onInputSuccess: procedure(sender: TInputText) of object;
-    onInputFailure: procedure(sender: TInputText) of object;
+ var // event emitters
+  onInputSuccess: procedure(Sender: TInputText) of object;
+  onInputFailure: procedure(Sender: TInputText) of object;
 
-
-    FSnippets: TRegexpSnippets;
-    isValid: Boolean;
-    validate: procedure(sender: TInputText);
-    FErrors: TErrors;
-  end;
+  FSnippets: TRegexpSnippets;
+  isValid: Boolean;
+  validate: procedure(Sender: TInputText);
+  FErrors: TErrors;
+ end;
 
 implementation
 
- const
-  KEY_ENTER: Word = 13;
+uses
+ FMX.Dialogs;
 
- procedure TPopupMenu.Popup(X,Y: Single);
-  begin
-   onPopup(self);
-  end; { TPopupMenu.popup end }
+const
+ KEY_ENTER: Word = 13;
 
- constructor TInputText.Create(AOwner: TComponent;
-  var snippets: untTRegexpSnippets.TRegexpSnippets);
-  begin
-   inherited Create(AOwner);
-   FSnippets := snippets;
-  end; { TInputText.Create end }
+procedure TPopupMenu.Popup(X, Y: Single);
+ begin
+  onPopup(self);
+ end; { TPopupMenu.popup end }
 
- destructor TInputText.Destroy;
-  begin
-   setLength(FErrors,0);
-   inherited;
-  end;
+constructor TInputText.Create(AOwner: TComponent);
+ begin
+  inherited Create(AOwner);
+ end; { TInputText.Create end }
 
- procedure TInputText.handleKey(Sender: TObject;var key: Word;var keyChar: Char;
-  Shift: TShiftState);
-  begin
-   if not(key = KEY_ENTER) then
-    exit;
-   isValid := true;
-   validate(self);
-   if isValid then onInputSuccess(self)
-   else onInputFailure(self);
+destructor TInputText.Destroy;
+ begin
+  setLength(FErrors, 0);
+  inherited;
+ end;
 
-  end; { TInputText.handleKey end }
+procedure TInputText.handleKey(Sender: TObject; var key: Word;
+ var keyChar: Char; Shift: TShiftState);
+ begin
+  if not(key = KEY_ENTER) then
+   exit;
+
+  self.OnKeyUp := nil;
+
+  isValid := true;
+  validate(self);
+  if isValid then
+   onInputSuccess(self)
+  else
+   onInputFailure(self);
+
+ end; { TInputText.handleKey end }
 
 end.
