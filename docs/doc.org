@@ -30,7 +30,7 @@ a TFrame.
 Kitchen is the central interface by means of which the program can perform its
 tasks.
 
-It is the root of all other compnoents.
+It is the root of all other components.
 
 Its functions are amongst others:
 

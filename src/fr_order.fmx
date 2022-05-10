@@ -1,7 +1,7 @@
 object FOrder: TFOrder
   Align = Client
-  Size.Width = 782.000000000000000000
-  Size.Height = 689.000000000000000000
+  Size.Width = 780.000000000000000000
+  Size.Height = 688.000000000000000000
   Size.PlatformDefault = False
   object Rectangle1: TRectangle
     Align = Client
@@ -10,8 +10,8 @@ object FOrder: TFOrder
     Padding.Right = 20.000000000000000000
     Padding.Bottom = 20.000000000000000000
     Sides = []
-    Size.Width = 782.000000000000000000
-    Size.Height = 689.000000000000000000
+    Size.Width = 780.000000000000000000
+    Size.Height = 688.000000000000000000
     Size.PlatformDefault = False
     Stroke.Kind = None
     Stroke.Thickness = 0.000000000000000000
@@ -19,7 +19,7 @@ object FOrder: TFOrder
       Align = Top
       Position.X = 20.000000000000000000
       Position.Y = 15.000000000000000000
-      Size.Width = 742.000000000000000000
+      Size.Width = 740.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
@@ -27,7 +27,7 @@ object FOrder: TFOrder
         Align = Client
         Fill.Kind = None
         Sides = []
-        Size.Width = 742.000000000000000000
+        Size.Width = 740.000000000000000000
         Size.Height = 75.000000000000000000
         Size.PlatformDefault = False
         Stroke.Kind = None
@@ -58,6 +58,7 @@ object FOrder: TFOrder
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
+          OnClick = btnCancelOrderClick
         end
         object btnDeleteProduce: TButton
           Align = Vertical
@@ -86,14 +87,15 @@ object FOrder: TFOrder
           TextSettings.HorzAlign = Center
           Align = Right
           CanFocus = False
-          Position.X = 497.000000000000000000
+          Cursor = crArrow
+          Position.X = 495.000000000000000000
           Size.Width = 245.000000000000000000
           Size.Height = 75.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'memo1Style1'
           TabOrder = 3
-          Viewport.Width = 245.000000000000000000
-          Viewport.Height = 75.000000000000000000
+          Viewport.Width = 241.000000000000000000
+          Viewport.Height = 71.000000000000000000
         end
       end
     end
@@ -102,7 +104,7 @@ object FOrder: TFOrder
       Margins.Top = 20.000000000000000000
       Position.X = 20.000000000000000000
       Position.Y = 110.000000000000000000
-      Size.Width = 742.000000000000000000
+      Size.Width = 740.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
@@ -113,7 +115,7 @@ object FOrder: TFOrder
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Family = 'Comic Sans MS'
-        TextSettings.Font.Size = 22.000000000000000000
+        TextSettings.Font.Size = 20.000000000000000000
         TextSettings.HorzAlign = Center
         Text = #922#969#948#953#954#959#962
         TabOrder = 2
@@ -121,12 +123,12 @@ object FOrder: TFOrder
       object lblAmountHeader: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 622.000000000000000000
+        Position.X = 620.000000000000000000
         Size.Width = 120.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Family = 'Comic Sans MS'
-        TextSettings.Font.Size = 22.000000000000000000
+        TextSettings.Font.Size = 20.000000000000000000
         TextSettings.HorzAlign = Center
         Text = #913#965#958#951#963#951' '#954#945#964#945':'
         TabOrder = 3
@@ -134,12 +136,12 @@ object FOrder: TFOrder
       object Label1: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 502.000000000000000000
+        Position.X = 500.000000000000000000
         Size.Width = 120.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Family = 'Comic Sans MS'
-        TextSettings.Font.Size = 22.000000000000000000
+        TextSettings.Font.Size = 20.000000000000000000
         TextSettings.HorzAlign = Center
         Text = #928#959#963#959#964#951#964#945
         TabOrder = 1
@@ -147,40 +149,42 @@ object FOrder: TFOrder
       object label2: TLabel
         Align = Client
         StyledSettings = [FontColor]
-        Size.Width = 382.000000000000000000
+        Size.Width = 380.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Family = 'Comic Sans MS'
-        TextSettings.Font.Size = 22.000000000000000000
+        TextSettings.Font.Size = 20.000000000000000000
         TextSettings.HorzAlign = Center
         Text = #927#957#959#956#945' '#960#961#959#953#959#957#964#969#962
         TabOrder = 0
       end
     end
-    object listProduce: TVertScrollBox
+    object scrollProduce: TVertScrollBox
       Align = Client
+      Padding.Right = 10.000000000000000000
       Margins.Top = 20.000000000000000000
-      Size.Width = 742.000000000000000000
-      Size.Height = 469.000000000000000000
+      Size.Width = 740.000000000000000000
+      Size.Height = 468.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
-      Viewport.Width = 742.000000000000000000
-      Viewport.Height = 469.000000000000000000
+      Viewport.Width = 740.000000000000000000
+      Viewport.Height = 468.000000000000000000
       object panelProduceTemplate: TPanel
         Align = Top
         Cursor = crHandPoint
-        Size.Width = 742.000000000000000000
+        Size.Width = 730.000000000000000000
         Size.Height = 64.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'panel1style1'
-        TabOrder = 0
+        Visible = False
+        TabOrder = 1
         object Rectangle4: TRectangle
           Align = Client
           Fill.Color = claWhite
           HitTest = False
           Padding.Left = 10.000000000000000000
           Padding.Right = 10.000000000000000000
-          Size.Width = 742.000000000000000000
+          Size.Width = 730.000000000000000000
           Size.Height = 64.000000000000000000
           Size.PlatformDefault = False
           Stroke.Color = claWhite
@@ -194,13 +198,15 @@ object FOrder: TFOrder
             ReadOnly = True
             Text = 'dafuq'
             TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.HorzAlign = Center
-            Position.X = 512.000000000000000000
+            Position.X = 500.000000000000000000
+            HitTest = False
             Margins.Right = 20.000000000000000000
             Size.Width = 100.000000000000000000
             Size.Height = 64.000000000000000000
             Size.PlatformDefault = False
-            StyledSettings = [Size, Style, FontColor]
+            StyledSettings = [Size, FontColor]
           end
           object edtProduceName: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -210,43 +216,141 @@ object FOrder: TFOrder
             ReadOnly = True
             Text = 'should'
             TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 14.000000000000000000
             TextSettings.HorzAlign = Center
+            HitTest = False
             Margins.Right = 20.000000000000000000
-            Size.Width = 362.000000000000000000
+            Size.Width = 350.000000000000000000
             Size.Height = 64.000000000000000000
             Size.PlatformDefault = False
-            StyledSettings = [Size, Style, FontColor]
+            StyledSettings = [Style, FontColor]
           end
           object edtProduceIncrBy: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
             Align = Right
             StyleLookup = 'transparentedit'
             TabOrder = 1
+            ReadOnly = True
             Text = 'transparentedit'
             TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.HorzAlign = Center
-            Position.X = 632.000000000000000000
+            Position.X = 620.000000000000000000
+            HitTest = False
             Size.Width = 100.000000000000000000
             Size.Height = 64.000000000000000000
             Size.PlatformDefault = False
-            StyledSettings = [Size, Style, FontColor]
+            StyledSettings = [Size, FontColor]
           end
-          object edtProduceStockID: TEdit
+          object edtProduceID: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
             Align = Left
             StyleLookup = 'transparentedit'
             TabOrder = 0
+            ReadOnly = True
             Text = 'transparentedit'
             TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.HorzAlign = Center
             Position.X = 10.000000000000000000
+            HitTest = False
             Margins.Right = 20.000000000000000000
             Size.Width = 100.000000000000000000
             Size.Height = 64.000000000000000000
             Size.PlatformDefault = False
-            StyledSettings = [Size, Style, FontColor]
+            StyledSettings = [FontColor]
           end
         end
+      end
+      object inputPanelTemplate: TPanel
+        Align = Top
+        Cursor = crHandPoint
+        Size.Width = 730.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'panel1style1'
+        TabOrder = 0
+        object Rectangle3: TRectangle
+          Align = Client
+          Fill.Color = claWhite
+          HitTest = False
+          Padding.Left = 10.000000000000000000
+          Padding.Right = 10.000000000000000000
+          Size.Width = 730.000000000000000000
+          Size.Height = 64.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claWhite
+          XRadius = 11.000000000000000000
+          YRadius = 11.000000000000000000
+          object inputProduceID: TTextInput
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Left
+            StyleLookup = 'transparentEdit'
+            TabOrder = 3
+            Text = 'sample'
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Position.X = 10.000000000000000000
+            Size.Width = 100.000000000000000000
+            Size.Height = 64.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [FontColor]
+          end
+          object inputProduceIncrBy: TTextInput
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Right
+            StyleLookup = 'transparentEdit'
+            TabOrder = 0
+            Text = 'sample'
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Position.X = 620.000000000000000000
+            Size.Width = 100.000000000000000000
+            Size.Height = 64.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [FontColor]
+          end
+          object inputProduceAfter: TTextInput
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Right
+            StyleLookup = 'transparentEdit'
+            TabOrder = 1
+            Text = 'sample'
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Position.X = 500.000000000000000000
+            Margins.Right = 20.000000000000000000
+            Size.Width = 100.000000000000000000
+            Size.Height = 64.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [FontColor]
+          end
+          object inputProduceName: TTextInput
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            StyleLookup = 'transparentEdit'
+            TabOrder = 2
+            Text = 'sample'
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Center
+            Size.Width = 390.000000000000000000
+            Size.Height = 64.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [FontColor]
+          end
+        end
+      end
+      object TextInput1: TTextInput
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 2
+        Position.X = 320.000000000000000000
+        Position.Y = 224.000000000000000000
       end
     end
   end

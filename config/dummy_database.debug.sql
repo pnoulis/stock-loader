@@ -12,17 +12,17 @@ GO
 use dummy;
 GO
 
+-- ALTER TABLE stockMoves DROP CONSTRAINT IF EXISTS FK_stockMoves_stockOrderID;
 -- ALTER TABLE stockMoves DROP CONSTRAINT IF EXISTS FK_stockMoves_itemCID;
 -- ALTER TABLE stockMoves DROP CONSTRAINT IF EXISTS FK_stockMoves_storeID;
--- ALTER TABLE stockMoves DROP CONSTRAINT IF EXISTS FK_stockMoves_moveID;
--- ALTER TABLE stockMovesLog DROP CONSTRAINT IF EXISTS FK_stockMovesLog_storeID;
+-- ALTER TABLE stockMovesLog DROP CONSTRAINT IF EXISTS FK_stockOrders_storeID;
 -- GO
 
-DROP TABLE IF EXISTS stockMoves;
-DROP TABLE IF EXISTS stockMovesLog;
-DROP TABLE IF EXISTS Store;
-DROP TABLE IF EXISTS Item;
-GO
+-- DROP TABLE IF EXISTS stockMoves;
+-- DROP TABLE IF EXISTS stockOrders;
+-- DROP TABLE IF EXISTS Store;
+-- DROP TABLE IF EXISTS Item;
+-- GO
 
 
 CREATE TABLE Store (
@@ -41,23 +41,26 @@ CREATE TABLE Item (
 );
 GO
 
-CREATE TABLE dbo.stockMovesLog (
-  moveID INT IDENTITY(1,1) NOT NULL, -- PK
+CREATE TABLE dbo.stockOrders (
+  stockOrderID INT IDENTITY(1,1) NOT NULL, -- PK
   storeID INT NOT NULL, -- FK
   moveDate smalldatetime DEFAULT GETDATE() NOT NULL,
 
-  CONSTRAINT PK_stockMovesLog_moveID PRIMARY KEY CLUSTERED (moveID)
+  CONSTRAINT PK_stockOrders_stockOrderID PRIMARY KEY CLUSTERED (stockOrderID)
 );
 GO
 
 CREATE TABLE dbo.stockMoves (
-  moveID INT NOT NULL, --FK
+  moveID INT IDENTITY(1,1) NOT NULL, --PK
+  stockOrderID INT NOT NULL, --FK
   storeID INT NOT NULL, -- FK
   itemCID NVARCHAR(50) NOT NULL, -- FK
   itemName NVARCHAR(200) NOT NULL, -- FK
   stockBefore INT NULL,
   stockIncrease INT NOT NULL,
   stockAfter INT NOT NULL,
+
+  CONSTRAINT PK_stockMoves_moveID PRIMARY KEY CLUSTERED (moveID)
 );
 GO
 
@@ -65,9 +68,9 @@ GO
 -- FOREIGN KEYS
 ALTER TABLE dbo.stockMoves
   WITH CHECK ADD CONSTRAINT
-  FK_stockMoves_moveID
-  FOREIGN KEY (moveID) REFERENCES
-  dbo.stockMovesLog(moveID);
+  FK_stockMoves_stockOrderID
+  FOREIGN KEY (stockOrderID) REFERENCES
+  dbo.stockOrders(stockOrderID);
 
 
 ALTER TABLE dbo.stockMoves
@@ -82,48 +85,9 @@ ALTER TABLE dbo.stockMoves
   FOREIGN KEY (storeID) REFERENCES
   dbo.Store(StoreId);
 
-ALTER TABLE dbo.stockMovesLog
+ALTER TABLE dbo.stockOrders
   WITH CHECK ADD CONSTRAINT
-  FK_stockMovesLog_storeID
+  FK_stockOrders_storeID
   FOREIGN KEY (storeID) REFERENCES
   dbo.Store(storeId);
-GO
-
--- Procedure
-
-CREATE PROCEDURE addStockMove
-  @itemCID NVARCHAR (50),
-  @stockIncrease INTEGER,
-  @moveID INTEGER,
-  @itemName NVARCHAR (200) = ''
-AS
-BEGIN
-  SET NOCOUNT ON;
-
-  DECLARE @storeID INTEGER;
-  DECLARE @stockBefore INTEGER;
-  DECLARE @stockAfter INTEGER;
-
-  SELECT
-    @itemCID = itemCID,
-    @itemName = itemName,
-    @stockBefore = itemAmount
-    FROM Item
-   WHERE itemCID = @itemCID;
-
-  UPDATE Item
-     SET itemAmount = @stockIncrease + @stockBefore
-   WHERE itemCID = @itemCID;
-
-  SET @stockAfter = @stockIncrease + @stockBefore;
-  SET @storeID = 1;
-
-  INSERT INTO stockMoves (
-    moveID, storeID, itemCID, itemName, stockBefore, stockIncrease, stockAfter
-  )
-  VALUES (
-    @moveID, @storeID, @itemCID, @itemName, @stockBefore, @stockIncrease, @stockAfter
-  );
-
-END;
 GO

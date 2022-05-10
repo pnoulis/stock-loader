@@ -24,6 +24,7 @@ type
   end;
 
   TErrors = array of string;
+  EStatusOrder = (served, commited, scratch);
   TAsyncCB = reference to procedure;
 
 procedure runAsync(const cb: TAsyncCB; const delay: UInt32 = 0);

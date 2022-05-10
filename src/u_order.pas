@@ -3,133 +3,130 @@
 interface
 
 uses
- data.DB,
-// udmServerMSSQL,
- FireDAC.Comp.Client,
- system.DateUtils,
- system.Classes,
- system.SysUtils,
- system.UITypes,
- FMX.Objects,
- FMX.Dialogs,
- FMX.Controls,
- FMX.Layouts,
- FMX.Types,
- FMX.Edit,
- FMX.StdCtrls,
- FMX.Forms,
- FMX.Graphics,
- FMX.Menus,
- FMX.Controls.Presentation,
- system.Generics.Collections;
+  data.DB,
+  u_produce,
+  untTypes,
+  FireDAC.Comp.Client,
+  system.DateUtils,
+  system.Classes,
+  system.SysUtils,
+  system.UITypes,
+  FMX.Objects,
+  FMX.Dialogs,
+  FMX.Controls,
+  FMX.Layouts,
+  FMX.Types,
+  FMX.Edit,
+  FMX.StdCtrls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Menus,
+  FMX.Controls.Presentation,
+  system.Generics.Collections;
 
 type
- TOrder = class;
- TListOrders = array of TOrder;
- EStatusOrder = (served, commited, scratchpad);
+  TOrder = class;
+  TListOrders = array of TOrder;
 
- TOrder = class(TObject)
- private type
-  TOrderDate = record
-   commited: TDateTime;
-   issue: string;
-   render: string;
+  TOrder = class(TObject)
+  private type
+    TOrderDate = record
+      commited: TDateTime;
+      issue: string;
+      render: string;
+    end;
+  private
+  var
+    date: TOrderDate;
+    isSelected: Boolean;
+    produce: TListProduce;
+  public
+  var
+    id: cardinal;
+    status: EStatusOrder;
+    isDisplayed: Boolean;
+    onOrderDblClick: procedure(order: TOrder) of object;
+    constructor Create(const orderID: cardinal; const data: TFDTable = nil);
+    function renderSelf(aOwner: TComponent; template: TPanel): TPanel;
+    procedure handleClick(Sender: TObject);
+    procedure handleDblClick(Sender: TObject);
   end;
- private
- var
-  date: TOrderDate;
-  isSelected: Boolean;
-  procedure fetchProduce;
- public
- var
-  id: cardinal;
-  status: EStatusOrder;
-  isDisplayed: Boolean;
-  onOrderDblClick: procedure(order: TOrder) of object;
-  constructor Create(const orderID: cardinal; const data: TFDTable = nil);
-  function renderSelf(aOwner: TComponent; template: TPanel): TPanel;
-  procedure handleClick(Sender: TObject);
-  procedure handleDblClick(Sender: TObject);
- end;
 
 implementation
+
 uses
- udmServerMSSQL;
+  udmServerMSSQL;
 { TOrder }
 
 function todayForDB: string;
- var date, time: string;
- begin
+var
+  date, time: string;
+begin
   dateTimeToString(date, 'yyyy-mm-dd', today);
   dateTimeToString(time, 'hh-mm-ss', GetTime);
   result := date + ' ' + time;
- end;
+end;
 
 function renderDate(const aValue: TDateTime): string;
- begin
+begin
   dateTimeToString(result, 'dddddd', aValue);
- end;
+end;
 
 constructor TOrder.Create(const orderID: cardinal; const data: TFDTable = nil);
- var time: string;
- begin
+var
+  time: string;
+begin
   inherited Create;
   id := orderID;
   isSelected := false;
 
   if assigned(data) then
-   begin
+  begin
     date.commited := data.FieldByName('moveDate').Value;
     date.render := renderDate(date.commited);
     if isToday(date.commited) then
-     status := EStatusOrder.served
+      status := EStatusOrder.commited
     else
-     status := EStatusOrder.commited;
-   end
+      status := EStatusOrder.served;
+  end
   else
-   begin
+  begin
     date.render := renderDate(today);
-    status := EStatusOrder.scratchpad;
-   end;
+    status := EStatusOrder.scratch;
+  end;
 
- end;
-
-procedure TOrder.fetchProduce;
- begin
-  var
-  i := 0;
-  const query = DB.queryStockMoves;
-
- end;
+end;
 
 procedure TOrder.handleClick(Sender: TObject);
- begin
+begin
+
   isSelected := not isSelected;
 
   if isSelected then
-   begin
+  begin
     TRectangle(TComponent(Sender).Components[0]).Fill.Color :=
-        TAlphaColorRec.Cornflowerblue;
+      TAlphaColorRec.Cornflowerblue;
     TRectangle(TComponent(Sender).Components[0]).Stroke.Color :=
-        TAlphaColorRec.Cornflowerblue;
-   end
+      TAlphaColorRec.Cornflowerblue;
+  end
   else
-   begin
+  begin
     TRectangle(TComponent(Sender).Components[0]).Fill.Color :=
-        TAlphaColorRec.white;
+      TAlphaColorRec.white;
     TRectangle(TComponent(Sender).Components[0]).Stroke.Color :=
-        TAlphaColorRec.white;
-   end;
- end;
+      TAlphaColorRec.white;
+  end;
+end;
 
 procedure TOrder.handleDblClick(Sender: TObject);
- begin
-  handleClick(Sender);
+begin
   self.onOrderDblClick(self);
- end;
+  isSelected := true;
+  handleClick(Sender);
+end;
 
 function TOrder.renderSelf(aOwner: TComponent; template: TPanel): TPanel;
- begin
+begin
   result := TPanel(template.clone(aOwner));
   result.Align := TAlignLayout.Top;
   result.Margins.Bottom := 20.0;
@@ -138,6 +135,6 @@ function TOrder.renderSelf(aOwner: TComponent; template: TPanel): TPanel;
   result.OnDblClick := handleDblClick;
   TLabel(result.Components[1]).text := id.toString;
   TLabel(result.Components[2]).text := date.render;
- end;
+end;
 
 end.

@@ -18,7 +18,8 @@ uses
   fr_kitchen in 'fr_kitchen.pas' {frKitchen: TFrame},
   fr_order in 'fr_order.pas' {Order: TFrame},
   u_kitchen in 'u_kitchen.pas',
-  u_order in 'u_order.pas';
+  u_order in 'u_order.pas',
+  u_produce in 'u_produce.pas';
 
 {$R *.res}
 
