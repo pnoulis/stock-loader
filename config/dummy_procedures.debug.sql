@@ -1,5 +1,7 @@
 DROP PROCEDURE IF EXISTS dbo.addStockMove
 GO
+DROP PROCEDURE IF EXISTS dbo.addStockOrder
+GO
 
 CREATE PROCEDURE addStockMove
   @itemCID NVARCHAR(50),
@@ -59,3 +61,21 @@ WHERE itemCID = @itemCID;
 
 END;
 GO
+
+CREATE PROCEDURE addStockOrder
+  @storeID INTEGER = 1
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  DECLARE @moveDate smalldatetime;
+  DECLARE @stockOrderID INT;
+
+  SET @moveDate = getdate();
+
+
+  INSERT INTO stockOrders (storeID, moveDate)
+  VALUES (@storeID, @moveDate) SET @stockOrderID = @@identity;
+
+  SELECT * from stockOrders  where stockOrderID = @stockOrderID;
+END

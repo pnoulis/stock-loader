@@ -4,8 +4,8 @@ interface
 
 uses
   data.DB,
-  u_produce,
   untTypes,
+  u_produce,
   FireDAC.Comp.Client,
   system.DateUtils,
   system.Classes,
@@ -37,16 +37,19 @@ type
     end;
   private
   var
-    date: TOrderDate;
     isSelected: Boolean;
-    produce: TListProduce;
   public
   var
+    date: TOrderDate;
+    listProduce: TListProduce;
     id: cardinal;
+    stockOrderID: cardinal;
+    storeID: cardinal;
     status: EStatusOrder;
     isDisplayed: Boolean;
+    isFetching: Boolean;
     onOrderDblClick: procedure(order: TOrder) of object;
-    constructor Create(const orderID: cardinal; const data: TFDTable = nil);
+    constructor Create(const index: cardinal; const data: TFDTable = nil);
     function renderSelf(aOwner: TComponent; template: TPanel): TPanel;
     procedure handleClick(Sender: TObject);
     procedure handleDblClick(Sender: TObject);
@@ -72,25 +75,28 @@ begin
   dateTimeToString(result, 'dddddd', aValue);
 end;
 
-constructor TOrder.Create(const orderID: cardinal; const data: TFDTable = nil);
-var
-  time: string;
+constructor TOrder.Create(const index: cardinal; const data: TFDTable = nil);
 begin
   inherited Create;
-  id := orderID;
+  id := index;
   isSelected := false;
+  isFetching := false;
 
   if assigned(data) then
   begin
+    stockOrderID := data.FieldByName('stockOrderID').Value;
     date.commited := data.FieldByName('moveDate').Value;
     date.render := renderDate(date.commited);
     if isToday(date.commited) then
-      status := EStatusOrder.commited
+    begin
+      status := EStatusOrder.commited;
+      end
     else
       status := EStatusOrder.served;
   end
   else
   begin
+    stockOrderID := 0;
     date.render := renderDate(today);
     status := EStatusOrder.scratch;
   end;
@@ -133,7 +139,7 @@ begin
   result.visible := true;
   result.OnClick := handleClick;
   result.OnDblClick := handleDblClick;
-  TLabel(result.Components[1]).text := id.toString;
+  TLabel(result.Components[1]).text := stockOrderID.toString;
   TLabel(result.Components[2]).text := date.render;
 end;
 

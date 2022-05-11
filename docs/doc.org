@@ -68,3 +68,8 @@ Orders can be in 3 states as far as parent components are concerned such as
 ** Produce
 * color
 #FFE0E0E0
+* Commitng a new order
+The commitng of the order should take place at the highest level because it
+requires a lot of interaction amongst components across the hierarchy.
+
+

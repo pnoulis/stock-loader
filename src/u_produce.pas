@@ -3,340 +3,395 @@
 interface
 
 uses
- FireDAC.Comp.Client,
- system.DateUtils,
- system.Classes,
- system.Threading,
- system.SysUtils,
- system.UITypes,
- Data.DB,
- FMX.Objects,
- FMX.Dialogs,
- FMX.Controls,
- FMX.Layouts,
- FMX.Types,
- FMX.Edit,
- FMX.StdCtrls,
- FMX.Forms,
- FMX.Graphics,
- FMX.Menus,
- FMX.Controls.Presentation,
- system.Generics.Collections,
- untInput,
- untTRegexpSnippets,
- untTypes;
+  FireDAC.Comp.Client,
+  system.DateUtils,
+  system.Classes,
+  system.Threading,
+  system.SysUtils,
+  system.UITypes,
+  Data.DB,
+  FMX.Objects,
+  FMX.Dialogs,
+  FMX.Controls,
+  FMX.Layouts,
+  FMX.Types,
+  FMX.Edit,
+  FMX.StdCtrls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Menus,
+  FMX.Controls.Presentation,
+  system.Generics.Collections,
+  untInput,
+  untTRegexpSnippets,
+  untTypes;
 
 type
- TProduce = class;
- TListProduce = array of TProduce;
+  TProduce = class;
+  TListProduce = array of TProduce;
 
- TProduce = class(TObject)
- private
-  FmoveID: TInputText;
-  FstockOrderID: TInputText;
-  FitemCID: TInputText;
-  FitemName: TInputText;
-  FstockBefore: TInputText;
-  FstockIncrease: TInputText;
-  FstockAfter: TInputText;
-  FError: TLabel;
+  TProduce = class(TObject)
+  private
+    FmoveID: TInputText;
+    FstockOrderID: TInputText;
+    FitemCID: TInputText;
+    FitemName: TInputText;
+    FstockBefore: TInputText;
+    FstockIncrease: TInputText;
+    FstockAfter: TInputText;
+    FError: TLabel;
 
-  procedure setMoveID(const moveID: string);
-  procedure setStockOrderID(const stockOrderID: string);
-  procedure setItemCID(const itemCID: string);
-  procedure setitemName(const itemName: string);
-  procedure setstockBefore(const stockBefore: string);
-  procedure setstockIncrease(const stockIncrease: string);
-  procedure setstockAfter(const stockAfter: string);
-  procedure renderItemCID;
-  procedure renderItemName;
-  procedure renderStockAfter;
-  procedure renderStockIncrease;
-  procedure renderError;
-  procedure handleInputSuccess(Sender: TInputText);
-  procedure handleInputFailure(Sender: TInputText);
+    procedure setMoveID(const moveID: string);
+    procedure setStockOrderID(const stockOrderID: string);
+    procedure setItemCID(const itemCID: string);
+    procedure setitemName(const itemName: string);
+    procedure setstockBefore(const stockBefore: string);
+    procedure setstockIncrease(const stockIncrease: string);
+    procedure setstockAfter(const stockAfter: string);
+    procedure renderItemCID;
+    procedure renderItemName;
+    procedure renderStockAfter;
+    procedure renderStockIncrease;
+    procedure renderStockBefore;
+    procedure renderError;
+    procedure handleInputSuccess(Sender: TInputText);
+    procedure handleInputFailure(Sender: TInputText);
 
-  procedure askItemCID;
-  procedure fetchProduce;
-  procedure recordCurrentStockLevels;
-  procedure askNewStockToBeAdded;
-  procedure cacheUpdatedStocklevels;
-  procedure enableInteractivity(Target: TInputText);
-  procedure disableInteractivity(Target: TInputText);
-  procedure commitUpdatedStocklevels;
-  procedure displayError(const errMsg: string = '');
+    procedure askItemCID;
+    procedure fetchProduce;
+    procedure recordCurrentStockLevels(fetched: TFDQuery);
+    procedure askNewStockToBeAdded;
+    procedure cacheUpdatedStocklevels;
+    procedure enableInteractivity(Target: TInputText);
+    procedure disableInteractivity(Target: TInputText);
+    procedure commitUpdatedStocklevels;
+    procedure displayError(const errMsg: string = '');
 
- public
- var
-  isSelected: Boolean;
-  statusOrder: EStatusOrder;
-  statusProduce: EStatusOrder;
-  graphic: TPanel;
-  onProduceCached: procedure of object;
-  constructor Create(status: EStatusOrder; template: TPanel;
-   Data: TFDQuery = nil);
-  procedure waitForProduce;
-  procedure setFocus(Target: TControl = nil);
+  public
+  var
+    isSelected: Boolean;
+    statusOrder: EStatusOrder;
+    statusProduce: EStatusOrder;
+    graphic: TPanel;
+    onProduceCached: procedure of object;
 
-
- end;
+    constructor Create(status: EStatusOrder; template: TPanel;
+      Data: TFDQuery = nil);
+    procedure waitForProduce;
+    procedure setFocus(Sender: TInputText = nil);
+    procedure handleGraphicClick(Sender: TObject);
+  end;
 
 implementation
 
-var
- regexpSnippets: untTRegexpSnippets.TRegexpSnippets;
+uses
+  udmServerMSSQL;
 
- { TProduce }
+var
+  regexpSnippets: untTRegexpSnippets.TRegexpSnippets;
+
+  { TProduce }
 
 procedure enableAsyncKey(Target: TInputText);
- begin
+begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-     sleep(2000);
-     TThread.Synchronize(nil,
-       procedure
-       begin
-        Target.OnKeyUp := Target.handleKey;
-       end);
+      sleep(2000);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          Target.OnKeyUp := Target.handleKey;
+        end);
     end).Start;
- end;
+end;
 
 procedure TProduce.waitForProduce;
- begin
-  showMessage('wait for produce');
+begin
   disableInteractivity(FitemName);
   disableInteractivity(FstockIncrease);
 
-  if (statusProduce = EStatusOrder.commited) then
-   askNewStockToBeAdded
+  if (statusProduce = EStatusOrder.scratch) then
+    askItemCID
   else
-   askItemCID;
-
- end;
+    askNewStockToBeAdded;
+end;
 
 procedure TProduce.askItemCID;
- begin
-  showMessage('ask produce name');
+begin
   enableInteractivity(FitemCID);
- end;
+end;
 
-procedure TProduce.recordCurrentStockLevels;
- begin
-  showMessage('record current stock levels');
- end;
+procedure TProduce.fetchProduce;
+begin
+var fetched: TFDQuery;
+
+  try
+    fetched := DB.fetchItem(FitemCID.Text);
+  except
+    on E: Exception do
+      showMessage(E.message);
+  end;
+
+  if Fetched.RecordCount < 1 then
+  begin
+    displayError(FItemCID.Text + ' does not exist!');
+    waitForProduce;
+  end
+  else
+  begin
+    recordCurrentStockLevels(fetched);
+    askNewStockToBeAdded;
+  end;
+
+end;
+
+procedure TProduce.recordCurrentStockLevels(fetched: TFDQuery);
+begin
+  setItemName(fetched.FieldByName('itemName').Value);
+  setstockBefore(fetched.FieldByName('itemAmount').Value);
+end;
 
 procedure TProduce.askNewStockToBeAdded;
- begin
-  showMessage('ask new stock to be added');
+begin
   enableInteractivity(FstockIncrease);
- end;
+end;
 
 procedure TProduce.cacheUpdatedStocklevels;
- begin
-  showMessage('cache updated stock levels');
- statusProduce := EStatusOrder.cached;
- onProduceCached;
- end;
+var
+  popup: TPopupMenu;
+begin
+  statusProduce := EStatusOrder.cached;
+  onProduceCached;
+  graphic.OnClick := handleGraphicClick;
+  popup := TPopupMenu.Create(graphic);
+  popup.OnPopup := handleGraphicClick;
+  graphic.PopupMenu := popup;
+end;
 
 procedure TProduce.commitUpdatedStocklevels;
- begin
+begin
   showMessage('commit updated stock levels');
- end;
+end;
 
 procedure validateItemCID(Sender: TInputText);
- begin
-  showMessage('validating');
+begin
   with Sender do
-   begin
+  begin
     if length(FErrors) = 0 then
-     setLength(FErrors, 2);
+      setLength(FErrors, 2);
 
     regexpSnippets['!iNum'].subject := Text;
-    showMessage('after snippets');
     if Text = '' then
-     begin
+    begin
       FErrors[0] := 'Wrong Input! Name cannot be empty';
       isValid := false;
-     end
+    end
     else if regexpSnippets['!iNum'].match then
-     begin
+    begin
       FErrors[0] := 'Wrong Input! Name only accepts integers';
       isValid := false;
-     end;
+    end;
 
-   end;
- end;
+  end;
+end;
 
 procedure validateStockIncrease(Sender: TInputText);
- begin
-  showMessage('validating');
+begin
   with Sender do
-   begin
+  begin
     if length(FErrors) = 0 then
-     setLength(FErrors, 2);
+      setLength(FErrors, 2);
 
     regexpSnippets['!rNum'].subject := Text;
-    showMessage('after regexp');
     if Text = '' then
-     begin
-      FErrors[0] := 'Wrong Input! Amount cannot be empty';
+    begin
+      FErrors[0] := 'Wrong Input! Ammount cannot be empty';
       isValid := false;
-     end
-    else if FSnippets['!rNum'].match then
-     begin
-      FErrors[0] := 'Wrong Input! Amount only accepts integers';
+    end
+    else if regexpSnippets['!rNum'].match then
+    begin
+      FErrors[0] := 'Wrong Input! Ammount only accepts integers';
       isValid := false;
-     end;
+    end;
 
-   end;
- end;
+  end;
+end;
 
 procedure TProduce.handleInputSuccess(Sender: TInputText);
- begin
-  showMessage('handleInputSuccess');
-  displayError; // clears errors
+begin
   disableInteractivity(Sender);
+  displayError;
 
   if Sender.name = 'itemCID' then
-   fetchProduce
+    fetchProduce
   else
-   cacheUpdatedStocklevels;
+    cacheUpdatedStocklevels;
 
- end;
+end;
 
 procedure TProduce.handleInputFailure(Sender: TInputText);
- begin
+begin
   self.displayError(Sender.FErrors[0]);
   enableAsyncKey(Sender);
- end;
+end;
+
+procedure TProduce.handleGraphicClick(Sender: TObject);
+begin
+  if statusProduce = EStatusOrder.scratch then
+    exit;
+
+  if Sender.Classname = 'TPopupMenu' then // right click
+  begin
+    waitForProduce;
+    exit;
+  end;
+
+  with graphic.Components[0] as TRectangle do
+  begin
+    if isSelected then
+    begin
+      Fill.Color := TAlphaColorRec.White;
+      isSelected := false;
+    end
+    else
+    begin
+      Fill.Color := TAlphaColorRec.Cornflowerblue;
+      isSelected := true;
+    end;
+  end;
+
+end;
 
 constructor TProduce.Create(status: EStatusOrder; template: TPanel;
 Data: TFDQuery = nil);
- begin
+begin
 
   statusOrder := status;
   isSelected := false;
   graphic := template;
 
   if (statusOrder = EStatusOrder.served) then
-   begin
+  begin
     TEdit(template.Components[4]).Text := Data.FieldByName('itemCID').Value;
     TEdit(template.Components[2]).Text := Data.FieldByName('itemName').Value;
     TEdit(template.Components[1]).Text := Data.FieldByName('stockAfter').Value;
     TEdit(template.Components[3]).Text :=
-        Data.FieldByName('stockIncrease').Value;
+      Data.FieldByName('stockIncrease').Value;
     exit;
-   end;
+  end;
 
   if (statusOrder = EStatusOrder.commited) then
-   begin
+  begin
     statusProduce := EStatusOrder.commited;
     setItemCID(Data.FieldByName('itemCID').ToString);
     setitemName(Data.FieldByName('itemName').ToString);
-    setstockAfter(Data.FieldByName('stockAfter').toString);
-    setstockIncrease(Data.FieldByName('stockIncrease').toString);
-   end
+    setstockAfter(Data.FieldByName('stockAfter').ToString);
+    setstockIncrease(Data.FieldByName('stockIncrease').ToString);
+  end
   else
-   begin
+  begin
     statusProduce := EStatusOrder.scratch;
     setItemCID('');
     setitemName('');
-    setstockAfter('');
+    setstockBefore('');
     setstockIncrease('');
-   end;
+  end;
 
   renderStockIncrease;
-  renderStockAfter;
+  renderStockBefore;
   renderItemCID;
   renderItemName;
   renderError;
- end;
 
-procedure TProduce.setFocus(Target: TControl = nil);
- begin
+end;
+
+procedure TProduce.setFocus(Sender: TInputText = nil);
+begin
   TThread.CreateAnonymousThread(
-   procedure
+    procedure
     begin
-     sleep(100);
-     TThread.Synchronize(nil,
-       procedure
-       begin
-        if Target.name = 'itemCID' then
-         FitemCID.setFocus
-        else
-         FstockIncrease.setFocus;
-       end);
+      sleep(100);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          if (Sender <> nil) then
+            Sender.setFocus
+          else if (statusProduce = EStatusOrder.cached) then
+            FstockIncrease.setFocus
+          else
+            FitemCID.setFocus;
+        end);
     end).Start;
- end;
+end;
 
 procedure TProduce.setItemCID(const itemCID: string);
- begin
+begin
   if not(assigned(FitemCID)) then
-   FitemCID := TInputText.Create(graphic);
+    FitemCID := TInputText.Create(graphic);
 
   FitemCID.Text := itemCID;
- end;
+end;
 
 procedure TProduce.setMoveID(const moveID: string);
- begin
+begin
   if not(assigned(FmoveID)) then
-   FmoveID := TInputText.Create(graphic);
+    FmoveID := TInputText.Create(graphic);
 
   FmoveID.Text := moveID;
- end;
+end;
 
 procedure TProduce.setStockOrderID(const stockOrderID: string);
- begin
+begin
   if not(assigned(FstockOrderID)) then
-   FstockOrderID := TInputText.Create(graphic);
+    FstockOrderID := TInputText.Create(graphic);
 
   FstockOrderID.Text := stockOrderID;
- end;
+end;
 
 procedure TProduce.setstockAfter(const stockAfter: string);
- begin
+begin
   if not(assigned(FstockAfter)) then
-   FstockAfter := TInputText.Create(graphic);
+    FstockAfter := TInputText.Create(graphic);
 
   FstockAfter.Text := stockAfter;
- end;
+end;
 
 procedure TProduce.setstockBefore(const stockBefore: string);
- begin
+begin
   if not(assigned(FstockBefore)) then
-   FstockBefore := TInputText.Create(graphic);
+    FstockBefore := TInputText.Create(graphic);
 
   FstockBefore.Text := stockBefore;
- end;
+end;
 
 procedure TProduce.setstockIncrease(const stockIncrease: string);
- begin
+begin
   if not(assigned(FstockIncrease)) then
-   FstockIncrease := TInputText.Create(graphic);
+    FstockIncrease := TInputText.Create(graphic);
 
   FstockIncrease.Text := stockIncrease;
- end;
+end;
 
 procedure TProduce.setitemName(const itemName: string);
- begin
+begin
   if not(assigned(FitemName)) then
-   FitemName := TInputText.Create(graphic);
+    FitemName := TInputText.Create(graphic);
 
   FitemName.Text := itemName;
- end;
+end;
 
 procedure TProduce.renderItemCID;
- begin
+begin
   with FitemCID do
-   begin
+  begin
     Name := 'itemCID';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
     TextSettings.Font.Family := 'Comic Sans MS';
     Enabled := true;
     align := TAlignLayout.Left;
-    TextSettings.Font.Size := 12.0;
+    TextSettings.Font.Size := 14.0;
     TextSettings.HorzAlign := TTextAlign.Center;
     ReadOnly := true;
     HitTest := false;
@@ -344,14 +399,14 @@ procedure TProduce.renderItemCID;
     validate := @validateItemCID;
     onInputSuccess := self.handleInputSuccess;
     onInputFailure := self.handleInputFailure;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FitemCID);
- end;
+end;
 
 procedure TProduce.renderItemName;
- begin
+begin
   with FitemName do
-   begin
+  begin
     name := 'itemName';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -360,65 +415,85 @@ procedure TProduce.renderItemName;
     TextSettings.HorzAlign := TTextAlign.Center;
     Enabled := true;
     TextSettings.Font.Size := 14.0;
-    Text := 'haha';
     HitTest := false;
     Margins.Right := 20.0;
-   end;
+  end;
 
   TRectangle(graphic.Components[0]).AddObject(FitemName);
- end;
+end;
 
 procedure TProduce.renderStockAfter;
- begin
+begin
   with FstockAfter do
-   begin
+  begin
     Name := 'stockAfter';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
     TextSettings.Font.Family := 'Comic Sans MS';
     Enabled := true;
     align := TAlignLayout.Right;
-    TextSettings.Font.Size := 12.0;
+    TextSettings.Font.Size := 14.0;
+    TextSettings.Font.Style := [TFontStyle.fsBold];
     TextSettings.HorzAlign := TTextAlign.Center;
     ReadOnly := true;
     HitTest := false;
     Margins.Right := 20;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FstockAfter);
- end;
+end;
+
+procedure TProduce.renderStockBefore;
+begin
+  with FStockBefore do
+  begin
+    Name := 'stockAfter';
+    StyleLookup := 'transparentedit';
+    StyledSettings := [];
+    TextSettings.Font.Family := 'Comic Sans MS';
+    Enabled := true;
+    align := TAlignLayout.Right;
+    TextSettings.Font.Size := 14.0;
+    TextSettings.Font.Style := [TFontStyle.fsBold];
+    TextSettings.HorzAlign := TTextAlign.Center;
+    ReadOnly := true;
+    HitTest := false;
+    Margins.Right := 20;
+  end;
+  TRectangle(graphic.Components[0]).AddObject(FSTockBefore);
+end;
 
 procedure TProduce.renderStockIncrease;
- begin
+begin
   with FstockIncrease do
-   begin
+  begin
     Name := 'stockIncrease';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
     TextSettings.Font.Family := 'Comic Sans MS';
     align := TAlignLayout.Right;
     Enabled := true;
-    TextSettings.Font.Size := 12.0;
+    TextSettings.Font.Size := 14.0;
     TextSettings.HorzAlign := TTextAlign.Center;
     ReadOnly := true;
     HitTest := false;
     validate := @validateStockIncrease;
     onInputSuccess := self.handleInputSuccess;
     onInputFailure := self.handleInputFailure;
-   end;
+  end;
 
   TRectangle(graphic.Components[0]).AddObject(FstockIncrease);
- end;
+end;
 
 procedure TProduce.renderError;
- begin
+begin
   FError := TLabel.Create(graphic.Components[0]);
 
   with FError do
-   begin
+  begin
     StyledSettings := [];
     Position.Y := 65.0;
     Size.Width := graphic.Size.Width;
-    Margins.Left := 40.0;
+    Margins.Left := 50.0;
     TextAlign := TTextAlign.Center;
     TextSettings.Font.Family := 'Comic Sans MS';
     TextSettings.Font.Size := 18.0;
@@ -426,90 +501,69 @@ procedure TProduce.renderError;
     AutoSize := true;
     Text := '-';
     Visible := false;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FError);
- end;
+end;
 
 procedure TProduce.displayError(const errMsg: string);
- begin
+begin
   var
   rect := TRectangle(graphic.Components[0]);
 
   if errMsg = '' then
-   begin
+  begin
     rect.Sides := [];
     rect.Stroke.Color := TAlphaColorRec.White;
     rect.Stroke.thickness := 0.0;
-    FError.Text := '';
+    FError.Text := '-';
     FError.Visible := false;
     graphic.Margins.Bottom := 20.0;
-   end
+  end
   else
-   begin
+  begin
     rect.Sides := [TSide.Top, TSide.Bottom, TSide.Left, TSide.Right];
     rect.Stroke.thickness := 3.0;
     rect.Stroke.Color := TAlphaColorRec.Crimson;
     FError.Text := errMsg;
     FError.Visible := true;
     graphic.Margins.Bottom := 40.0;
-   end;
+  end;
 
- end;
+end;
 
 procedure TProduce.enableInteractivity(Target: TInputText);
- begin
-  showMessage('enable interactivity');
+begin
   Target.ReadOnly := false;
   Target.HitTest := true;
   Target.OnKeyUp := Target.handleKey;
-  Target.Text := '';
   setFocus(Target);
- end;
+end;
 
 procedure TProduce.disableInteractivity(Target: TInputText);
- begin
-  showMessage('disable interactivity');
+begin
+  graphic.OnClick := nil;
+  graphic.PopupMenu.Free;
   Target.ReadOnly := true;
   Target.HitTest := false;
   Target.OnKeyUp := nil;
-  // graphic.OnClick := nil;
- end;
-
-procedure TProduce.fetchProduce;
- begin
-  showMessage('fetch produce');
-  var
-   fetched: Boolean := true;
-
-  if fetched then
-   begin
-    recordCurrentStockLevels;
-    askNewStockToBeAdded;
-   end
-  else
-   begin
-    displayError(FitemCID.Text + ' does not exist!');
-    waitForProduce;
-   end;
-
- end;
+end;
 
 initialization
 
 begin
- try
-  regexpSnippets := TRegexpSnippets.Create;
-  regexpSnippets.compileSnippets(['!iNum', '!rNum']);
- except
-  on E: Exception do
-   showMessage(E.message);
- end;
+  try
+    regexpSnippets := TRegexpSnippets.Create;
+    regexpSnippets.compileSnippets(['!iNum', '!rNum']);
+  except
+    on E: Exception do
+      showMessage(E.message);
+  end;
 end;
 
 finalization
 
 begin
- regexpSnippets.Free;
+  regexpSnippets.Free;
 end;
 
 end.

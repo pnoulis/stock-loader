@@ -8,6 +8,7 @@ uses
   fr_order,
   fr_pass,
   udmServerMSSQL,
+  FireDAC.Comp.Client,
   System.sysUtils,
   System.classes,
   System.UITypes,
@@ -23,18 +24,19 @@ type
   private
     Pin: TTabItem;
     Pass: TPass;
-    Orders: TListOrders;
+    ListOrders: TListOrders;
     newOrders: TListOrders;
     procedure renderPass;
     procedure renderPin;
     procedure fetchOrders;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure handleNewTab(Order: TOrder);
+    procedure handleNewTab(Order: TOrder = nil);
     procedure handleTabClick(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Single);
     procedure handleOrderDblClick(AOrder: TOrder);
     procedure handleCancelOrderClick(FOrder: TFOrder);
+    procedure handleCommitOrder(FOrder: TFOrder);
   end;
 
 implementation
@@ -54,18 +56,44 @@ begin
   setLength(newOrders, 1);
 end;
 
+procedure TKitchen.renderPin;
+begin
+  Pin := add;
+  Pin.Cursor := TCursor(crHandPoint);
+  Pin.text := 'Παραγγελιες';
+end;
+
 procedure TKitchen.fetchOrders;
+var
+  data: TFDTable;
 begin
 
   try
-    Orders := DB.fetchOrders;
-    for var Order in Orders do
-      Order.onOrderDblClick := handleOrderDblClick;
+    data := DB.fetchOrders;
+    setLength(ListOrders, data.RecordCount);
+
+    for var i := 0 to data.RecordCount - 1 do
+    begin
+      ListOrders[i] := TOrder.Create(i, data);
+      ListOrders[i].onOrderDblClick := handleOrderDblClick;
+      data.Next;
+    end;
+
   except
     on E: Exception do
       showMessage(E.Message);
   end;
 
+end;
+
+procedure TKitchen.renderPass;
+begin
+  fetchOrders;
+  Pass := TPass.Create(Pin);
+  Pass.onNewOrder := handleNewTab;
+  Pin.AddObject(Pass);
+  for var Order in ListOrders do
+    Pass.orderToPass(Order);
 end;
 
 procedure TKitchen.handleCancelOrderClick(FOrder: TFOrder);
@@ -77,11 +105,57 @@ begin
     FOrder.Order.isDisplayed := false;
 
   self.First(TTabTransition.none, TTabTransitionDirection.Normal);
-  delete(TTabItem(FOrder.TagObject).index);
+  delete(TTabItem(FOrder.TagObject).Index);
 
 end;
 
-procedure TKitchen.handleNewTab(Order: TOrder);
+procedure TKitchen.handleCommitOrder(FOrder: TFOrder);
+begin
+  var proc := db.addStockOrder;
+  var tmp: TFOrder;
+  FOrder.Order.stockOrderID := proc.FieldByName('stockOrderID').AsInteger;
+  FOrder.Order.storeID := proc.FieldByName('storeID').AsInteger;
+  FOrder.Order.date.commited := proc.FieldByName('moveDate').AsDateTime;
+  FOrder.Order.status := EStatusOrder.commited;
+  FOrder.order.isFetching := false;
+  self.Pass.Free;
+    TThread.CreateAnonymousThread(
+    procedure
+    begin
+      sleep(400);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          self.renderPass;
+        end);
+    end).Start;
+
+
+    for var order in FOrder.Order.listProduce do
+    begin
+      o
+    end;
+
+    var mytab := TTabItem(FOrder.TagObject);
+
+    tmp := TFOrder.Create(mytab, FOrder.Order);
+    tmp.TagObject := FOrder.TagObject;
+    tmp.onCancelOrderClick := handlecancelorderclick;
+    tmp.onCommitOrder := handlecommitorder;
+
+
+  {
+  tmp.TagObject := TTabItem(FOrder.tagObject);
+  FOrder.onCancelOrderClick := handleCancelOrderClick;
+  FOrder.onCommitOrder := handleCommitOrder;
+  tab.AddObject(FOrder);
+  tab.TagObject := Order;
+  Order.isDisplayed := true;
+  ActiveTab := tab;
+  }
+end;
+
+procedure TKitchen.handleNewTab(Order: TOrder = nil);
 var
   tab: TTabItem;
   lnOrders, nextID: cardinal;
@@ -112,7 +186,7 @@ begin
     if (tabGap < 0) or (tabGap = lnOrders - 1) then
     begin
 
-      //Order := TOrder.Create(nextID);
+      // Order := TOrder.Create(nextID);
       Order := TOrder.Create(0);
       Order.onOrderDblClick := handleOrderDblClick;
       newOrders[lnOrders - 1] := Order;
@@ -120,7 +194,7 @@ begin
     end
     else
     begin
-      //Order := TOrder.Create(nextID);
+      // Order := TOrder.Create(nextID);
       Order := TOrder.Create(0);
       Order.onOrderDblClick := handleOrderDblClick;
       newOrders[tabGap] := Order;
@@ -142,6 +216,7 @@ begin
   FOrder := TFOrder.Create(tab, Order);
   FOrder.TagObject := tab;
   FOrder.onCancelOrderClick := handleCancelOrderClick;
+  FOrder.onCommitOrder := handleCommitOrder;
   tab.AddObject(FOrder);
   tab.TagObject := Order;
   Order.isDisplayed := true;
@@ -181,12 +256,15 @@ end;
 procedure TKitchen.handleTabClick(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
 begin
+
   var
   btn := TButton(TTabItem(Sender).FindStyleResource('btnClose'));
   var
-  index := TTabItem(Sender).index;
+  index := TTabItem(Sender).Index;
   var
   Order := TOrder(TTabItem(Sender).TagObject);
+
+  if Order.isFetching then exit;
 
   if (X >= btn.BoundsRect.Left) then
   begin
@@ -200,21 +278,6 @@ begin
     delete(index);
   end;
 
-end;
-
-procedure TKitchen.renderPass;
-begin
-  fetchOrders;
-  Pass := TPass.Create(Pin, Orders);
-  Pass.onNewOrder := handleNewTab;
-  Pin.AddObject(Pass);
-end;
-
-procedure TKitchen.renderPin;
-begin
-  Pin := add;
-  Pin.Cursor := TCursor(crHandPoint);
-  Pin.text := 'Παραγκελιες';
 end;
 
 end.

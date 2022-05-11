@@ -3,11 +3,19 @@ object FOrder: TFOrder
   Size.Width = 780.000000000000000000
   Size.Height = 688.000000000000000000
   Size.PlatformDefault = False
+  object loaderCommit: TAniIndicator
+    Align = Center
+    Size.Width = 100.000000000000000000
+    Size.Height = 100.000000000000000000
+    Size.PlatformDefault = False
+    Style = Circular
+    Visible = False
+  end
   object Rectangle1: TRectangle
     Align = Client
     Padding.Left = 20.000000000000000000
     Padding.Top = 15.000000000000000000
-    Padding.Right = 20.000000000000000000
+    Padding.Right = 5.000000000000000000
     Padding.Bottom = 20.000000000000000000
     Sides = []
     Size.Width = 780.000000000000000000
@@ -19,7 +27,7 @@ object FOrder: TFOrder
       Align = Top
       Position.X = 20.000000000000000000
       Position.Y = 15.000000000000000000
-      Size.Width = 740.000000000000000000
+      Size.Width = 755.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
@@ -27,7 +35,7 @@ object FOrder: TFOrder
         Align = Client
         Fill.Kind = None
         Sides = []
-        Size.Width = 740.000000000000000000
+        Size.Width = 755.000000000000000000
         Size.Height = 75.000000000000000000
         Size.PlatformDefault = False
         Stroke.Kind = None
@@ -44,6 +52,7 @@ object FOrder: TFOrder
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
+          OnClick = btnCommitOrderClick
         end
         object btnCancelOrder: TButton
           Align = Vertical
@@ -73,6 +82,7 @@ object FOrder: TFOrder
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
+          OnClick = btnDeleteProduceClick
         end
         object memoOrderID: TMemo
           Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
@@ -88,7 +98,7 @@ object FOrder: TFOrder
           Align = Right
           CanFocus = False
           Cursor = crArrow
-          Position.X = 495.000000000000000000
+          Position.X = 510.000000000000000000
           Size.Width = 245.000000000000000000
           Size.Height = 75.000000000000000000
           Size.PlatformDefault = False
@@ -104,7 +114,7 @@ object FOrder: TFOrder
       Margins.Top = 20.000000000000000000
       Position.X = 20.000000000000000000
       Position.Y = 110.000000000000000000
-      Size.Width = 740.000000000000000000
+      Size.Width = 755.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
@@ -123,7 +133,7 @@ object FOrder: TFOrder
       object lblAmountHeader: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 620.000000000000000000
+        Position.X = 635.000000000000000000
         Size.Width = 120.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
@@ -133,10 +143,11 @@ object FOrder: TFOrder
         Text = #913#965#958#951#963#951' '#954#945#964#945':'
         TabOrder = 3
       end
-      object Label1: TLabel
+      object lblStockAfter: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 500.000000000000000000
+        Margins.Right = 20.000000000000000000
+        Position.X = 495.000000000000000000
         Size.Width = 120.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
@@ -146,10 +157,10 @@ object FOrder: TFOrder
         Text = #928#959#963#959#964#951#964#945
         TabOrder = 1
       end
-      object label2: TLabel
+      object lblItemName: TLabel
         Align = Client
         StyledSettings = [FontColor]
-        Size.Width = 380.000000000000000000
+        Size.Width = 375.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Family = 'Comic Sans MS'
@@ -161,18 +172,18 @@ object FOrder: TFOrder
     end
     object scrollProduce: TVertScrollBox
       Align = Client
-      Padding.Right = 10.000000000000000000
+      Padding.Right = 20.000000000000000000
       Margins.Top = 20.000000000000000000
-      Size.Width = 740.000000000000000000
+      Size.Width = 755.000000000000000000
       Size.Height = 468.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
-      Viewport.Width = 740.000000000000000000
+      Viewport.Width = 755.000000000000000000
       Viewport.Height = 468.000000000000000000
       object panelProduceTemplate: TPanel
         Align = Top
         Cursor = crHandPoint
-        Size.Width = 730.000000000000000000
+        Size.Width = 735.000000000000000000
         Size.Height = 65.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'panel1style1'
@@ -184,7 +195,7 @@ object FOrder: TFOrder
           HitTest = False
           Padding.Left = 10.000000000000000000
           Padding.Right = 10.000000000000000000
-          Size.Width = 730.000000000000000000
+          Size.Width = 735.000000000000000000
           Size.Height = 65.000000000000000000
           Size.PlatformDefault = False
           Stroke.Color = claWhite
@@ -200,7 +211,7 @@ object FOrder: TFOrder
             TextSettings.Font.Family = 'Comic Sans MS'
             TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.HorzAlign = Center
-            Position.X = 500.000000000000000000
+            Position.X = 505.000000000000000000
             HitTest = False
             Margins.Right = 20.000000000000000000
             Size.Width = 100.000000000000000000
@@ -220,7 +231,7 @@ object FOrder: TFOrder
             TextSettings.HorzAlign = Center
             HitTest = False
             Margins.Right = 20.000000000000000000
-            Size.Width = 350.000000000000000000
+            Size.Width = 355.000000000000000000
             Size.Height = 65.000000000000000000
             Size.PlatformDefault = False
             StyledSettings = [Style, FontColor]
@@ -235,7 +246,7 @@ object FOrder: TFOrder
             TextSettings.Font.Family = 'Comic Sans MS'
             TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.HorzAlign = Center
-            Position.X = 620.000000000000000000
+            Position.X = 625.000000000000000000
             HitTest = False
             Size.Width = 100.000000000000000000
             Size.Height = 65.000000000000000000

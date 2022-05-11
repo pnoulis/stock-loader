@@ -1,4 +1,5 @@
 object Pass: TPass
+  Align = Client
   Size.Width = 852.000000000000000000
   Size.Height = 688.000000000000000000
   Size.PlatformDefault = False
@@ -21,7 +22,7 @@ object Pass: TPass
       object Rectangle1: TRectangle
         Align = Client
         EnableDragHighlight = False
-        Padding.Left = 20.000000000000000000
+        Padding.Left = 25.000000000000000000
         Size.Width = 852.000000000000000000
         Size.Height = 58.000000000000000000
         Size.PlatformDefault = False
@@ -34,7 +35,7 @@ object Pass: TPass
           EnableDragHighlight = False
           StyledSettings = [FontColor]
           Margins.Right = 20.000000000000000000
-          Position.X = 20.000000000000000000
+          Position.X = 25.000000000000000000
           Size.Width = 113.000000000000000000
           Size.Height = 58.000000000000000000
           Size.PlatformDefault = False
@@ -43,6 +44,7 @@ object Pass: TPass
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
+          OnClick = btnNewOrderClick
         end
         object btnDeleteOrder: TButton
           Align = Left
@@ -50,7 +52,7 @@ object Pass: TPass
           Cursor = crHandPoint
           EnableDragHighlight = False
           StyledSettings = [FontColor]
-          Position.X = 153.000000000000000000
+          Position.X = 158.000000000000000000
           Size.Width = 113.000000000000000000
           Size.Height = 58.000000000000000000
           Size.PlatformDefault = False
@@ -99,10 +101,10 @@ object Pass: TPass
         TabOrder = 0
       end
     end
-    object listOrders: TVertScrollBox
+    object scrollOrders: TVertScrollBox
       Align = Client
-      Padding.Left = 30.000000000000000000
-      Padding.Right = 30.000000000000000000
+      Padding.Left = 25.000000000000000000
+      Padding.Right = 25.000000000000000000
       Margins.Top = 20.000000000000000000
       Size.Width = 852.000000000000000000
       Size.Height = 486.000000000000000000

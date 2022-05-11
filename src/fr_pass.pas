@@ -3,6 +3,7 @@
 interface
 
 uses
+untTypes,
   u_order,
   System.SysUtils,
   System.Types,
@@ -27,44 +28,51 @@ type
     layoutHeader: TLayout;
     lblOrderID: TLabel;
     lblOrderDate: TLabel;
-    listOrders: TVertScrollBox;
+    scrollOrders: TVertScrollBox;
     Rectangle2: TRectangle;
     Rectangle1: TRectangle;
     panelOrderTemplate: TPanel;
     Label1: TLabel;
     Label2: TLabel;
     Rectangle3: TRectangle;
+    procedure btnNewOrderClick(Sender: TObject);
   private
   public
-    onNewOrder: procedure(order: TOrder) of object;
-    constructor Create(AOwner: TComponent; orders: u_order.TListOrders);
-    procedure handleNewOrderClick(Sender: TObject);
+    onNewOrder: procedure(order: TOrder = nil) of object;
+    procedure orderToPass(AOrder: TOrder);
   end;
 
 implementation
-
+var
+scrollHeight, contentHeight: Double;
 {$R *.fmx}
 { TPass }
 
-constructor TPass.Create(AOwner: TComponent; orders: u_order.TListOrders);
-var
-  tmp: TPanel;
+procedure TPass.btnNewOrderClick(Sender: TObject);
 begin
-  inherited Create(AOwner);
-
-  Align := TAlignLayout.Client;
-  listOrders.Padding.Left := 25.0;
-  listOrders.Padding.Right := 25.0;
-
-  for var order in orders do
-    listOrders.AddObject(order.renderSelf(listOrders, panelOrderTemplate));
-
-  btnNewOrder.OnClick := handleNewOrderClick;
+onNewOrder;
 end;
 
-procedure TPass.handleNewOrderClick(Sender: TObject);
+procedure TPass.orderToPass(AOrder: TOrder);
 begin
-  onNewOrder(nil);
+
+var some := AOrder.renderSelf(self, panelOrderTemplate);
+some.Align := TAlignLayout.Top;
+some.Margins.Bottom := 20.0;
+
+  if scrollHeight = 0 then
+    scrollHeight := panelOrderTemplate.Size.Height + panelOrderTemplate.Margins.Height;
+
+  contentHeight := contentHeight + scrollHeight + 200;
+  panelOrderTemplate.Position.Y := contentHeight;
+
+  if contentHeight > Size.Height then
+    scrollOrders.scrollBy(0.0, -contentHeight);
+
+scrollOrders.AddObject(some);
 end;
 
+begin
+contentHeight := 0;
+scrollHeight := 0;
 end.
