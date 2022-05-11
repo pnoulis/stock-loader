@@ -66,8 +66,10 @@ some.Margins.Bottom := 20.0;
   contentHeight := contentHeight + scrollHeight + 200;
   panelOrderTemplate.Position.Y := contentHeight;
 
+  {
   if contentHeight > Size.Height then
     scrollOrders.scrollBy(0.0, -contentHeight);
+    }
 
 scrollOrders.AddObject(some);
 end;

@@ -88,8 +88,7 @@ object FOrder: TFOrder
           Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
           DataDetectorTypes = []
           Lines.Strings = (
-            #913#961'. '#928#945#961#945#947#947#949#955#953#945#962': '
-            '')
+            #913#961'. '#928#945#961#945#947#947#949#955#953#945#962': ')
           StyledSettings = [FontColor]
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
@@ -104,8 +103,8 @@ object FOrder: TFOrder
           Size.PlatformDefault = False
           StyleLookup = 'memo1Style1'
           TabOrder = 3
-          Viewport.Width = 241.000000000000000000
-          Viewport.Height = 71.000000000000000000
+          Viewport.Width = 245.000000000000000000
+          Viewport.Height = 75.000000000000000000
         end
       end
     end

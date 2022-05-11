@@ -118,41 +118,10 @@ begin
   FOrder.Order.date.commited := proc.FieldByName('moveDate').AsDateTime;
   FOrder.Order.status := EStatusOrder.commited;
   FOrder.order.isFetching := false;
-  self.Pass.Free;
-    TThread.CreateAnonymousThread(
-    procedure
-    begin
-      sleep(400);
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          self.renderPass;
-        end);
-    end).Start;
-
-
-    for var order in FOrder.Order.listProduce do
-    begin
-      o
-    end;
-
-    var mytab := TTabItem(FOrder.TagObject);
-
-    tmp := TFOrder.Create(mytab, FOrder.Order);
-    tmp.TagObject := FOrder.TagObject;
-    tmp.onCancelOrderClick := handlecancelorderclick;
-    tmp.onCommitOrder := handlecommitorder;
-
-
-  {
-  tmp.TagObject := TTabItem(FOrder.tagObject);
-  FOrder.onCancelOrderClick := handleCancelOrderClick;
-  FOrder.onCommitOrder := handleCommitOrder;
-  tab.AddObject(FOrder);
-  tab.TagObject := Order;
-  Order.isDisplayed := true;
-  ActiveTab := tab;
-  }
+  self.Pass.orderToPass(FOrder.Order);
+  FOrder.Order.isDisplayed := true;
+  TTabItem(FOrder.TagObject).Text := forder.Order.stockOrderID.tostring;
+  forder.commitProduce;
 end;
 
 procedure TKitchen.handleNewTab(Order: TOrder = nil);
@@ -236,7 +205,7 @@ begin
   with tab do
   begin
     StyleLookup := 'tabItemClose';
-    text := AOrder.id.toString;
+    text := AOrder.stockOrderID.tostring;
     autoSize := false;
     Size.Width := TAB_WIDTH;
     Size.Height := TAB_HEIGHT;
