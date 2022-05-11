@@ -128,8 +128,8 @@ function TdmServerMSSQL.fetchItem(const itemCID: string): TFDQuery;
  begin
   result := queryItem;
   result.active := false;
-  result.Open('select itemCID, itemName, itemAmount from item where itemCID = '
-      + itemCID);
+  result.Open('select itemCID, itemName, itemAmount from item where itemCID = '''
+      + itemCID + '''');
  end;
 
 function TdmServerMSSQL.fetchOrders: TFDTable;

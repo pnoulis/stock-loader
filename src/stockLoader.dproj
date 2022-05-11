@@ -248,17 +248,12 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="untProduce.pas"/>
-        <DCCReference Include="untKitchen.pas"/>
         <DCCReference Include="untTypes.pas"/>
         <DCCReference Include="regexp-snippets\untTRegexpSnippets.pas"/>
         <DCCReference Include="regexp-snippets\untSnippets.pas"/>
         <DCCReference Include="untInput.pas"/>
         <DCCReference Include="..\lib\delphi-utils\src\uDBConnect.pas"/>
         <DCCReference Include="..\lib\delphi-utils\src\uFilesystem.pas"/>
-        <DCCReference Include="frmStockLoader.pas">
-            <Form>frmLoader</Form>
-        </DCCReference>
         <DCCReference Include="udmServerMSSQL.pas">
             <Form>dmServerMSSQL</Form>
             <DesignClass>TDataModule</DesignClass>

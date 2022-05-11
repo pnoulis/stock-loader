@@ -64,6 +64,36 @@ Orders can be in 3 states as far as parent components are concerned such as
 1) served orders
 2) commited orders
 3) scratchpad orders
+   
+
+order.addProduce
+order.deleteProduce
+order.editProduce
+order.commit
+
+pass.inspectOrder
+
+
+kitchen.inspectOrder
+kitchen.addOrder
+kitchen.deleteOrder
+
+kitchen.handleNewOrder
+
+
+order.commit
+order.onCommit
+
+
+the produce notifies the order when it has done its job.
+the order then needs to create  a new produce and list it
+
+
+forder.commit_order
+forder_delete_selected_orders
+produce_edit
+produce_commit
+
 
 ** Produce
 * color
