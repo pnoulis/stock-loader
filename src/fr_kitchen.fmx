@@ -1,6 +1,39 @@
-object frKitchen: TfrKitchen
+object Kitchen: TKitchen
   Align = Client
-  Size.Width = 848.000000000000000000
-  Size.Height = 640.000000000000000000
+  Padding.Left = 2.000000000000000000
+  Padding.Top = 5.000000000000000000
+  Size.Width = 816.000000000000000000
+  Size.Height = 904.000000000000000000
   Size.PlatformDefault = False
+  object Pass: TTabControl
+    Align = Client
+    Size.Width = 814.000000000000000000
+    Size.Height = 899.000000000000000000
+    Size.PlatformDefault = False
+    StyleLookup = 'tabcontrol1style1'
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = PlatformDefault
+    Sizes = (
+      814s
+      869s)
+    object Pin: TTabItem
+      AutoSize = False
+      Cursor = crHandPoint
+      CustomIcon = <
+        item
+        end>
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      StyledSettings = [FontColor]
+      IsSelected = True
+      Size.Width = 130.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = #928#945#961#945#947#947#949#955#953#949#962
+    end
+  end
 end

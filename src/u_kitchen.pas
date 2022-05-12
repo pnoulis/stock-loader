@@ -6,7 +6,7 @@ uses
   u_order,
   untTypes,
   fr_order,
-  fr_pass,
+  fr_floor,
   udmServerMSSQL,
   FireDAC.Comp.Client,
   System.sysUtils,
@@ -23,7 +23,7 @@ type
   TKitchen = class(TTabControl)
   private
     Pin: TTabItem;
-    Pass: TPass;
+    Pass: TFloor;
     ListOrders: TListOrders;
     newOrders: TListOrders;
     procedure renderPass;
@@ -89,7 +89,7 @@ end;
 procedure TKitchen.renderPass;
 begin
   fetchOrders;
-  Pass := TPass.Create(Pin);
+  Pass := TFloor.Create(Pin);
   Pass.onNewOrder := handleNewTab;
   Pin.AddObject(Pass);
   for var Order in ListOrders do

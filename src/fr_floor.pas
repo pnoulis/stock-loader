@@ -1,4 +1,4 @@
-﻿unit fr_pass;
+﻿unit fr_floor;
 
 interface
 
@@ -21,7 +21,7 @@ uses
  FMX.Objects;
 
 type
- TPass = class(TFrame)
+ TFloor = class(TFrame)
   layoutActions: TLayout;
   btnDeleteOrder: TButton;
   btnNewOrder: TButton;
@@ -47,14 +47,14 @@ implementation
 var
  scrollHeight, contentHeight: Double;
 {$R *.fmx}
- { TPass }
+ { TFloor }
 
-procedure TPass.btnNewOrderClick(Sender: TObject);
+procedure TFloor.btnNewOrderClick(Sender: TObject);
  begin
   onNewOrder;
  end;
 
-procedure TPass.orderToPass(AOrder: TOrder);
+procedure TFloor.orderToPass(AOrder: TOrder);
  begin
 
   var

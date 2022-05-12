@@ -1,4 +1,4 @@
-object Pass: TPass
+object Pass: TFloor
   Align = Client
   Size.Width = 852.000000000000000000
   Size.Height = 688.000000000000000000
