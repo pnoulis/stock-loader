@@ -4,6 +4,7 @@ interface
 
 uses
  untTypes,
+ udmServerMSSQL,
  u_order,
  System.SysUtils,
  System.Types,
@@ -16,6 +17,7 @@ uses
  FMX.Forms,
  FMX.Dialogs,
  FMX.StdCtrls,
+ FireDAC.Comp.Client,
  FMX.Controls.Presentation,
  FMX.Layouts,
  FMX.Objects;
@@ -37,6 +39,7 @@ type
   Rectangle3: TRectangle;
   procedure btnNewOrderClick(Sender: TObject);
  private
+  procedure fetchOrders;
  public
   onNewOrder: procedure(order: TOrder = nil) of object;
   procedure orderToPass(AOrder: TOrder);
@@ -54,30 +57,45 @@ procedure TFloor.btnNewOrderClick(Sender: TObject);
   onNewOrder;
  end;
 
+procedure TFloor.fetchOrders;
+ var Orders: TFDTable;
+ begin
+
+  try
+   Orders := DB.fetchOrders;
+  except
+   on E: Exception do
+    showMessage(E.Message);
+  end;
+
+ end;
+
 procedure TFloor.orderToPass(AOrder: TOrder);
  begin
 
-  var
-  some := AOrder.renderSelf(self, panelOrderTemplate);
-  some.Align := TAlignLayout.Top;
-  some.Margins.Bottom := 20.0;
-
-  if scrollHeight = 0 then
-   scrollHeight := panelOrderTemplate.Size.Height +
-       panelOrderTemplate.Margins.Height;
-
-  contentHeight := contentHeight + scrollHeight + 200;
-  panelOrderTemplate.Position.Y := contentHeight;
-
   {
+    var
+    some := AOrder.renderSelf(self, panelOrderTemplate);
+    some.Align := TAlignLayout.Top;
+    some.Margins.Bottom := 20.0;
+
+    if scrollHeight = 0 then
+    scrollHeight := panelOrderTemplate.Size.Height +
+    panelOrderTemplate.Margins.Height;
+
+    contentHeight := contentHeight + scrollHeight + 200;
+    panelOrderTemplate.Position.Y := contentHeight;
+
+    {
     if contentHeight > Size.Height then
     scrollOrders.scrollBy(0.0, -contentHeight);
   }
 
-  scrollOrders.AddObject(some);
+  // scrollOrders.AddObject(some);
  end;
 
 begin
+
  contentHeight := 0;
  scrollHeight := 0;
 

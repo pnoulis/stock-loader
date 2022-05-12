@@ -16,7 +16,7 @@ object Kitchen: TKitchen
     TabPosition = PlatformDefault
     Sizes = (
       814s
-      869s)
+      859s)
     object Pin: TTabItem
       AutoSize = False
       Cursor = crHandPoint
@@ -29,7 +29,7 @@ object Kitchen: TKitchen
       StyledSettings = [FontColor]
       IsSelected = True
       Size.Width = 130.000000000000000000
-      Size.Height = 30.000000000000000000
+      Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
