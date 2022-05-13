@@ -14,6 +14,7 @@ object dmServerMSSQL: TdmServerMSSQL
     Connection = connection
     FetchOptions.AssignedValues = [evRecordCountMode]
     FetchOptions.RecordCountMode = cmTotal
+    SchemaName = 'dbo'
     TableName = 'stockOrders'
     Left = 168
     Top = 16
@@ -69,5 +70,9 @@ object dmServerMSSQL: TdmServerMSSQL
         ParamType = ptInput
         Value = 0
       end>
+  end
+  object DataSource1: TDataSource
+    Left = 112
+    Top = 280
   end
 end

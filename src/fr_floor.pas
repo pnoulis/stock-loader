@@ -19,6 +19,7 @@ uses
  FMX.StdCtrls,
  FireDAC.Comp.Client,
  FMX.Controls.Presentation,
+ Data.DB,
  FMX.Layouts,
  FMX.Objects;
 
@@ -33,70 +34,181 @@ type
   scrollOrders: TVertScrollBox;
   Rectangle2: TRectangle;
   Rectangle1: TRectangle;
-  panelOrderTemplate: TPanel;
+  templateFloorOrder: TPanel;
   Label1: TLabel;
   Label2: TLabel;
   Rectangle3: TRectangle;
   procedure btnNewOrderClick(Sender: TObject);
- private
+
+ private type
+  TFloorOrder = record
+   isSelected: Boolean;
+   Order: TOrder;
+  end;
+
+  TListFloorOrders = array of TFloorOrder;
+
+ var
+  FScrollHeight: Double;
+  FContentHeight: Double;
+  ListOrders: TListFloorOrders;
+  procedure flushFloor;
   procedure fetchOrders;
+  procedure OrdersToFloor(Data: TDataSet);
+  procedure OrderToFloor(AOrderRecord: TFields; const IndexRecord: cardinal);
+  procedure renderOrder(AOrder: TPanel);
+  function formatDate(const ADate: TDateTime): string;
+  procedure handlePanelClick(Sender: TObject);
+  procedure handlePanelDblClick(Sender: TObject);
  public
-  onNewOrder: procedure(order: TOrder = nil) of object;
-  procedure orderToPass(AOrder: TOrder);
+  onNewOrder: procedure(Order: TOrder = nil) of object;
+  constructor Create(AOwner: TComponent); override;
+  destructor Destroy; override;
  end;
 
 implementation
 
-var
- scrollHeight, contentHeight: Double;
 {$R *.fmx}
- { TFloor }
+{ TFloor }
+
+constructor TFloor.Create(AOwner: TComponent);
+ begin
+  inherited Create(AOwner);
+  FScrollHeight := 0.0;
+  FContentHeight := 0.0;
+  fetchOrders;
+ end;
+
+destructor TFloor.Destroy;
+ begin
+  flushFloor;
+  inherited Destroy;
+ end;
 
 procedure TFloor.btnNewOrderClick(Sender: TObject);
  begin
   onNewOrder;
  end;
 
-procedure TFloor.fetchOrders;
- var Orders: TFDTable;
+procedure TFloor.flushFloor;
  begin
 
-  try
-   Orders := DB.fetchOrders;
-  except
-   on E: Exception do
-    showMessage(E.Message);
-  end;
+  for var i := 0 to High(ListOrders) do
+   FreeAndNil(ListOrders[i].Order);
+
+  scrollOrders.BeginUpdate;
+  scrollOrders.Content.DeleteChildren;
+  scrollOrders.RealignContent;
+  scrollOrders.EndUpdate;
+
+  FScrollHeight := 0.0;
+  FContentHeight := 0.0;
+ end;
+
+procedure TFloor.fetchOrders;
+ begin
+
+  DB.fetchAsyncOrders(
+    procedure(Data: TDataSource)
+    begin
+     if (Data <> nil) then
+      OrdersToFloor(Data.DataSet)
+     else
+      OrdersToFloor(nil);
+    end);
 
  end;
 
-procedure TFloor.orderToPass(AOrder: TOrder);
+procedure TFloor.OrdersToFloor(Data: TDataSet);
  begin
+
+  if not assigned(Data) then
+   exit;
+
+  flushFloor;
+  SetLength(ListOrders, Data.RecordCount);
+  while not Data.Eof do
+   begin
+    OrderToFloor(Data.Fields, Data.RecNo);
+    Data.Next;
+   end;
+
+ end;
+
+procedure TFloor.OrderToFloor(AOrderRecord: TFields;
+const IndexRecord: cardinal);
+ begin
+  var
+  Order := TOrder.Create(AOrderRecord);
+  var
+  Panel := templateFloorOrder.Clone(scrollOrders) as TPanel;
+
+  TLabel(Panel.Components[1]).Text := Order.StockOrderID.ToString;
+  TLabel(Panel.Components[2]).Text := formatDate(Order.Date.commited);
+  Panel.Visible := true;
+  Panel.TabOrder := IndexRecord;
+  Panel.Tag := IndexRecord;
+
+  Panel.OnDblClick := handlePanelDblClick;
+  if not(Order.Status = EStatusOrder.served) then
+   Panel.OnClick := handlePanelClick;
+
+  ListOrders[IndexRecord - 1].Order := Order;
+  ListOrders[IndexRecord - 1].isSelected := false;
+
+  renderOrder(Panel);
+ end;
+
+procedure TFloor.renderOrder(AOrder: TPanel);
+ begin
+
+  if FScrollHeight = 0 then
+   FScrollHeight := AOrder.Size.Height + AOrder.Margins.Bottom;
+
+  FContentHeight := FContentHeight + FScrollHeight;
+  AOrder.Position.Y := FContentHeight;
 
   {
-    var
-    some := AOrder.renderSelf(self, panelOrderTemplate);
-    some.Align := TAlignLayout.Top;
-    some.Margins.Bottom := 20.0;
-
-    if scrollHeight = 0 then
-    scrollHeight := panelOrderTemplate.Size.Height +
-    panelOrderTemplate.Margins.Height;
-
-    contentHeight := contentHeight + scrollHeight + 200;
-    panelOrderTemplate.Position.Y := contentHeight;
-
-    {
-    if contentHeight > Size.Height then
-    scrollOrders.scrollBy(0.0, -contentHeight);
+    if FContentHeight > scrollOrders.Height then
+    scrollOrders.scrollBy(0.0, -FContentHeight);
   }
 
-  // scrollOrders.AddObject(some);
+  scrollOrders.AddObject(AOrder);
  end;
 
-begin
+function TFloor.formatDate(const ADate: TDateTime): string;
+ Begin
+  datetimetostring(result, 'ddd dd/mm/yy hh:mm', ADate);
+ end;
 
- contentHeight := 0;
- scrollHeight := 0;
+procedure TFloor.handlePanelClick(Sender: TObject);
+ var
+  POrder: ^TFloorOrder;
+ begin
+  var
+  Style := TRectangle(TPanel(Sender).Components[0]);
+  POrder := @ListOrders[TPanel(Sender).Tag - 1];
+
+  POrder^.isSelected := not POrder^.isSelected;
+
+  if POrder^.isSelected then
+   Style.fill.Color := TAlphaColorRec.Cornflowerblue
+  else
+   Style.fill.Color := TAlphaColorRec.white;
+ end;
+
+procedure TFloor.handlePanelDblClick(Sender: TObject);
+ var
+  POrder: ^TFloorOrder;
+ begin
+  POrder := @ListOrders[TPanel(Sender).Tag - 1];
+
+  if assigned(TPanel(Sender).OnClick) then
+   begin
+    POrder^.isSelected := true;
+    handlePanelClick(Sender);
+   end;
+
+ end;
 
 end.

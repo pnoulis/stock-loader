@@ -19,7 +19,7 @@ object Kitchen: TKitchen
       859s)
     object Pin: TTabItem
       AutoSize = False
-      Cursor = crHandPoint
+      Cursor = crArrow
       CustomIcon = <
         item
         end>

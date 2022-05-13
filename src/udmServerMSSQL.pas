@@ -46,13 +46,17 @@ type
   storedGetStockMove: TFDStoredProc;
   queryItem: TFDQuery;
   storedProc: TFDStoredProc;
- private
+  DataSource1: TDataSource;
+ private type
+  TAfterFetch = reference to procedure(Data: TDataSource);
+
  public
   onConnected: TOnConnected;
   onConnectionError: TOnConnectionError;
   currentOrderID: uint32;
   procedure connect;
   function fetchOrders: TFDTable;
+  procedure fetchAsyncOrders(cb: TAfterFetch);
   function fetchProduce(const orderStatus: EStatusOrder;
    const orderID: cardinal): TFDQuery;
   function fetchItem(const itemCID: string): TFDQuery;
@@ -84,6 +88,7 @@ const
 var
  connected: Boolean;
  errMsg: string;
+ DataSource1: TDataSource;
 
 procedure initialize;
  begin
@@ -93,6 +98,7 @@ procedure initialize;
 
 procedure TdmServerMSSQL.connect;
  begin
+
   TThread.CreateAnonymousThread(
     procedure
     begin
@@ -128,16 +134,34 @@ function TdmServerMSSQL.fetchItem(const itemCID: string): TFDQuery;
  begin
   result := queryItem;
   result.active := false;
-  result.Open('select itemCID, itemName, itemAmount from item where itemCID = '''
-      + itemCID + '''');
+  result.Open
+      ('select itemCID, itemName, itemAmount from item where itemCID = ''' +
+      itemCID + '''');
  end;
 
 function TdmServerMSSQL.fetchOrders: TFDTable;
  begin
   result := tableStockOrders;
   result.active := false;
-  result.IndexFieldNames := 'moveDate:D';
+  result.IndexFieldNames := 'moveDate:A';
   result.active := true;
+ end;
+
+procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
+ begin
+  var
+  table := tableStockOrders;
+
+  try
+   table.active := false;
+//   table.IndexFieldNames := 'moveDate:D';
+   table.active := true;
+   DataSource1.DataSet := tableStockOrders;
+   cb(DataSource1);
+  except
+   cb(nil);
+  end;
+
  end;
 
 function TdmServerMSSQL.addStockOrder: TFDStoredProc;
@@ -177,19 +201,19 @@ const storeID: cardinal; const moveID: cardinal = 0): TFDStoredProc;
    proc.Params[3].value := stockIncrease;
    proc.Params[4].value := storeID;
    {
-   if moveID <> 0 then
-   proc.Params[5].Value := moveID;
+     if moveID <> 0 then
+     proc.Params[5].Value := moveID;
    }
    proc.ExecProc;
-{
-   proc.Close;
-   proc.Prepare;
-   proc.Params[1].value := '00009';
-   proc.Params[2].value := 21;
-   proc.Params[3].value := 100;
-   proc.Params[4].value := 1;
-   proc.ExecProc;
    {
+     proc.Close;
+     proc.Prepare;
+     proc.Params[1].value := '00009';
+     proc.Params[2].value := 21;
+     proc.Params[3].value := 100;
+     proc.Params[4].value := 1;
+     proc.ExecProc;
+     {
      storedGetStockMove.ParamByName('itemCID').value := itemCID;
      storedGetStockMove.ParamByName('stockOrderID').value := stockOrderID;
      storedGetStockMove.ParamByName('stockIncrease').value := stockIncrease;

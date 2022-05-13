@@ -46,10 +46,12 @@ type
   listProduce: TListProduce;
 
   onOrderDblClick: procedure(order: TOrder) of object;
-  constructor Create(data: TFieldList = nil);
-  // function renderSelf(aOwner: TComponent; template: TPanel): TPanel;
-  // procedure handleClick(Sender: TObject);
-  // procedure handleDblClick(Sender: TObject);
+  constructor Create(data: TFields = nil);
+
+  property Date: TOrderDate read FDate;
+  property StockOrderID: cardinal read FStockOrderID;
+  property StoreID: byte read FStoreID;
+  property Status: EStatusOrder read FStatus;
  end;
 
 implementation
@@ -60,19 +62,14 @@ uses
 
 function todayForDB: string;
  var
-  date, time: string;
+  Date, time: string;
  begin
-  dateTimeToString(date, 'yyyy-mm-dd', today);
+  dateTimeToString(Date, 'yyyy-mm-dd', today);
   dateTimeToString(time, 'hh-mm-ss', GetTime);
-  result := date + ' ' + time;
+  result := Date + ' ' + time;
  end;
 
-function renderDate(const aValue: TDateTime): string;
- begin
-  dateTimeToString(result, 'dddddd', aValue);
- end;
-
-constructor TOrder.Create(data: TFieldList = nil);
+constructor TOrder.Create(data: TFields = nil);
  begin
   inherited Create;
 
@@ -83,8 +80,6 @@ constructor TOrder.Create(data: TFieldList = nil);
 
     FStockOrderID := data.FieldByName('stockOrderID').Value;
     FDate.commited := data.FieldByName('moveDate').Value;
-
-    // date.render := renderDate(date.commited);
 
     if isToday(FDate.commited) then
      FStatus := EStatusOrder.commited
@@ -97,53 +92,9 @@ constructor TOrder.Create(data: TFieldList = nil);
 
     FStockOrderID := 0;
     FStatus := EStatusOrder.scratch;
-    // date.render := renderDate(today);
 
    end;
 
  end;
-{
-  procedure TOrder.handleClick(Sender: TObject);
-  begin
-
-  isSelected := not isSelected;
-
-  if isSelected then
-  begin
-  TRectangle(TComponent(Sender).Components[0]).Fill.Color :=
-  TAlphaColorRec.Cornflowerblue;
-  TRectangle(TComponent(Sender).Components[0]).Stroke.Color :=
-  TAlphaColorRec.Cornflowerblue;
-  end
-  else
-  begin
-  TRectangle(TComponent(Sender).Components[0]).Fill.Color :=
-  TAlphaColorRec.white;
-  TRectangle(TComponent(Sender).Components[0]).Stroke.Color :=
-  TAlphaColorRec.white;
-  end;
-  end;
-
-}
-{
-  procedure TOrder.handleDblClick(Sender: TObject);
-  begin
-  self.onOrderDblClick(self);
-  isSelected := true;
-  handleClick(Sender);
-  end;
-
-  function TOrder.renderSelf(aOwner: TComponent; template: TPanel): TPanel;
-  begin
-  result := TPanel(template.clone(aOwner));
-  result.Align := TAlignLayout.Top;
-  result.Margins.Bottom := 20.0;
-  result.visible := true;
-  result.OnClick := handleClick;
-  result.OnDblClick := handleDblClick;
-  TLabel(result.Components[1]).text := stockOrderID.toString;
-  TLabel(result.Components[2]).text := date.render;
-  end;
-}
 
 end.
