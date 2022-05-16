@@ -97,13 +97,13 @@ object FOrder: TFOrder
           Align = Right
           CanFocus = False
           Cursor = crArrow
-          Position.X = 510.000000000000000000
-          Size.Width = 245.000000000000000000
+          Position.X = 568.000000000000000000
+          Size.Width = 187.000000000000000000
           Size.Height = 75.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'memo1Style1'
           TabOrder = 3
-          Viewport.Width = 245.000000000000000000
+          Viewport.Width = 187.000000000000000000
           Viewport.Height = 75.000000000000000000
         end
       end

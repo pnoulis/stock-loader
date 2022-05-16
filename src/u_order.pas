@@ -4,8 +4,8 @@ interface
 
 uses
  data.DB,
- untTypes,
  u_produce,
+ untTypes,
  FireDAC.Comp.Client,
  system.DateUtils,
  system.Classes,
@@ -25,8 +25,6 @@ uses
  system.Generics.Collections;
 
 type
- TOrder = class;
- TListOrders = array of TOrder;
 
  TOrder = class(TObject)
  private type
@@ -34,24 +32,39 @@ type
    commited: TDateTime;
    issued: TDateTime;
   end;
+
+  TAfterOperation = procedure(success: Boolean) of object;
+
  var
   FDate: TOrderDate;
   FStockOrderID: cardinal;
   FStoreID: byte;
   FStatus: EStatusOrder;
-  FIsFetching: Boolean;
+  FProduce: TDataSource;
+  FListOnAfterCommit: array of TAfterOperation;
+  FListOnAfterDelete: array of TAfterOperation;
 
+  procedure setAfterCommit(cb: TAfterOperation);
+  procedure setAfterDelete(cb: TAfterOperation);
+
+  function fetchProduce: TDataSource;
+  procedure commitOrder;
+  procedure commitProduce(ListProduce: TListProduce);
+  procedure deleteOrder;
+  procedure deleteProduce(ListProduce: TListProduce);
  public
  var
-  listProduce: TListProduce;
-
-  onOrderDblClick: procedure(order: TOrder) of object;
-  constructor Create(data: TFields = nil);
+  constructor Create(data: TFields = nil; const storeID: byte = 0);
+  procedure commit(ListProduce: TListProduce = nil);
+  procedure delete(ListProduce: TListProduce = nil);
 
   property Date: TOrderDate read FDate;
   property StockOrderID: cardinal read FStockOrderID;
-  property StoreID: byte read FStoreID;
+  property storeID: byte read FStoreID;
   property Status: EStatusOrder read FStatus;
+  property onAfterCommit: TAfterOperation write setAfterCommit;
+  property onAfterDelete: TAfterOperation write setAfterDelete;
+  property produce: TDataSource read fetchProduce;
  end;
 
 implementation
@@ -69,32 +82,83 @@ function todayForDB: string;
   result := Date + ' ' + time;
  end;
 
-constructor TOrder.Create(data: TFields = nil);
+procedure TOrder.commit(ListProduce: TListProduce = nil);
+ begin
+
+  showMessage('commit');
+ end;
+
+procedure TOrder.delete(ListProduce: TListProduce = nil);
+ begin
+  showMessage('delete');
+ end;
+
+procedure TOrder.commitOrder;
+ begin
+
+  {
+    for var listener in FListOnAfterCommit do
+    listener(true);
+  }
+
+ end;
+
+procedure TOrder.commitProduce(ListProduce: TListProduce);
+ begin
+  showMessage('commit produce');
+ end;
+
+procedure TOrder.deleteOrder;
+ begin
+  showMessage('delete order');
+ end;
+
+procedure TOrder.deleteProduce(ListProduce: TListProduce);
+ begin
+  showMessage('delete produce');
+ end;
+
+procedure TOrder.setAfterCommit(cb: TAfterOperation);
+ begin
+  var
+  index := length(self.FListOnAfterCommit);
+
+  SetLength(FListOnAfterCommit, index + 1);
+  FListOnAfterCommit[index] := cb;
+ end;
+
+procedure TOrder.setAfterDelete(cb: TAfterOperation);
+ begin
+  showMessage('what');
+ end;
+
+constructor TOrder.Create(data: TFields = nil; const storeID: byte = 0);
  begin
   inherited Create;
 
-  FIsFetching := false;
-
   if assigned(data) then
    begin
-
     FStockOrderID := data.FieldByName('stockOrderID').Value;
     FDate.commited := data.FieldByName('moveDate').Value;
+    FStoreID := data.FieldByName('storeID').Value;
 
     if isToday(FDate.commited) then
      FStatus := EStatusOrder.commited
     else
      FStatus := EStatusOrder.served;
-
    end
   else // is a new order
    begin
-
     FStockOrderID := 0;
     FStatus := EStatusOrder.scratch;
-
+    FStoreID := storeID;
    end;
 
+ end;
+
+function TOrder.fetchProduce: TDataSource;
+ begin
+  showMessage('fetch produce');
  end;
 
 end.

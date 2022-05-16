@@ -34,7 +34,7 @@ object Floor: TFloor
           Size.PlatformDefault = False
           Stroke.Color = claLightgray
           Stroke.Thickness = 0.000000000000000000
-          object btnNewOrderClick: TButton
+          object btnNewOrder: TButton
             Align = Left
             AutoTranslate = False
             Cursor = crHandPoint
@@ -45,36 +45,20 @@ object Floor: TFloor
             Size.Width = 113.000000000000000000
             Size.Height = 58.000000000000000000
             Size.PlatformDefault = False
-            TabOrder = 2
+            TabOrder = 1
             Text = #925#949#945' '#917#947#947#961#945#966#951
             TextSettings.Font.Family = 'Comic Sans MS'
             TextSettings.Font.Size = 16.000000000000000000
             TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnClick = btnNewOrderClick
           end
-          object Button4: TButton
+          object btnShowFilters: TButton
             Align = Left
             AutoTranslate = False
             Cursor = crHandPoint
             EnableDragHighlight = False
             StyledSettings = [FontColor]
-            Margins.Right = 20.000000000000000000
             Position.X = 158.000000000000000000
-            Size.Width = 113.000000000000000000
-            Size.Height = 58.000000000000000000
-            Size.PlatformDefault = False
-            TabOrder = 1
-            Text = #916#953#945#947#961#945#966#951
-            TextSettings.Font.Family = 'Comic Sans MS'
-            TextSettings.Font.Size = 16.000000000000000000
-            TextSettings.Font.StyleExt = {00070000000000000004000000}
-          end
-          object btnShowFiltersClick: TButton
-            Align = Left
-            AutoTranslate = False
-            Cursor = crHandPoint
-            EnableDragHighlight = False
-            StyledSettings = [FontColor]
-            Position.X = 291.000000000000000000
             Size.Width = 113.000000000000000000
             Size.Height = 58.000000000000000000
             Size.PlatformDefault = False
@@ -83,7 +67,7 @@ object Floor: TFloor
             TextSettings.Font.Family = 'Comic Sans MS'
             TextSettings.Font.Size = 16.000000000000000000
             TextSettings.Font.StyleExt = {00070000000000000004000000}
-            OnClick = btnShowFiltersClickClick
+            OnClick = btnShowFiltersClick
           end
         end
       end
@@ -154,7 +138,7 @@ object Floor: TFloor
         Size.PlatformDefault = False
         Stroke.Kind = None
         Stroke.Thickness = 0.000000000000000000
-        object btnShowHeaderClick: TButton
+        object btnShowHeader: TButton
           Align = Right
           Cursor = crHandPoint
           Position.X = 724.000000000000000000
@@ -164,7 +148,7 @@ object Floor: TFloor
           StyleLookup = 'priortoolbuttonbordered'
           TabOrder = 0
           Text = 'Button1'
-          OnClick = btnShowHeaderClickClick
+          OnClick = btnShowHeaderClick
         end
         object Layout1: TLayout
           Align = Client
@@ -234,7 +218,7 @@ object Floor: TFloor
             TabOrder = 1
           end
         end
-        object btnApplyFilterClick: TButton
+        object btnApplyFilters: TButton
           Align = Right
           Cursor = crHandPoint
           Position.X = 644.000000000000000000
@@ -243,10 +227,10 @@ object Floor: TFloor
           Size.PlatformDefault = False
           StyleLookup = 'searchtoolbutton'
           TabOrder = 2
-          Text = 'btnApplyFilterClick'
-          OnClick = btnApplyFilterClickClick
+          Text = 'btnApplyFilters'
+          OnClick = btnApplyFiltersClick
         end
-        object btnRefreshFilterClick: TButton
+        object btnResetFilters: TButton
           Align = Right
           Cursor = crHandPoint
           Position.X = 564.000000000000000000
@@ -255,8 +239,8 @@ object Floor: TFloor
           Size.PlatformDefault = False
           StyleLookup = 'refreshtoolbutton'
           TabOrder = 3
-          Text = 'btnRefreshFilterClick'
-          OnClick = btnRefreshFilterClickClick
+          Text = 'btnResetFilters'
+          OnClick = btnResetFiltersClick
         end
       end
     end

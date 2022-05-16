@@ -77,6 +77,7 @@ implementation
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
 {$R *.dfm}
+
 const
  DBCONN_CONFIG_FILEPATH = './config/config.ini';
  DBCONN_CONFIG_INI_SECTION =
@@ -87,6 +88,7 @@ const
 {$ELSE}
     'DBCONN_MSSQL_DEBUG';
 {$IFEND}
+
 var
  connected: Boolean;
  errMsg: string;
@@ -191,7 +193,7 @@ cb: TdmServerMSSQL.TAfterFetch);
       '})' + ' and (moveDate <= {d ' + formatDateTime('yyyy-mm-dd',
       IncDay(dateTo)) + '})';
   table.Filtered := true;
-  cb(dataSource1);
+  cb(DataSource1);
  end;
 
 function TdmServerMSSQL.addStockOrder: TFDStoredProc;

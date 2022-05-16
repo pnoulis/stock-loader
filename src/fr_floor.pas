@@ -39,7 +39,7 @@ type
   Rectangle3: TRectangle;
   panelDateFilter: TPanel;
   Rectangle4: TRectangle;
-  btnShowHeaderClick: TButton;
+  btnShowHeader: TButton;
   Layout1: TLayout;
   lblDateFilterHeader: TLabel;
   lblDateFrom: TLabel;
@@ -48,16 +48,16 @@ type
   lblDateTo: TLabel;
   panelActions: TPanel;
   Rectangle5: TRectangle;
-  btnNewOrderClick: TButton;
-  Button4: TButton;
-  btnShowFiltersClick: TButton;
-  btnApplyFilterClick: TButton;
-  btnRefreshFilterClick: TButton;
-  procedure btnShowFiltersClickClick(Sender: TObject);
-  procedure btnShowHeaderClickClick(Sender: TObject);
+  btnNewOrder: TButton;
+  btnShowFilters: TButton;
+  btnApplyFilters: TButton;
+  btnResetFilters: TButton;
+  procedure btnShowFiltersClick(Sender: TObject);
+  procedure btnShowHeaderClick(Sender: TObject);
+  procedure btnApplyFiltersClick(Sender: TObject);
+  procedure btnResetFiltersClick(Sender: TObject);
   procedure dateFromChange(Sender: TObject);
-  procedure btnApplyFilterClickClick(Sender: TObject);
-  procedure btnRefreshFilterClickClick(Sender: TObject);
+  procedure btnNewOrderClick(Sender: TObject);
 
  private type
   TFloorOrder = record
@@ -80,17 +80,20 @@ type
   procedure handlePanelClick(Sender: TObject);
   procedure handlePanelDblClick(Sender: TObject);
  public
-  onNewOrder: procedure(Order: TOrder = nil) of object;
+  onOrder: procedure(Order: TOrder = nil) of object;
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
+  procedure handleOrderCommit(success: Boolean);
  end;
 
 implementation
 
-{$R *.fmx}
-{ TFloor }
+const DEFAULT_STORE_ID = 1;
 
-procedure TFloor.btnApplyFilterClickClick(Sender: TObject);
+{$R *.fmx}
+ { TFloor }
+
+procedure TFloor.btnApplyFiltersClick(Sender: TObject);
  begin
   DB.fetchOrdersFilterDate(dateFrom.Date, dateTo.Date,
     procedure(Data: TDataSource)
@@ -102,19 +105,33 @@ procedure TFloor.btnApplyFilterClickClick(Sender: TObject);
     end);
  end;
 
-procedure TFloor.btnRefreshFilterClickClick(Sender: TObject);
+procedure TFloor.handleOrderCommit(success: Boolean);
+ begin
+  showMessage('yes it was commited');
+ end;
+
+procedure TFloor.btnNewOrderClick(Sender: TObject);
+ var AOrder: TOrder;
+ begin
+  var
+  newOrder := TOrder.Create(nil, DEFAULT_STORE_ID);
+  newOrder.onAfterCommit := handleOrderCommit;
+  onOrder(AOrder);
+ end;
+
+procedure TFloor.btnResetFiltersClick(Sender: TObject);
  begin
   fetchOrders;
  end;
 
-procedure TFloor.btnShowFiltersClickClick(Sender: TObject);
+procedure TFloor.btnShowFiltersClick(Sender: TObject);
  begin
   layoutActions.RemoveObject(panelActions);
   layoutActions.AddObject(panelDateFilter);
   panelDateFilter.Visible := true;
  end;
 
-procedure TFloor.btnShowHeaderClickClick(Sender: TObject);
+procedure TFloor.btnShowHeaderClick(Sender: TObject);
  begin
   layoutActions.RemoveObject(panelDateFilter);
   layoutActions.AddObject(panelActions);
@@ -254,11 +271,12 @@ procedure TFloor.handlePanelDblClick(Sender: TObject);
  begin
   POrder := @ListOrders[TPanel(Sender).Tag - 1];
 
-  if assigned(TPanel(Sender).OnClick) then
-   begin
-    POrder^.isSelected := true;
-    handlePanelClick(Sender);
-   end;
+  // double clicking activates the onClick handler as well
+  // this code makes sure to deactivate it
+  POrder^.isSelected := true;
+  handlePanelClick(Sender);
+
+  onOrder(POrder^.Order);
 
  end;
 

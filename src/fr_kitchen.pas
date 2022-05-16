@@ -7,6 +7,7 @@ uses
  fr_floor,
  udmServerMSSQL,
  System.SysUtils,
+ System.DateUtils,
  System.Types,
  System.UITypes,
  System.Classes,
@@ -31,17 +32,26 @@ type
  TKitchen = class(TFrame)
   Pass: TTabControl;
   Pin: TTabItem;
-    Layout1: TLayout;
-    Label1: TLabel;
-    Timer1: TTimer;
+  layoutFooter: TLayout;
+  lblTime: TLabel;
+  timerSecond: TTimer;
 
- private
+ private type
+  TKitchenOrder = record
+   isNew: Boolean;
+   isDisplayed: Boolean;
+   tab: TTabItem;
+   order: TOrder;
+   frame: TFrame;
+  end;
+
+ var
+  ListOrders: array of TKitchenOrder;
   Floor: TFloor;
-
-  ListOrders: TListOrders;
 
   procedure renderFloor;
   procedure startTimer(Sender: TObject);
+  procedure handleOrder(order: TOrder = nil);
  public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
@@ -52,6 +62,10 @@ var
 
 implementation
 
+const
+TAB_WIDTH = 130.0;
+TAB_HEIGHT = 40.0;
+
 {$R *.fmx}
 { Tkitchen }
 
@@ -60,17 +74,17 @@ constructor TKitchen.Create(AOwner: TComponent);
   inherited Create(AOwner);
   renderFloor;
   startTimer(self);
-  self.Timer1.OnTimer := startTimer;
+  timerSecond.OnTimer := startTimer;
  end;
 
 destructor TKitchen.Destroy;
  begin
 
   if Assigned(ListOrders) then
-   for var Order in ListOrders do
-    FreeAndNil(Order);
+   for var KitchenOrder in ListOrders do
+    FreeAndNil(KitchenOrder.order);
 
-  FreeAndNil(ListOrders);
+  setlength(ListOrders, 0);
 
   inherited Destroy;
  end;
@@ -81,12 +95,35 @@ procedure TKitchen.renderFloor;
    FreeAndNil(Floor);
 
   Floor := TFloor.Create(Pin);
+  Floor.onOrder := handleOrder;
   Pin.AddObject(Floor);
  end;
 
- procedure TKitchen.startTimer(Sender: TObject);
+procedure TKitchen.startTimer(Sender: TObject);
  begin
-   Label1.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', now);
+  lblTime.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', now)
+ end;
+
+procedure TKitchen.handleOrder(order: TOrder = nil);
+var tab: TTabItem;
+ begin
+
+  if Assigned(order) then
+   begin
+    for var KitchenOrder in ListOrders do
+     if KitchenOrder.order.StockOrderID = order.StockOrderID then
+      exit;
+
+    tab := Pass.Add(TTabItem);
+    tab.StyleLookup := 'tabItemClose';
+    tab.AutoSize := false;
+    tab.Cursor := crHandPoint;
+    tab.Width := TAB_WIDTH;
+    tab.Height := TAB_HEIGHT;
+    pass.SetActiveTabWithTransition(tab, TTabTransition.None);
+
+   end;
+
  end;
 
 end.
