@@ -10,7 +10,7 @@ uses
   system.UITypes, system.Classes, system.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.Memo.Types,
-  FMX.ScrollBox, FMX.Memo, FMX.TabControl, FMX.Objects;
+  FMX.ScrollBox, FMX.Memo, FMX.TabControl, FMX.Objects, FMX.DateTimeCtrls;
 
 type
   TmainForm = class(TForm)

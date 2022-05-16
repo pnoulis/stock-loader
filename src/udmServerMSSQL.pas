@@ -57,6 +57,8 @@ type
   procedure connect;
   function fetchOrders: TFDTable;
   procedure fetchAsyncOrders(cb: TAfterFetch);
+  procedure fetchBetween(cb: TAfterFetch);
+  procedure fetchOrdersFilterDate(dateFrom, dateTo: TDate; cb: TAfterFetch);
   function fetchProduce(const orderStatus: EStatusOrder;
    const orderID: cardinal): TFDQuery;
   function fetchItem(const itemCID: string): TFDQuery;
@@ -98,7 +100,6 @@ procedure initialize;
 
 procedure TdmServerMSSQL.connect;
  begin
-
   TThread.CreateAnonymousThread(
     procedure
     begin
@@ -154,7 +155,9 @@ procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
 
   try
    table.active := false;
-//   table.IndexFieldNames := 'moveDate:D';
+   table.Filter := '';
+   table.Filtered := false;
+   // table.IndexFieldNames := 'moveDate:D';
    table.active := true;
    DataSource1.DataSet := tableStockOrders;
    cb(DataSource1);
@@ -162,6 +165,33 @@ procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
    cb(nil);
   end;
 
+ end;
+
+procedure TdmServerMSSQL.fetchBetween(cb: TdmServerMSSQL.TAfterFetch);
+ begin
+  var
+  table := tableStockOrders;
+  var
+  f1 := '( moveDate >= {d ' + '2022-05-12' + '} )' + ' and ( moveDate <= {d ' +
+      '2022-05-28' + '} )';
+  table.Filtered := false;
+  table.Filter := f1;
+  table.Filtered := true;
+  cb(DataSource1);
+ end;
+
+procedure TdmServerMSSQL.fetchOrdersFilterDate(dateFrom: TDate; dateTo: TDate;
+cb: TdmServerMSSQL.TAfterFetch);
+ begin
+
+  var
+  table := tableStockOrders;
+  table.Filtered := false;
+  table.Filter := '(moveDate >= {d ' + formatDateTime('yyyy-mm-dd', dateFrom) +
+      '})' + ' and (moveDate <= {d ' + formatDateTime('yyyy-mm-dd',
+      IncDay(dateTo)) + '})';
+  table.Filtered := true;
+  cb(dataSource1);
  end;
 
 function TdmServerMSSQL.addStockOrder: TFDStoredProc;

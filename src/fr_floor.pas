@@ -21,26 +21,43 @@ uses
  FMX.Controls.Presentation,
  Data.DB,
  FMX.Layouts,
- FMX.Objects, FMX.Calendar;
+ FMX.Objects,
+ FMX.Calendar,
+ FMX.DateTimeCtrls;
 
 type
  TFloor = class(TFrame)
   layoutActions: TLayout;
-  btnDeleteOrder: TButton;
-  btnNewOrder: TButton;
   layoutHeader: TLayout;
   lblOrderID: TLabel;
   lblOrderDate: TLabel;
   scrollOrders: TVertScrollBox;
   Rectangle2: TRectangle;
-  Rectangle1: TRectangle;
   templateFloorOrder: TPanel;
   Label1: TLabel;
   Label2: TLabel;
   Rectangle3: TRectangle;
-    Button1: TButton;
-  procedure btnNewOrderClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+  panelDateFilter: TPanel;
+  Rectangle4: TRectangle;
+  btnShowHeaderClick: TButton;
+  Layout1: TLayout;
+  lblDateFilterHeader: TLabel;
+  lblDateFrom: TLabel;
+  dateFrom: TDateEdit;
+  dateTo: TDateEdit;
+  lblDateTo: TLabel;
+  panelActions: TPanel;
+  Rectangle5: TRectangle;
+  btnNewOrderClick: TButton;
+  Button4: TButton;
+  btnShowFiltersClick: TButton;
+  btnApplyFilterClick: TButton;
+  btnRefreshFilterClick: TButton;
+  procedure btnShowFiltersClickClick(Sender: TObject);
+  procedure btnShowHeaderClickClick(Sender: TObject);
+  procedure dateFromChange(Sender: TObject);
+  procedure btnApplyFilterClickClick(Sender: TObject);
+  procedure btnRefreshFilterClickClick(Sender: TObject);
 
  private type
   TFloorOrder = record
@@ -73,13 +90,40 @@ implementation
 {$R *.fmx}
 { TFloor }
 
-procedure TFloor.Button1Click(Sender: TObject);
-begin
-var btn := TButton.Create(self);
-btn.Text := 'thoeuth';
-btn.Width := 10.0;
-btn.Height := 10.0;
-end;
+procedure TFloor.btnApplyFilterClickClick(Sender: TObject);
+ begin
+  DB.fetchOrdersFilterDate(dateFrom.Date, dateTo.Date,
+    procedure(Data: TDataSource)
+    begin
+     if (Data <> nil) then
+      OrdersToFloor(Data.DataSet)
+     else
+      OrdersToFloor(nil);
+    end);
+ end;
+
+procedure TFloor.btnRefreshFilterClickClick(Sender: TObject);
+ begin
+  fetchOrders;
+ end;
+
+procedure TFloor.btnShowFiltersClickClick(Sender: TObject);
+ begin
+  layoutActions.RemoveObject(panelActions);
+  layoutActions.AddObject(panelDateFilter);
+  panelDateFilter.Visible := true;
+ end;
+
+procedure TFloor.btnShowHeaderClickClick(Sender: TObject);
+ begin
+  layoutActions.RemoveObject(panelDateFilter);
+  layoutActions.AddObject(panelActions);
+ end;
+
+procedure TFloor.dateFromChange(Sender: TObject);
+ begin
+  dateTo.Date := TDateEdit(Sender).Date;
+ end;
 
 constructor TFloor.Create(AOwner: TComponent);
  begin
@@ -95,16 +139,13 @@ destructor TFloor.Destroy;
   inherited Destroy;
  end;
 
-procedure TFloor.btnNewOrderClick(Sender: TObject);
- begin
-  onNewOrder;
- end;
-
 procedure TFloor.flushFloor;
  begin
 
   for var i := 0 to High(ListOrders) do
    FreeAndNil(ListOrders[i].Order);
+
+  setLength(ListOrders, 0);
 
   scrollOrders.BeginUpdate;
   scrollOrders.Content.DeleteChildren;
@@ -119,7 +160,7 @@ procedure TFloor.fetchOrders;
  begin
 
   DB.fetchAsyncOrders(
-    procedure(Data: TDataSource)
+   procedure(Data: TDataSource)
     begin
      if (Data <> nil) then
       OrdersToFloor(Data.DataSet)
@@ -136,7 +177,7 @@ procedure TFloor.OrdersToFloor(Data: TDataSet);
    exit;
 
   flushFloor;
-  SetLength(ListOrders, Data.RecordCount);
+  setLength(ListOrders, Data.RecordCount);
   while not Data.Eof do
    begin
     OrderToFloor(Data.Fields, Data.RecNo);

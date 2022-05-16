@@ -40,6 +40,7 @@ object Kitchen: TKitchen
     Align = Bottom
     Padding.Left = 20.000000000000000000
     Padding.Right = 20.000000000000000000
+    Padding.Bottom = 5.000000000000000000
     Position.X = 2.000000000000000000
     Position.Y = 880.000000000000000000
     Size.Width = 814.000000000000000000
@@ -52,7 +53,7 @@ object Kitchen: TKitchen
       StyledSettings = [Style, FontColor]
       Position.X = 20.000000000000000000
       Size.Width = 312.000000000000000000
-      Size.Height = 24.000000000000000000
+      Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
       TextSettings.Font.Family = 'Comic Sans MS'
       TextSettings.Font.Size = 18.000000000000000000
