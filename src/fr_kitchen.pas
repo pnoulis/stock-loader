@@ -31,6 +31,9 @@ type
  TKitchen = class(TFrame)
   Pass: TTabControl;
   Pin: TTabItem;
+    Layout1: TLayout;
+    Label1: TLabel;
+    Timer1: TTimer;
 
  private
   Floor: TFloor;
@@ -38,6 +41,7 @@ type
   ListOrders: TListOrders;
 
   procedure renderFloor;
+  procedure startTimer(Sender: TObject);
  public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
@@ -55,6 +59,8 @@ constructor TKitchen.Create(AOwner: TComponent);
  begin
   inherited Create(AOwner);
   renderFloor;
+  startTimer(self);
+  self.Timer1.OnTimer := startTimer;
  end;
 
 destructor TKitchen.Destroy;
@@ -76,6 +82,11 @@ procedure TKitchen.renderFloor;
 
   Floor := TFloor.Create(Pin);
   Pin.AddObject(Floor);
+ end;
+
+ procedure TKitchen.startTimer(Sender: TObject);
+ begin
+   Label1.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', now);
  end;
 
 end.

@@ -21,7 +21,7 @@ uses
  FMX.Controls.Presentation,
  Data.DB,
  FMX.Layouts,
- FMX.Objects;
+ FMX.Objects, FMX.Calendar;
 
 type
  TFloor = class(TFrame)
@@ -38,7 +38,9 @@ type
   Label1: TLabel;
   Label2: TLabel;
   Rectangle3: TRectangle;
+    Button1: TButton;
   procedure btnNewOrderClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
 
  private type
   TFloorOrder = record
@@ -70,6 +72,14 @@ implementation
 
 {$R *.fmx}
 { TFloor }
+
+procedure TFloor.Button1Click(Sender: TObject);
+begin
+var btn := TButton.Create(self);
+btn.Text := 'thoeuth';
+btn.Width := 10.0;
+btn.Height := 10.0;
+end;
 
 constructor TFloor.Create(AOwner: TComponent);
  begin
