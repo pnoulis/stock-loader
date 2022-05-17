@@ -34,8 +34,8 @@ type
     procedure handleTabClick(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Single);
     procedure handleOrderDblClick(AOrder: TOrder);
-    procedure handleCancelOrderClick(FOrder: TFOrder);
-    procedure handleCommitOrder(FOrder: TFOrder);
+    procedure handleCancelOrderClick(Pad: TPad);
+    procedure handleCommitOrder(Pad: TPad);
   end;
 
 implementation
@@ -95,31 +95,31 @@ begin
     Pass.orderToPass(Order);
 end;
 
-procedure TKitchen.handleCancelOrderClick(FOrder: TFOrder);
+procedure TKitchen.handleCancelOrderClick(Pad: TPad);
 begin
 
-  if (FOrder.Order.status = EStatusOrder.scratch) then
-    freeAndNil(newOrders[TTabItem(FOrder.TagObject).Index])
+  if (Pad.Order.status = EStatusOrder.scratch) then
+    freeAndNil(newOrders[TTabItem(Pad.TagObject).Index])
   else
-    FOrder.Order.isDisplayed := false;
+    Pad.Order.isDisplayed := false;
 
   self.First(TTabTransition.none, TTabTransitionDirection.Normal);
-  delete(TTabItem(FOrder.TagObject).Index);
+  delete(TTabItem(Pad.TagObject).Index);
 
 end;
 
-procedure TKitchen.handleCommitOrder(FOrder: TFOrder);
+procedure TKitchen.handleCommitOrder(Pad: TPad);
 begin
   var proc := db.addStockOrder;
-  var tmp: TFOrder;
-  FOrder.Order.stockOrderID := proc.FieldByName('stockOrderID').AsInteger;
-  FOrder.Order.storeID := proc.FieldByName('storeID').AsInteger;
-  FOrder.Order.date.commited := proc.FieldByName('moveDate').AsDateTime;
-  FOrder.Order.status := EStatusOrder.commited;
-  FOrder.order.isFetching := false;
-  self.Pass.orderToPass(FOrder.Order);
-  FOrder.Order.isDisplayed := true;
-  TTabItem(FOrder.TagObject).Text := forder.Order.stockOrderID.tostring;
+  var tmp: TPad;
+  Pad.Order.stockOrderID := proc.FieldByName('stockOrderID').AsInteger;
+  Pad.Order.storeID := proc.FieldByName('storeID').AsInteger;
+  Pad.Order.date.commited := proc.FieldByName('moveDate').AsDateTime;
+  Pad.Order.status := EStatusOrder.commited;
+  Pad.order.isFetching := false;
+  self.Pass.orderToPass(Pad.Order);
+  Pad.Order.isDisplayed := true;
+  TTabItem(Pad.TagObject).Text := forder.Order.stockOrderID.tostring;
   forder.commitProduce;
 end;
 
@@ -128,7 +128,7 @@ var
   tab: TTabItem;
   lnOrders, nextID: cardinal;
   tabGap: integer;
-  FOrder: TFOrder;
+  Pad: TPad;
 begin
   tab := add;
   lnOrders := length(newOrders);
@@ -181,11 +181,11 @@ begin
     OnMouseUp := handleTabClick;
   end;
 
-  FOrder := TFOrder.Create(tab, Order);
-  FOrder.TagObject := tab;
-  FOrder.onCancelOrderClick := handleCancelOrderClick;
-  FOrder.onCommitOrder := handleCommitOrder;
-  tab.AddObject(FOrder);
+  Pad := TPad.Create(tab, Order);
+  Pad.TagObject := tab;
+  Pad.onCancelOrderClick := handleCancelOrderClick;
+  Pad.onCommitOrder := handleCommitOrder;
+  tab.AddObject(Pad);
   tab.TagObject := Order;
   Order.isDisplayed := true;
   ActiveTab := tab;
@@ -193,7 +193,7 @@ end;
 
 procedure TKitchen.handleOrderDblClick(AOrder: TOrder);
 var
-  FOrder: TFOrder;
+  Pad: TPad;
   tab: TTabItem;
 begin
 
@@ -212,10 +212,10 @@ begin
     OnMouseUp := handleTabClick;
   end;
 
-  FOrder := TFOrder.Create(tab, AOrder);
-  FOrder.TagObject := tab;
-  FOrder.onCancelOrderClick := handleCancelOrderClick;
-  tab.AddObject(FOrder);
+  Pad := TPad.Create(tab, AOrder);
+  Pad.TagObject := tab;
+  Pad.onCancelOrderClick := handleCancelOrderClick;
+  tab.AddObject(Pad);
   tab.TagObject := AOrder;
   AOrder.isDisplayed := true;
   ActiveTab := tab;

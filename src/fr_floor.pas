@@ -4,7 +4,6 @@ interface
 
 uses
  untTypes,
- udmServerMSSQL,
  u_order,
  System.SysUtils,
  System.Types,
@@ -88,6 +87,9 @@ type
 
 implementation
 
+uses
+ udmServerMSSQL;
+
 const DEFAULT_STORE_ID = 1;
 
 {$R *.fmx}
@@ -111,12 +113,11 @@ procedure TFloor.handleOrderCommit(success: Boolean);
  end;
 
 procedure TFloor.btnNewOrderClick(Sender: TObject);
- var AOrder: TOrder;
  begin
   var
   newOrder := TOrder.Create(nil, DEFAULT_STORE_ID);
   newOrder.onAfterCommit := handleOrderCommit;
-  onOrder(AOrder);
+  onOrder(newOrder);
  end;
 
 procedure TFloor.btnResetFiltersClick(Sender: TObject);
@@ -276,7 +277,7 @@ procedure TFloor.handlePanelDblClick(Sender: TObject);
   POrder^.isSelected := true;
   handlePanelClick(Sender);
 
-  onOrder(POrder^.Order);
+  onOrder(POrder^.Order.Clone);
 
  end;
 

@@ -16,13 +16,13 @@ object Floor: TFloor
       Align = Top
       Position.Y = 15.000000000000000000
       Size.Width = 804.000000000000000000
-      Size.Height = 58.000000000000000000
+      Size.Height = 65.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
       object panelActions: TPanel
         Align = Client
         Size.Width = 804.000000000000000000
-        Size.Height = 58.000000000000000000
+        Size.Height = 65.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object Rectangle5: TRectangle
@@ -30,7 +30,7 @@ object Floor: TFloor
           EnableDragHighlight = False
           Padding.Left = 25.000000000000000000
           Size.Width = 804.000000000000000000
-          Size.Height = 58.000000000000000000
+          Size.Height = 65.000000000000000000
           Size.PlatformDefault = False
           Stroke.Color = claLightgray
           Stroke.Thickness = 0.000000000000000000
@@ -43,7 +43,7 @@ object Floor: TFloor
             Margins.Right = 20.000000000000000000
             Position.X = 25.000000000000000000
             Size.Width = 113.000000000000000000
-            Size.Height = 58.000000000000000000
+            Size.Height = 65.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 1
             Text = #925#949#945' '#917#947#947#961#945#966#951
@@ -60,7 +60,7 @@ object Floor: TFloor
             StyledSettings = [FontColor]
             Position.X = 158.000000000000000000
             Size.Width = 113.000000000000000000
-            Size.Height = 58.000000000000000000
+            Size.Height = 65.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 0
             Text = #934#953#955#964#961#945
@@ -75,7 +75,7 @@ object Floor: TFloor
     object layoutHeader: TLayout
       Align = Top
       Margins.Top = 30.000000000000000000
-      Position.Y = 103.000000000000000000
+      Position.Y = 110.000000000000000000
       Size.Width = 804.000000000000000000
       Size.Height = 59.000000000000000000
       Size.PlatformDefault = False
@@ -115,11 +115,11 @@ object Floor: TFloor
       Padding.Right = 25.000000000000000000
       Margins.Top = 20.000000000000000000
       Size.Width = 804.000000000000000000
-      Size.Height = 506.000000000000000000
+      Size.Height = 499.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 5
       Viewport.Width = 804.000000000000000000
-      Viewport.Height = 506.000000000000000000
+      Viewport.Height = 499.000000000000000000
     end
     object panelDateFilter: TPanel
       Align = Top

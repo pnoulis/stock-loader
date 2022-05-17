@@ -2,51 +2,20 @@ object Kitchen: TKitchen
   Align = Client
   Padding.Left = 2.000000000000000000
   Padding.Top = 5.000000000000000000
-  Size.Width = 836.000000000000000000
-  Size.Height = 748.000000000000000000
+  Size.Width = 769.000000000000000000
+  Size.Height = 692.000000000000000000
   Size.PlatformDefault = False
-  object Pass: TTabControl
-    Align = Client
-    Size.Width = 834.000000000000000000
-    Size.Height = 719.000000000000000000
-    Size.PlatformDefault = False
-    StyleLookup = 'tabcontrol1style1'
-    TabIndex = 0
-    TabOrder = 0
-    TabPosition = PlatformDefault
-    Sizes = (
-      834s
-      679s)
-    object Pin: TTabItem
-      AutoSize = False
-      Cursor = crArrow
-      CustomIcon = <
-        item
-        end>
-      TextSettings.Font.Family = 'Comic Sans MS'
-      TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.Font.StyleExt = {00070000000000000004000000}
-      StyledSettings = [FontColor]
-      IsSelected = True
-      Size.Width = 130.000000000000000000
-      Size.Height = 40.000000000000000000
-      Size.PlatformDefault = False
-      StyleLookup = ''
-      TabOrder = 0
-      Text = #928#945#961#945#947#947#949#955#953#949#962
-    end
-  end
   object layoutFooter: TLayout
     Align = Bottom
     Padding.Left = 20.000000000000000000
     Padding.Right = 20.000000000000000000
     Padding.Bottom = 5.000000000000000000
     Position.X = 2.000000000000000000
-    Position.Y = 724.000000000000000000
-    Size.Width = 834.000000000000000000
+    Position.Y = 668.000000000000000000
+    Size.Width = 767.000000000000000000
     Size.Height = 24.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 1
+    TabOrder = 0
     object lblTime: TLabel
       Align = Left
       AutoSize = True
@@ -63,6 +32,36 @@ object Kitchen: TKitchen
     object timerSecond: TTimer
       Left = 104
       Top = 864
+    end
+  end
+  object Pass: TTabControl
+    Align = Client
+    Size.Width = 767.000000000000000000
+    Size.Height = 663.000000000000000000
+    Size.PlatformDefault = False
+    StyleLookup = 'tabcontrol1style1'
+    TabIndex = 0
+    TabOrder = 2
+    TabPosition = PlatformDefault
+    Sizes = (
+      767s
+      623s)
+    object Pin: TTabItem
+      AutoSize = False
+      CustomIcon = <
+        item
+        end>
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      StyledSettings = [FontColor]
+      IsSelected = True
+      Size.Width = 130.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = #928#945#961#945#947#947#949#955#953#949#962
     end
   end
 end

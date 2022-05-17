@@ -59,8 +59,7 @@ type
   procedure fetchAsyncOrders(cb: TAfterFetch);
   procedure fetchBetween(cb: TAfterFetch);
   procedure fetchOrdersFilterDate(dateFrom, dateTo: TDate; cb: TAfterFetch);
-  function fetchProduce(const orderStatus: EStatusOrder;
-   const orderID: cardinal): TFDQuery;
+  procedure fetchProduce(const orderID: cardinal; cb: TAfterFetch);
   function fetchItem(const itemCID: string): TFDQuery;
   function addStockOrder: TFDStoredProc;
   function addStockMove(const itemCID: string; const stockOrderID: cardinal;
@@ -260,14 +259,22 @@ const storeID: cardinal; const moveID: cardinal = 0): TFDStoredProc;
 
  end;
 
-function TdmServerMSSQL.fetchProduce(const orderStatus: EStatusOrder;
-const orderID: cardinal): TFDQuery;
+procedure TdmServerMSSQL.fetchProduce(const orderID: cardinal; cb: TAfterFetch);
  begin
+  var
+  query := queryStockMoves;
 
-  result := queryStockMoves;
-  result.active := false;
-  result.Open('select * from stockMoves where stockOrderID = ' +
-      orderID.ToString);
+  try
+   query.active := false;
+   query.active := true;
+   query.Open('select * from stockMoves where stockOrderID = ' +
+       orderID.ToString);
+   DataSource1.DataSet := query;
+   cb(DataSource1);
+  except
+   cb(nil);
+  end;
+
  end;
 
 begin

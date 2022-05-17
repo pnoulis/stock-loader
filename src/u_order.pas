@@ -10,6 +10,7 @@ uses
  system.DateUtils,
  system.Classes,
  system.SysUtils,
+ system.Rtti,
  system.UITypes,
  FMX.Objects,
  FMX.Dialogs,
@@ -34,6 +35,7 @@ type
   end;
 
   TAfterOperation = procedure(success: Boolean) of object;
+  TAfterFetch = reference to procedure(data: TDataset);
 
  var
   FDate: TOrderDate;
@@ -57,6 +59,8 @@ type
   constructor Create(data: TFields = nil; const storeID: byte = 0);
   procedure commit(ListProduce: TListProduce = nil);
   procedure delete(ListProduce: TListProduce = nil);
+  function clone: TOrder;
+  procedure fetch(cb: TAfterFetch);
 
   property Date: TOrderDate read FDate;
   property StockOrderID: cardinal read FStockOrderID;
@@ -93,6 +97,31 @@ procedure TOrder.delete(ListProduce: TListProduce = nil);
   showMessage('delete');
  end;
 
+function TOrder.clone: TOrder;
+ begin
+  result := TOrder.Create(nil, FStoreID);
+  result.FDate := self.Date;
+  result.FStockOrderID := self.FStockOrderID;
+  result.FStatus := self.FStatus;
+ end;
+
+procedure TOrder.fetch(cb: TAfterFetch);
+ begin
+
+  if FStockOrderID = 0 then
+   cb(nil);
+
+  DB.fetchProduce(FStockOrderID,
+    procedure(data: TDataSource)
+    begin
+     if (data <> nil) then
+      cb(data.DataSet)
+     else
+      cb(nil);
+    end);
+
+ end;
+
 procedure TOrder.commitOrder;
  begin
 
@@ -121,7 +150,7 @@ procedure TOrder.deleteProduce(ListProduce: TListProduce);
 procedure TOrder.registerAfterCommit(cb: TAfterOperation);
  begin
   var
-  index := length(FListOnAfterCommit);
+  index := Length(FListOnAfterCommit);
 
   SetLength(FListOnAfterCommit, index + 1);
   FListOnAfterCommit[index] := cb;
@@ -130,7 +159,7 @@ procedure TOrder.registerAfterCommit(cb: TAfterOperation);
 procedure TOrder.registerAfterDelete(cb: TAfterOperation);
  begin
   var
-  index := length(FListOnAfterDelete);
+  index := Length(FListOnAfterDelete);
 
   SetLength(FListOnAfterDelete, index + 1);
   FListOnAfterDelete[index] := cb;
@@ -162,7 +191,7 @@ constructor TOrder.Create(data: TFields = nil; const storeID: byte = 0);
 
 function TOrder.fetchProduce: TDataSource;
  begin
-  showMessage('fetch produce');
+
  end;
 
 end.

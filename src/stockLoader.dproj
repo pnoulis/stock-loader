@@ -271,13 +271,14 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="u_order.pas"/>
-        <DCCReference Include="fr_order.pas">
-            <Form>FOrder</Form>
-            <FormType>fmx</FormType>
+        <DCCReference Include="u_order.pas">
+            <Form>/fr_pad in &apos;fr_pad.pas&apos; {Pad</Form>
+            <DesignClass>TFrame};</DesignClass>
+        </DCCReference>
+        <DCCReference Include="fr_pad.pas">
+            <Form>Pad</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="u_produce.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
