@@ -44,8 +44,8 @@ type
   FListOnAfterCommit: array of TAfterOperation;
   FListOnAfterDelete: array of TAfterOperation;
 
-  procedure setAfterCommit(cb: TAfterOperation);
-  procedure setAfterDelete(cb: TAfterOperation);
+  procedure registerAfterCommit(cb: TAfterOperation);
+  procedure registerAfterDelete(cb: TAfterOperation);
 
   function fetchProduce: TDataSource;
   procedure commitOrder;
@@ -62,8 +62,8 @@ type
   property StockOrderID: cardinal read FStockOrderID;
   property storeID: byte read FStoreID;
   property Status: EStatusOrder read FStatus;
-  property onAfterCommit: TAfterOperation write setAfterCommit;
-  property onAfterDelete: TAfterOperation write setAfterDelete;
+  property onAfterCommit: TAfterOperation write registerAfterCommit;
+  property onAfterDelete: TAfterOperation write registerAfterDelete;
   property produce: TDataSource read fetchProduce;
  end;
 
@@ -118,18 +118,22 @@ procedure TOrder.deleteProduce(ListProduce: TListProduce);
   showMessage('delete produce');
  end;
 
-procedure TOrder.setAfterCommit(cb: TAfterOperation);
+procedure TOrder.registerAfterCommit(cb: TAfterOperation);
  begin
   var
-  index := length(self.FListOnAfterCommit);
+  index := length(FListOnAfterCommit);
 
   SetLength(FListOnAfterCommit, index + 1);
   FListOnAfterCommit[index] := cb;
  end;
 
-procedure TOrder.setAfterDelete(cb: TAfterOperation);
+procedure TOrder.registerAfterDelete(cb: TAfterOperation);
  begin
-  showMessage('what');
+  var
+  index := length(FListOnAfterDelete);
+
+  SetLength(FListOnAfterDelete, index + 1);
+  FListOnAfterDelete[index] := cb;
  end;
 
 constructor TOrder.Create(data: TFields = nil; const storeID: byte = 0);

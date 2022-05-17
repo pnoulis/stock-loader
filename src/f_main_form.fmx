@@ -4,8 +4,8 @@ object mainForm: TmainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = Single
   Caption = 'stockLoader'
-  ClientHeight = 852
-  ClientWidth = 852
+  ClientHeight = 850
+  ClientWidth = 850
   Position = ScreenCenter
   StyleBook = StyleBook1
   Constraints.MaxHeight = 850.000000000000000000
@@ -1589,21 +1589,21 @@ object mainForm: TmainForm
     Align = Client
     HitTest = False
     Sides = []
-    Size.Width = 852.000000000000000000
-    Size.Height = 852.000000000000000000
+    Size.Width = 850.000000000000000000
+    Size.Height = 850.000000000000000000
     Size.PlatformDefault = False
     Stroke.Kind = None
     Stroke.Thickness = 0.000000000000000000
     object layoutHeader: TLayout
       Align = Horizontal
       Position.Y = 130.000000000000000000
-      Size.Width = 852.000000000000000000
+      Size.Width = 850.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
       object lbl1: TLabel
         Align = Client
-        Size.Width = 852.000000000000000000
+        Size.Width = 850.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Center

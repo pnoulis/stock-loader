@@ -94,7 +94,7 @@ constructor TFOrder.Create(AOwner: TComponent; Order: TOrder);
 
 destructor TFOrder.Destroy;
  begin
-
+  inherited Destroy;
  end;
 
 end.

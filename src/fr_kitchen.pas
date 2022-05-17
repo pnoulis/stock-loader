@@ -4,6 +4,7 @@ interface
 
 uses
  u_order,
+ fr_order,
  fr_floor,
  udmServerMSSQL,
  System.SysUtils,
@@ -42,7 +43,7 @@ type
    isDisplayed: Boolean;
    tab: TTabItem;
    order: TOrder;
-   frame: TFrame;
+   pad: TFrame;
   end;
 
  var
@@ -52,6 +53,7 @@ type
   procedure renderFloor;
   procedure startTimer(Sender: TObject);
   procedure handleOrder(order: TOrder = nil);
+  function createTab: TTabItem;
  public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
@@ -63,11 +65,11 @@ var
 implementation
 
 const
-TAB_WIDTH = 130.0;
-TAB_HEIGHT = 40.0;
+ TAB_WIDTH = 130.0;
+ TAB_HEIGHT = 40.0;
 
 {$R *.fmx}
-{ Tkitchen }
+ { Tkitchen }
 
 constructor TKitchen.Create(AOwner: TComponent);
  begin
@@ -105,25 +107,34 @@ procedure TKitchen.startTimer(Sender: TObject);
  end;
 
 procedure TKitchen.handleOrder(order: TOrder = nil);
-var tab: TTabItem;
+ var tab: TTabItem;
+ var newKitchenOrder: TKitchenOrder;
  begin
+  newKitchenOrder.isNew := true;
 
   if Assigned(order) then
    begin
     for var KitchenOrder in ListOrders do
      if KitchenOrder.order.StockOrderID = order.StockOrderID then
       exit;
-
-    tab := Pass.Add(TTabItem);
-    tab.StyleLookup := 'tabItemClose';
-    tab.AutoSize := false;
-    tab.Cursor := crHandPoint;
-    tab.Width := TAB_WIDTH;
-    tab.Height := TAB_HEIGHT;
-    pass.SetActiveTabWithTransition(tab, TTabTransition.None);
-
+    newKitchenOrder.isNew := false;
    end;
 
+  newKitchenOrder.order := order;
+  newKitchenOrder.isDisplayed := true;
+  newKitchenOrder.tab := createTab;
+  newKitchenOrder.pad := TFOrder.Create(newKitchenOrder.tab, order);
+  newKitchenOrder.tab.AddObject(newKitchenOrder.pad);
+  Pass.SetActiveTabWithTransition(newKitchenOrder.tab, TTabTransition.None);
+ end;
+
+function TKitchen.createTab: TTabItem;
+ begin
+  result := Pass.Add(TTabItem);
+  result.StyleLookup := 'tabItemClose';
+  result.AutoSize := false;
+  result.Width := TAB_WIDTH;
+  result.Height := TAB_HEIGHT;
  end;
 
 end.
