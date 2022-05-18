@@ -159,7 +159,7 @@ procedure TProduce.fetchProduce;
 procedure TProduce.recordCurrentStockLevels(fetched: TFDQuery);
  begin
   setitemName(fetched.FieldByName('itemName').Value);
-  setstockBefore(fetched.FieldByName('itemAmount').Value);
+  setstockAfter(fetched.FieldByName('itemAmount').AsString);
  end;
 
 procedure TProduce.askNewStockToBeAdded;

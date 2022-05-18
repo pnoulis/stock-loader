@@ -1,15 +1,14 @@
 object dmServerMSSQL: TdmServerMSSQL
-  Height = 600
-  Width = 800
-  PixelsPerInch = 120
+  Height = 480
+  Width = 640
   object connection: TFDConnection
     LoginPrompt = False
-    Left = 40
-    Top = 20
+    Left = 32
+    Top = 16
   end
   object driverMSSQL: TFDPhysMSSQLDriverLink
-    Left = 40
-    Top = 110
+    Left = 32
+    Top = 88
   end
   object tableStockOrders: TFDTable
     Connection = connection
@@ -17,20 +16,20 @@ object dmServerMSSQL: TdmServerMSSQL
     FetchOptions.RecordCountMode = cmTotal
     SchemaName = 'dbo'
     TableName = 'stockOrders'
-    Left = 210
-    Top = 20
+    Left = 168
+    Top = 16
   end
   object queryStockMoves: TFDQuery
     Connection = connection
-    Left = 200
-    Top = 120
+    Left = 160
+    Top = 96
   end
   object storedGetStockMove: TFDStoredProc
     Connection = connection
     SchemaName = 'dbo'
     StoredProcName = 'addStockMove'
-    Left = 420
-    Top = 53
+    Left = 336
+    Top = 42
     ParamData = <
       item
         Name = 'itemCID'
@@ -50,14 +49,14 @@ object dmServerMSSQL: TdmServerMSSQL
   end
   object queryItem: TFDQuery
     Connection = connection
-    Left = 328
-    Top = 24
+    Left = 262
+    Top = 19
   end
   object storedProc: TFDStoredProc
     Connection = connection
     SchemaName = 'dbo'
-    Left = 384
-    Top = 201
+    Left = 307
+    Top = 161
     ParamData = <
       item
         Name = 'stockOrderID'
@@ -73,7 +72,7 @@ object dmServerMSSQL: TdmServerMSSQL
       end>
   end
   object DataSource1: TDataSource
-    Left = 140
-    Top = 350
+    Left = 112
+    Top = 280
   end
 end

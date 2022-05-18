@@ -95,8 +95,8 @@ object Pad: TPad
           Size.PlatformDefault = False
           StyleLookup = 'memo1Style1'
           TabOrder = 3
-          Viewport.Width = 256.000000000000000000
-          Viewport.Height = 104.000000000000000000
+          Viewport.Width = 260.000000000000000000
+          Viewport.Height = 108.000000000000000000
         end
       end
     end

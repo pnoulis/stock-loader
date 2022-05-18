@@ -44,7 +44,7 @@ type
    kitchenID: word;
    tab: TTabItem;
    order: TOrder;
-   pad: TFrame;
+   pad: TPad;
   end;
 
  var
@@ -62,6 +62,7 @@ type
   procedure handleTabMouseEnter(Sender: TObject);
   procedure handleTabMouseLeave(Sender: TObject);
   procedure removeOrder(var KOrder: TKitchenOrder);
+  procedure handleOrderCancel(const kitchenID: word);
  public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
@@ -150,7 +151,9 @@ procedure TKitchen.orderToKitchen(var KOrder: TKitchenOrder);
 
    inc(nOrders);
 
-   KOrder.pad := TPad.Create(KOrder.tab, KOrder.order);
+   KOrder.pad := TPad.Create(KOrder.tab, KOrder.order, KOrder.kitchenID);
+   KOrder.pad.onOrderCancel := handleOrderCancel;
+
    KOrder.tab.AddObject(KOrder.pad);
 
    KOrder.isFetching := false;
@@ -215,6 +218,17 @@ procedure TKitchen.removeOrder(var KOrder: TKitchen.TKitchenOrder);
   FreeAndNil(KOrder.order);
   KOrder.Free;
   ListOrders.Remove(KOrder);
+ end;
+
+procedure TKitchen.handleOrderCancel(const kitchenID: word);
+ var
+  KOrder: TKitchenOrder;
+ begin
+  for var KitchenOrder in ListOrders do
+   if (KitchenOrder.kitchenID = kitchenID) then
+    KOrder := KitchenOrder;
+
+   removeOrder(KOrder);
  end;
 
 end.
