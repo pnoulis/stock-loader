@@ -2,7 +2,7 @@ object Kitchen: TKitchen
   Align = Client
   Padding.Left = 2.000000000000000000
   Padding.Top = 5.000000000000000000
-  Size.Width = 769.000000000000000000
+  Size.Width = 768.000000000000000000
   Size.Height = 692.000000000000000000
   Size.PlatformDefault = False
   object layoutFooter: TLayout
@@ -12,7 +12,7 @@ object Kitchen: TKitchen
     Padding.Bottom = 5.000000000000000000
     Position.X = 2.000000000000000000
     Position.Y = 668.000000000000000000
-    Size.Width = 767.000000000000000000
+    Size.Width = 766.000000000000000000
     Size.Height = 24.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
@@ -36,7 +36,7 @@ object Kitchen: TKitchen
   end
   object Pass: TTabControl
     Align = Client
-    Size.Width = 767.000000000000000000
+    Size.Width = 766.000000000000000000
     Size.Height = 663.000000000000000000
     Size.PlatformDefault = False
     StyleLookup = 'tabcontrol1style1'
@@ -44,7 +44,7 @@ object Kitchen: TKitchen
     TabOrder = 2
     TabPosition = PlatformDefault
     Sizes = (
-      767s
+      766s
       623s)
     object Pin: TTabItem
       AutoSize = False

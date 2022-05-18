@@ -82,7 +82,7 @@ type
   onProduceCached: procedure of object;
 
   constructor Create(status: EStatusOrder; template: TPanel;
-   Data: TFDQuery = nil);
+   Data: TFields = nil);
   procedure waitForProduce;
   procedure setFocus(Sender: TInputText = nil);
   procedure handleGraphicClick(Sender: TObject);
@@ -274,7 +274,7 @@ procedure TProduce.handleGraphicClick(Sender: TObject);
  end;
 
 constructor TProduce.Create(status: EStatusOrder; template: TPanel;
-Data: TFDQuery = nil);
+Data: TFields = nil);
  begin
 
   statusOrder := status;
@@ -576,6 +576,7 @@ procedure TProduce.enableInteractivity(Target: TInputText);
   Target.ReadOnly := false;
   Target.HitTest := true;
   Target.OnKeyUp := Target.handleKey;
+  Target.Text := '';
   setFocus(Target);
  end;
 
