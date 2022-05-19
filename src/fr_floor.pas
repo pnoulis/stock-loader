@@ -51,6 +51,7 @@ type
   btnShowFilters: TButton;
   btnApplyFilters: TButton;
   btnResetFilters: TButton;
+    Label3: TLabel;
   procedure btnShowFiltersClick(Sender: TObject);
   procedure btnShowHeaderClick(Sender: TObject);
   procedure btnApplyFiltersClick(Sender: TObject);

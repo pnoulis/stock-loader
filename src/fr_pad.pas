@@ -43,21 +43,25 @@ type
   Rectangle2: TRectangle;
   memoOrderID: TMemo;
   layoutStockHeaders: TLayout;
-  lblCodeHeader: TLabel;
-  lblAmountHeader: TLabel;
+  lblitemCID: TLabel;
+  lblStockIncrease: TLabel;
   panelProduceTemplate: TPanel;
   Rectangle4: TRectangle;
-  edtProduceAfter: TEdit;
-  edtProduceIncrBy: TEdit;
-  edtProduceID: TEdit;
-  edtProduceName: TEdit;
-  lblStockAfter: TLabel;
+  edtStockBefore: TEdit;
+  edtStockIncrease: TEdit;
+  edtItemCID: TEdit;
+  edtItemName: TEdit;
+  lblStockBefore: TLabel;
   lblItemName: TLabel;
   inputPanelTemplate: TPanel;
   Rectangle3: TRectangle;
   loader: TAniIndicator;
   layoutBody: TLayout;
   scrollProduce: TVertScrollBox;
+  lblStockAfter: TLabel;
+  lblStockMoveID: TLabel;
+  edtStockAfter: TEdit;
+  edtStockMoveID: TEdit;
   procedure btnCancelOrderClick(Sender: TObject);
   procedure btnDeleteProduceClick(Sender: TObject);
   procedure btnCommitOrderClick(Sender: TObject);
@@ -92,30 +96,35 @@ implementation
 
 procedure TPad.btnCancelOrderClick(Sender: TObject);
  begin
-  askUserOrderDelete;
-  {
-    if (FOrder.Status = EStatusOrder.commited) and askUserOrderDelete then
-    FOrder.delete;
 
-    onOrderCancel(FKitchenID);
-  }
+  // if (FOrder.Status = EStatusOrder.commited) and askUserOrderDelete then
+  // FOrder.delete;
+
+  onOrderCancel(FKitchenID);
  end;
 
 procedure TPad.btnDeleteProduceClick(Sender: TObject);
  begin
-  for var produce in ListProduce do
-   begin
-    if not(produce.isSelected) then
-     continue;
+  var
+  tmp := TList<TProduce>.Create;
+  showMessage(ListProduce.Count.tostring);
 
+  for var produce in ListProduce do
+   if (produce.isSelected) then
+    tmp.add(produce);
+
+  for var produce in tmp do
+   begin
     if (produce.statusProduce = EStatusOrder.cached) then
      FOrder.delete([produce]);
-
+    ListProduce.Remove(produce);
     FreeAndNil(produce.graphic);
     produce.Free;
-    ListProduce.Remove(produce);
    end;
 
+  FreeAndNil(tmp);
+
+  showMessage(ListProduce.Count.tostring);
   ListProduce.Last.setFocus;
  end;
 
@@ -159,7 +168,7 @@ procedure TPad.renderHeaderOrder;
    memoOrderID.Lines.add('-');
 
   memoOrderID.Lines.add('Αρ. Παραγγελιας:');
-  memoOrderID.Lines.add(FOrder.StockOrderID.ToString);
+  memoOrderID.Lines.add(FOrder.StockOrderID.tostring);
  end;
 
 function TPad.formatDate(const ADate: TDateTime): string;

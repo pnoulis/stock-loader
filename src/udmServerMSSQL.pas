@@ -60,7 +60,7 @@ type
   procedure fetchBetween(cb: TAfterFetch);
   procedure fetchOrdersFilterDate(dateFrom, dateTo: TDate; cb: TAfterFetch);
   procedure fetchProduce(const orderID: cardinal; cb: TAfterFetch);
-  function fetchItem(const itemCID: string): TFDQuery;
+  function fetchItem(const itemCID: string): TDataSource;
   function addStockOrder: TFDStoredProc;
   function addStockMove(const itemCID: string; const stockOrderID: cardinal;
    const stockIncrease: integer; const storeID: cardinal;
@@ -132,22 +132,42 @@ procedure TdmServerMSSQL.connect;
     end).Start;
  end;
 
-function TdmServerMSSQL.fetchItem(const itemCID: string): TFDQuery;
+function TdmServerMSSQL.fetchItem(const itemCID: string): TDataSource;
  begin
+  var
+  query := queryItem;
+  try
+   query.Active := false;
+   query.Open
+       ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
+       'a.itemCID = b.itemCID and a.itemCID = ''' + itemCID + '''');
+   query.Active := true;
+   datasource1.DataSet := query;
+   result := datasource1;
+  except
+   on E: Exception do
+    begin
+     showMessage(E.Message);
+     result := nil;
+    end;
+
+  end;
+  {
   result := queryItem;
-  result.active := false;
+  result.Active := false;
   result.Open
       ('select itemCID, itemName, itemAmount from item where itemCID = ''' +
       itemCID + '''');
-  result.active := true;
+  result.Active := true;
+  }
  end;
 
 function TdmServerMSSQL.fetchOrders: TFDTable;
  begin
   result := tableStockOrders;
-  result.active := false;
+  result.Active := false;
   result.IndexFieldNames := 'moveDate:A';
-  result.active := true;
+  result.Active := true;
  end;
 
 procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
@@ -156,11 +176,11 @@ procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
   table := tableStockOrders;
 
   try
-   table.active := false;
+   table.Active := false;
    table.Filter := '';
    table.Filtered := false;
    // table.IndexFieldNames := 'moveDate:D';
-   table.active := true;
+   table.Active := true;
    DataSource1.DataSet := tableStockOrders;
    cb(DataSource1);
   except
@@ -266,10 +286,10 @@ procedure TdmServerMSSQL.fetchProduce(const orderID: cardinal; cb: TAfterFetch);
   query := queryStockMoves;
 
   try
-   query.active := false;
+   query.Active := false;
    query.Open('select * from stockMoves where stockOrderID = ' +
        orderID.ToString);
-   query.active := true;
+   query.Active := true;
    DataSource1.DataSet := query;
    cb(DataSource1);
   except

@@ -33,7 +33,7 @@ type
 
   FSnippets: TRegexpSnippets;
   isValid: Boolean;
-  validate: procedure(Sender: TInputText);
+  validate: procedure(Sender: TInputText) of object;
   FErrors: TErrors;
  end;
 
