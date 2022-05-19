@@ -51,7 +51,7 @@ type
   function getMoveID: cardinal;
   function getStockOrderID: cardinal;
   function getItemCID: string;
-  function getStockIncrease: integer;
+  function getStockIncrease: double;
 
   procedure setstockAfter(const stockAfter: string);
   procedure renderItemCID;
@@ -89,7 +89,7 @@ type
 
   property moveID: cardinal read getMoveID;
   property itemCID: string read getItemCID;
-  property stockIncrease: integer read getStockIncrease;
+  property stockIncrease: double read getStockIncrease;
  end;
 
 implementation
@@ -416,9 +416,9 @@ function TProduce.getItemCID: string;
   result := FitemCID.Text;
  end;
 
-function TProduce.getStockIncrease: integer;
+function TProduce.getStockIncrease: double;
  begin
-  result := strToInt(FstockIncrease.Text);
+  result := strToFloat(FstockIncrease.Text);
  end;
 
 procedure TProduce.renderItemCID;

@@ -75,6 +75,7 @@ CREATE TABLE dbo.stockMoves (
   stockMoveID BIGINT IDENTITY(1, 1) NOT NULL, -- PK
   stockOrderID BIGINT NOT NULL, --FK
   itemCID NVARCHAR(50) NOT NULL, -- FK
+  itemName NVARCHAR(200) NOT NULL,
   stockBefore DECIMAL(18, 3) NOT NULL,
   stockIncrease DECIMAL(18, 3) NOT NULL,
   stockAfter DECIMAL(18, 3) NOT NULL,
@@ -151,9 +152,9 @@ ELSE
 BEGIN
 
 INSERT INTO stockMoves (
-    stockOrderID, itemCID, stockBefore, stockIncrease, stockAfter
+    stockOrderID, itemCID, itemName, stockBefore, stockIncrease, stockAfter
 ) VALUES (
-    @stockOrderID, @itemCID, @stockBefore, @stockIncrease, @stockAfter
+    @stockOrderID, @itemCID, @itemName, @stockBefore, @stockIncrease, @stockAfter
 );
 
 END;

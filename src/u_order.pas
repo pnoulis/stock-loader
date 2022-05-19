@@ -172,7 +172,7 @@ constructor TOrder.Create(data: TFields = nil; const storeID: byte = 0);
   if assigned(data) then
    begin
     FStockOrderID := data.FieldByName('stockOrderID').Value;
-    FDate.commited := data.FieldByName('moveDate').Value;
+    FDate.commited := data.FieldByName('servedDate').Value;
     FStoreID := data.FieldByName('storeID').Value;
 
     if isToday(FDate.commited) then
