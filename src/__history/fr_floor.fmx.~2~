@@ -1,0 +1,308 @@
+object Floor: TFloor
+  Align = Client
+  Size.Width = 804.000000000000000000
+  Size.Height = 708.000000000000000000
+  Size.PlatformDefault = False
+  object Rectangle2: TRectangle
+    Align = Client
+    Padding.Top = 15.000000000000000000
+    Padding.Bottom = 20.000000000000000000
+    Sides = []
+    Size.Width = 804.000000000000000000
+    Size.Height = 708.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object layoutActions: TLayout
+      Align = Top
+      Position.Y = 15.000000000000000000
+      Size.Width = 804.000000000000000000
+      Size.Height = 65.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object panelActions: TPanel
+        Align = Client
+        Size.Width = 804.000000000000000000
+        Size.Height = 65.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object Rectangle5: TRectangle
+          Align = Client
+          EnableDragHighlight = False
+          Padding.Left = 25.000000000000000000
+          Size.Width = 804.000000000000000000
+          Size.Height = 65.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claLightgray
+          Stroke.Thickness = 0.000000000000000000
+          object btnNewOrder: TButton
+            Align = Left
+            AutoTranslate = False
+            Cursor = crHandPoint
+            EnableDragHighlight = False
+            StyledSettings = [FontColor]
+            Margins.Right = 20.000000000000000000
+            Position.X = 25.000000000000000000
+            Size.Width = 113.000000000000000000
+            Size.Height = 65.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Text = #925#949#945' '#917#947#947#961#945#966#951
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnClick = btnNewOrderClick
+          end
+          object btnShowFilters: TButton
+            Align = Left
+            AutoTranslate = False
+            Cursor = crHandPoint
+            EnableDragHighlight = False
+            StyledSettings = [FontColor]
+            Position.X = 158.000000000000000000
+            Size.Width = 113.000000000000000000
+            Size.Height = 65.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            Text = #934#953#955#964#961#945
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnClick = btnShowFiltersClick
+          end
+        end
+      end
+    end
+    object layoutHeader: TLayout
+      Align = Top
+      Margins.Top = 30.000000000000000000
+      Position.Y = 110.000000000000000000
+      Size.Width = 804.000000000000000000
+      Size.Height = 59.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object lblOrderID: TLabel
+        Align = Left
+        StyledSettings = [FontColor]
+        Margins.Left = 70.000000000000000000
+        Position.X = 70.000000000000000000
+        Size.Width = 217.000000000000000000
+        Size.Height = 59.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Family = 'Comic Sans MS'
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.HorzAlign = Center
+        Text = #913#961'. '#928#945#961#945#947#947#949#955#953#945#962
+        TabOrder = 1
+      end
+      object lblOrderDate: TLabel
+        Align = Right
+        StyledSettings = [FontColor]
+        Margins.Right = 130.000000000000000000
+        Position.X = 457.000000000000000000
+        Size.Width = 217.000000000000000000
+        Size.Height = 59.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Family = 'Comic Sans MS'
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.HorzAlign = Center
+        Text = #919#956#949#961#959#956#951#957#953#945' '#949#954#948#959#963#951#962
+        TabOrder = 0
+      end
+      object Label3: TLabel
+        Align = Client
+        Size.Width = 170.000000000000000000
+        Size.Height = 59.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+      end
+    end
+    object scrollOrders: TVertScrollBox
+      Align = Client
+      Padding.Left = 25.000000000000000000
+      Padding.Right = 25.000000000000000000
+      Margins.Top = 20.000000000000000000
+      Size.Width = 804.000000000000000000
+      Size.Height = 499.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Viewport.Width = 804.000000000000000000
+      Viewport.Height = 499.000000000000000000
+    end
+    object panelDateFilter: TPanel
+      Align = Top
+      Position.Y = 73.000000000000000000
+      Size.Width = 804.000000000000000000
+      Size.Height = 58.000000000000000000
+      Size.PlatformDefault = False
+      Visible = False
+      TabOrder = 1
+      object Rectangle4: TRectangle
+        Align = Client
+        HitTest = False
+        Sides = []
+        Size.Width = 804.000000000000000000
+        Size.Height = 58.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        Stroke.Thickness = 0.000000000000000000
+        object btnShowHeader: TButton
+          Align = Right
+          Cursor = crHandPoint
+          Position.X = 724.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 58.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'priortoolbuttonbordered'
+          TabOrder = 0
+          Text = 'Button1'
+          OnClick = btnShowHeaderClick
+        end
+        object Layout1: TLayout
+          Align = Client
+          Size.Width = 564.000000000000000000
+          Size.Height = 58.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          object lblDateFilterHeader: TLabel
+            StyledSettings = [FontColor]
+            Position.X = -96.000000000000000000
+            Position.Y = 4.000000000000000000
+            Size.Width = 650.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = #919#956#949#961#959#956#951#957#953#945
+            TabOrder = 0
+          end
+          object lblDateFrom: TLabel
+            StyledSettings = [FontColor]
+            Position.X = 62.000000000000000000
+            Position.Y = 30.000000000000000000
+            Size.Width = 76.000000000000000000
+            Size.Height = 24.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = #913#960#959':'
+            TabOrder = 2
+          end
+          object dateFrom: TDateEdit
+            Date = 44697.000000000000000000
+            OnChange = dateFromChange
+            Position.X = 135.000000000000000000
+            Position.Y = 29.000000000000000000
+            Size.Width = 100.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 3
+          end
+          object dateTo: TDateEdit
+            Date = 44697.000000000000000000
+            Position.X = 305.000000000000000000
+            Position.Y = 29.000000000000000000
+            Size.Width = 100.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 4
+          end
+          object lblDateTo: TLabel
+            StyledSettings = [FontColor]
+            Position.X = 243.000000000000000000
+            Position.Y = 30.000000000000000000
+            Size.Width = 54.000000000000000000
+            Size.Height = 24.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Comic Sans MS'
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = #917#969#962':'
+            TabOrder = 1
+          end
+        end
+        object btnApplyFilters: TButton
+          Align = Right
+          Cursor = crHandPoint
+          Position.X = 644.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 58.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'searchtoolbutton'
+          TabOrder = 2
+          Text = 'btnApplyFilters'
+          OnClick = btnApplyFiltersClick
+        end
+        object btnResetFilters: TButton
+          Align = Right
+          Cursor = crHandPoint
+          Position.X = 564.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 58.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'refreshtoolbutton'
+          TabOrder = 3
+          Text = 'btnResetFilters'
+          OnClick = btnResetFiltersClick
+        end
+      end
+    end
+  end
+  object templateFloorOrder: TPanel
+    Align = Top
+    Cursor = crHandPoint
+    EnableDragHighlight = False
+    Margins.Bottom = 20.000000000000000000
+    Size.Width = 804.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    StyleLookup = 'panel1style1'
+    Visible = False
+    TabOrder = 0
+    object Rectangle3: TRectangle
+      Align = Client
+      Fill.Color = claWhite
+      HitTest = False
+      Sides = []
+      Size.Width = 804.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      XRadius = 11.000000000000000000
+      YRadius = 11.000000000000000000
+      object Label1: TLabel
+        Align = Vertical
+        StyledSettings = [FontColor]
+        Position.X = 90.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Family = 'Comic Sans MS'
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.HorzAlign = Center
+        Text = 'Label1'
+        TabOrder = 1
+      end
+      object Label2: TLabel
+        Align = Right
+        StyledSettings = [FontColor]
+        Position.X = 520.000000000000000000
+        Size.Width = 284.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Family = 'Comic Sans MS'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Label1'
+        TabOrder = 0
+      end
+    end
+  end
+end

@@ -1,0 +1,46 @@
+object testUFilesystem: TtestUFilesystem
+  Left = 0
+  Top = 0
+  Caption = 'test uFilesystem'
+  ClientHeight = 480
+  ClientWidth = 640
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Layout1: TLayout
+    Align = Client
+    Size.Width = 640.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Memo1: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Lines.Strings = (
+        
+          '1. AnchorProjectRoot procedure should throw an exception if prov' +
+          'ided with'
+        ' a name of a directory not in the current path')
+      ReadOnly = True
+      ShowScrollBars = False
+      StyledSettings = [FontColor]
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      Align = Top
+      Cursor = crHandPoint
+      EnabledScroll = False
+      Size.Width = 640.000000000000000000
+      Size.Height = 57.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      OnClick = Memo1Click
+      Viewport.Width = 636.000000000000000000
+      Viewport.Height = 53.000000000000000000
+    end
+  end
+end

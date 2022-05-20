@@ -1,0 +1,97 @@
+object mainForm: TmainForm
+  Left = 0
+  Top = 0
+  Caption = 'Delphi utils'
+  ClientHeight = 480
+  ClientWidth = 640
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object GridLayout1: TGridLayout
+    Align = Client
+    ItemHeight = 80.000000000000000000
+    ItemWidth = 200.000000000000000000
+    Orientation = Horizontal
+    Size.Width = 640.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object btnTestUDBConnection: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Lines.Strings = (
+        'test'
+        'uDBConnection')
+      ReadOnly = True
+      ShowScrollBars = False
+      StyledSettings = [FontColor]
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      Align = Contents
+      Cursor = crHandPoint
+      EnabledScroll = False
+      Size.Width = 200.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      OnClick = btnTestUDBConnectionClick
+      Viewport.Width = 196.000000000000000000
+      Viewport.Height = 76.000000000000000000
+    end
+    object btnTestUFilesystem: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Lines.Strings = (
+        'test'
+        'uFileSystem')
+      ReadOnly = True
+      ShowScrollBars = False
+      StyledSettings = [FontColor]
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      Align = Contents
+      Cursor = crHandPoint
+      EnabledScroll = False
+      Size.Width = 200.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      OnClick = btnTestUFilesystemClick
+      Viewport.Width = 196.000000000000000000
+      Viewport.Height = 76.000000000000000000
+    end
+    object btnTestUTabs: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Lines.Strings = (
+        'test'
+        'uTabs')
+      ReadOnly = True
+      ShowScrollBars = False
+      StyledSettings = [FontColor]
+      TextSettings.Font.Family = 'Comic Sans MS'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      Align = Contents
+      Cursor = crHandPoint
+      EnabledScroll = False
+      Size.Width = 200.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      OnClick = btnTestUTabsClick
+      Viewport.Width = 196.000000000000000000
+      Viewport.Height = 76.000000000000000000
+    end
+  end
+end
