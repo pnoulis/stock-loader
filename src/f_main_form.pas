@@ -1,4 +1,4 @@
-﻿unit f_main_form;
+unit f_main_form;
 
 interface
 

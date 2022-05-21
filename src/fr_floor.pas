@@ -1,4 +1,4 @@
-﻿unit fr_floor;
+unit fr_floor;
 
 interface
 

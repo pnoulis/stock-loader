@@ -1,4 +1,4 @@
-﻿unit untInput;
+unit untInput;
 
 interface
 

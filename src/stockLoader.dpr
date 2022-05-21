@@ -1,4 +1,4 @@
-﻿program stockLoader;
+program stockLoader;
 
 uses
   untTypes in 'untTypes.pas',

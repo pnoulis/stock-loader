@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{54304C44-3029-4880-BE8C-0C2B001DD95F}</ProjectGuid>
         <ProjectVersion>19.4</ProjectVersion>
