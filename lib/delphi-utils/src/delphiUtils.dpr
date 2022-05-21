@@ -1,4 +1,4 @@
-﻿program delphiUtils;
+program delphiUtils;
 uses
   System.StartUpCopy,
   FMX.Forms,
