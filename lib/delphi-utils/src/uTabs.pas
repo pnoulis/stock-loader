@@ -1,4 +1,4 @@
-﻿unit uTabs;
+unit uTabs;
 
 interface
 

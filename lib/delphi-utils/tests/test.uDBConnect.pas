@@ -1,4 +1,4 @@
-﻿unit test.uDBConnect;
+unit test.uDBConnect;
 
 {
   Test uDBConnect:
