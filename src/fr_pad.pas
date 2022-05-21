@@ -1,4 +1,4 @@
-﻿unit fr_pad;
+unit fr_pad;
 
 interface
 

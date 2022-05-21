@@ -1,4 +1,4 @@
-﻿unit udmServerMSSQL;
+unit udmServerMSSQL;
 
 interface
 

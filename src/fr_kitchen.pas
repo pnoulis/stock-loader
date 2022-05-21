@@ -1,4 +1,4 @@
-﻿unit fr_kitchen;
+unit fr_kitchen;
 
 interface
 
