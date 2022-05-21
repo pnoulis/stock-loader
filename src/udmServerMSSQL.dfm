@@ -24,29 +24,6 @@ object dmServerMSSQL: TdmServerMSSQL
     Left = 160
     Top = 96
   end
-  object storedGetStockMove: TFDStoredProc
-    Connection = connection
-    SchemaName = 'dbo'
-    StoredProcName = 'addStockMove'
-    Left = 336
-    Top = 42
-    ParamData = <
-      item
-        Name = 'itemCID'
-      end
-      item
-        Name = 'stockOrderID'
-      end
-      item
-        Name = 'stockIncrease'
-      end
-      item
-        Name = 'storeID'
-      end
-      item
-        Name = 'moveID'
-      end>
-  end
   object queryItem: TFDQuery
     Connection = connection
     Left = 262
@@ -74,5 +51,23 @@ object dmServerMSSQL: TdmServerMSSQL
   object DataSource1: TDataSource
     Left = 112
     Top = 280
+  object DataSource1: TDataSource
+    Left = 32
+    Top = 184
+  end
+  object queryAddStockOrder: TFDQuery
+    Connection = connection
+    Left = 136
+    Top = 184
+  end
+  object queryAddStockMove: TFDQuery
+    Connection = connection
+    Left = 280
+    Top = 184
+  end
+  object queryDeleteStockOrder: TFDQuery
+    Connection = connection
+    Left = 304
+    Top = 97
   end
 end

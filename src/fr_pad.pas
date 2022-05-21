@@ -3,243 +3,270 @@ unit fr_pad;
 interface
 
 uses
- u_produce,
- untTypes,
- u_order,
- udmServerMSSQL,
- System.SysUtils,
- data.DB,
- System.Types,
- System.DateUtils,
- System.UITypes,
- System.Classes,
- System.Variants,
- System.Generics.Collections,
- System.UIConsts,
- FMX.Types,
- FMX.Graphics,
- FMX.TabControl,
- FMX.Controls,
- FMX.Forms,
- FMX.Dialogs,
- FMX.StdCtrls,
- FMX.Controls.Presentation,
- FMX.Objects,
- FMX.Layouts,
- FMX.DialogService.Sync,
- FireDAC.Comp.Client,
- FMX.Memo.Types,
- FMX.ScrollBox,
- FMX.Memo,
- FMX.Edit;
+  u_produce,
+  untTypes,
+  u_order,
+  udmServerMSSQL,
+  System.SysUtils,
+  data.DB,
+  System.Types,
+  System.DateUtils,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  System.Generics.Collections,
+  System.UIConsts,
+  FMX.Types,
+  FMX.Graphics,
+  FMX.TabControl,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Dialogs,
+  FMX.StdCtrls,
+  FMX.Controls.Presentation,
+  FMX.Objects,
+  FMX.Layouts,
+  FMX.DialogService.Sync,
+  FireDAC.Comp.Client,
+  FMX.Memo.Types,
+  FMX.ScrollBox,
+  FMX.Memo,
+  FMX.Edit;
 
 type
- TPad = class(TFrame)
-  Rectangle1: TRectangle;
-  layoutActions: TLayout;
-  btnCommitOrder: TButton;
-  btnCancelOrder: TButton;
-  btnDeleteProduce: TButton;
-  Rectangle2: TRectangle;
-  memoOrderID: TMemo;
-  layoutStockHeaders: TLayout;
-  lblitemCID: TLabel;
-  lblStockIncrease: TLabel;
-  panelProduceTemplate: TPanel;
-  Rectangle4: TRectangle;
-  edtStockBefore: TEdit;
-  edtStockIncrease: TEdit;
-  edtItemCID: TEdit;
-  edtItemName: TEdit;
-  lblStockBefore: TLabel;
-  lblItemName: TLabel;
-  inputPanelTemplate: TPanel;
-  Rectangle3: TRectangle;
-  loader: TAniIndicator;
-  layoutBody: TLayout;
-  scrollProduce: TVertScrollBox;
-  lblStockAfter: TLabel;
-  lblStockMoveID: TLabel;
-  edtStockAfter: TEdit;
-  edtStockMoveID: TEdit;
-  procedure btnCancelOrderClick(Sender: TObject);
-  procedure btnDeleteProduceClick(Sender: TObject);
-  procedure btnCommitOrderClick(Sender: TObject);
+  TPad = class(TFrame)
+    Rectangle1: TRectangle;
+    layoutActions: TLayout;
+    btnCommitOrder: TButton;
+    btnCancelOrder: TButton;
+    btnDeleteProduce: TButton;
+    Rectangle2: TRectangle;
+    memoOrderID: TMemo;
+    layoutStockHeaders: TLayout;
+    lblitemCID: TLabel;
+    lblStockIncrease: TLabel;
+    panelProduceTemplate: TPanel;
+    Rectangle4: TRectangle;
+    edtStockBefore: TEdit;
+    edtStockIncrease: TEdit;
+    edtItemCID: TEdit;
+    edtItemName: TEdit;
+    lblStockBefore: TLabel;
+    lblItemName: TLabel;
+    inputPanelTemplate: TPanel;
+    Rectangle3: TRectangle;
+    loader: TAniIndicator;
+    layoutBody: TLayout;
+    scrollProduce: TVertScrollBox;
+    lblStockAfter: TLabel;
+    lblStockMoveID: TLabel;
+    edtStockAfter: TEdit;
+    edtStockMoveID: TEdit;
+    procedure btnCancelOrderClick(Sender: TObject);
+    procedure btnDeleteProduceClick(Sender: TObject);
+    procedure btnCommitOrderClick(Sender: TObject);
 
- private
- var
-  ListProduce: TList<TProduce>;
-  FOrder: TOrder;
-  FKitchenID: word;
-  FScrollHeight: Double;
-  FContentHeight: Double;
-  procedure renderHeaderOrder;
-  function formatDate(const ADate: TDateTime): string;
-  procedure OrderToFloor;
-  procedure ProduceToFloor(AProduceRecord: TFields;
-   const IndexRecord: cardinal);
-  procedure switchLoading;
-  procedure addNewProduce;
-  procedure renderNewProduce(AProduce: TPanel);
-  procedure flushPad;
-  function askUserOrderDelete: Boolean;
- public
- var
-  onOrderCancel: procedure(const KitchenID: word) of object;
-  constructor Create(AOwner: TComponent; Order: TOrder; const KitchenID: word);
-  destructor Destroy; override;
- end;
+  private
+  var
+    ListProduce: TObjectList<TProduce>;
+    FOrder: TOrder;
+    FKitchenID: word;
+    FScrollHeight: Double;
+    FContentHeight: Double;
+    procedure renderHeaderOrder;
+    function formatDate(const ADate: TDateTime): string;
+    procedure OrderToFloor;
+    procedure ProduceToFloor(AProduceRecord: TFields;
+      const IndexRecord: cardinal);
+    procedure switchLoading;
+    procedure addNewProduce;
+    procedure renderNewProduce(AProduce: TPanel);
+    procedure flushPad;
+    function askUserOrderDelete: Boolean;
+  public
+  var
+    onOrderCancel: procedure(const KitchenID: word) of object;
+    onOrderCommit: procedure(const KitchenID: word) of object;
+    constructor Create(AOwner: TComponent; Order: TOrder;
+      const KitchenID: word);
+    destructor Destroy; override;
+  end;
 
 implementation
 
 {$R *.fmx}
 
 procedure TPad.btnCancelOrderClick(Sender: TObject);
- begin
+begin
 
-  // if (FOrder.Status = EStatusOrder.commited) and askUserOrderDelete then
-  // FOrder.delete;
+  if (FOrder.Status = EStatusOrder.commited) and askUserOrderDelete then
+    FOrder.delete;
 
   onOrderCancel(FKitchenID);
- end;
+end;
 
 procedure TPad.btnDeleteProduceClick(Sender: TObject);
- begin
+begin
   var
-  tmp := TList<TProduce>.Create;
-  showMessage(ListProduce.Count.tostring);
+  toBeRemoved := TList<TProduce>.Create;
 
   for var produce in ListProduce do
-   if (produce.isSelected) then
-    tmp.add(produce);
+    if (produce.isSelected) and (produce.statusProduce <> EStatusOrder.commited)
+    then
+      toBeRemoved.Add(produce);
 
-  for var produce in tmp do
-   begin
-    if (produce.statusProduce = EStatusOrder.cached) then
-     FOrder.delete([produce]);
+  for var produce in toBeRemoved do
     ListProduce.Remove(produce);
-    FreeAndNil(produce.graphic);
-    produce.Free;
-   end;
 
-  FreeAndNil(tmp);
-
-  showMessage(ListProduce.Count.tostring);
+  toBeRemoved.Free;
   ListProduce.Last.setFocus;
- end;
+end;
 
 procedure TPad.btnCommitOrderClick(Sender: TObject);
- begin
-  showMessage('commit order click');
- end;
+begin
+
+  if (FOrder.Status = EStatusOrder.served) then
+    exit;
+
+  var
+  lastOrder := ListProduce.Last;
+  ListProduce.Extract(lastOrder);
+  FOrder.commit(ListProduce);
+  ListProduce.Add(lastOrder);
+  renderHeaderOrder;
+  onOrderCommit(FKitchenID);
+
+  {
+    var
+    toBeCommited := TList<TProduce>.Create;
+    toBeCommited.Capacity := ListProduce.Count;
+
+    if (toBeCommited.Capacity = 1) then
+    exit;
+
+    for var produce in ListProduce do
+    if (produce.isSelected) then
+    toBeCommited.Add(produce);
+
+    if (toBeCommited.Count = 0) then
+    begin
+    lastOrder := ListProduce.ExtractAt(ListProduce.Count - 1);
+    FOrder.commit(ListProduce);
+    ListProduce.Add(lastOrder);
+    end
+    else
+    begin
+    FOrder.commit(toBeCommited)
+    end;
+  }
+end;
 
 constructor TPad.Create(AOwner: TComponent; Order: TOrder;
- const KitchenID: word);
- begin
+  const KitchenID: word);
+begin
   inherited Create(AOwner);
   FOrder := Order;
   FKitchenID := KitchenID;
-  ListProduce := TList<TProduce>.Create;
+  ListProduce := TObjectList<TProduce>.Create;
   ListProduce.Capacity := 10;
+  ListProduce.OwnsObjects := true;
   renderHeaderOrder;
   OrderToFloor;
 
   if (FOrder.Status = EStatusOrder.scratch) then
-   addNewProduce;
- end;
+    addNewProduce;
+end;
 
 destructor TPad.Destroy;
- begin
-  for var produce in ListProduce do
-   produce.Free;
-
-  FreeAndNil(ListProduce);
-
+begin
+  ListProduce.Free;
   inherited Destroy;
- end;
+end;
 
 procedure TPad.renderHeaderOrder;
- begin
-  memoOrderID.Lines.add('Ημερομηνια Εκδοσης:');
+begin
+  memoOrderID.Lines.Clear;
+
+  memoOrderID.Lines.Add('Ημερομηνια Εκδοσης:');
 
   if (FOrder.Date.commited <> 0) then
-   memoOrderID.Lines.add(formatDate(FOrder.Date.commited))
+    memoOrderID.Lines.Add(formatDate(FOrder.Date.commited))
   else
-   memoOrderID.Lines.add('-');
+    memoOrderID.Lines.Add('-');
 
-  memoOrderID.Lines.add('Αρ. Παραγγελιας:');
-  memoOrderID.Lines.add(FOrder.StockOrderID.tostring);
- end;
+  memoOrderID.Lines.Add('Αρ. Παραγγελιας:');
+  memoOrderID.Lines.Add(FOrder.StockOrderID);
+end;
 
 function TPad.formatDate(const ADate: TDateTime): string;
- Begin
+Begin
   datetimetostring(result, 'ddd dd/mm/yy hh:mm', ADate);
- end;
+end;
 
 procedure TPad.switchLoading;
- begin
+begin
   scrollProduce.Visible := not scrollProduce.Visible;
   loader.Visible := not loader.Visible;
   loader.Enabled := not loader.Enabled;
- end;
+end;
 
 procedure TPad.OrderToFloor;
- begin
+begin
 
   FOrder.fetch(
     procedure(data: TDataset)
     begin
 
-     if (data = nil) then
-      exit;
+      if (data = nil) then
+        exit;
 
-     while not data.Eof do
+      while not data.Eof do
       begin
-       ProduceToFloor(data.Fields, data.RecNo);
-       data.Next;
+        ProduceToFloor(data.Fields, data.RecNo);
+        data.Next;
       end;
 
     end);
 
- end;
+      end;
 
 procedure TPad.ProduceToFloor(AProduceRecord: TFields;
 const IndexRecord: cardinal);
- var
+var
   template: TPanel;
- begin
+begin
   template := TPanel(panelProduceTemplate.Clone(scrollProduce));
-  ListProduce.add(TProduce.Create(FOrder.Status, template, AProduceRecord));
+  ListProduce.Add(TProduce.Create(FOrder.Status, template, AProduceRecord));
   scrollProduce.AddObject(template);
   template.Visible := true;
- end;
+end;
 
 procedure TPad.addNewProduce;
- var
+var
   template: TPanel;
   produce: TProduce;
- begin
+begin
 
   if (scrollProduce.ComponentCount > 1) and
-      (ListProduce.Last.statusProduce = EStatusOrder.scratch) then
-   begin
+    (ListProduce.Last.statusProduce = EStatusOrder.scratch) then
+  begin
     ListProduce.Last.setFocus;
     exit;
-   end;
+  end;
 
   template := TPanel(inputPanelTemplate.Clone(scrollProduce));
   produce := TProduce.Create(FOrder.Status, template);
 
   produce.onProduceCached := addNewProduce;
-  ListProduce.add(produce);
+  ListProduce.Add(produce);
 
   renderNewProduce(template);
   produce.waitForProduce;
- end;
+end;
 
 procedure TPad.renderNewProduce(AProduce: TPanel);
- begin
-  // Delphi does not know how to position                          ^
+begin
+  // Delphi does not know how to position
   // dynamically added components into a tvertscrollbox.
   // By default it will insert the objects inverted such as:
   // ... 5 4 3 2 1
@@ -251,21 +278,21 @@ procedure TPad.renderNewProduce(AProduce: TPanel);
   // delphi-fmx-how-to-add-a-dynamically-created-top-aligned-component-under-all-pre
   // stock.align := top (at constructor)
   if FScrollHeight = 0 then
-   FScrollHeight := inputPanelTemplate.Size.Height +
-       inputPanelTemplate.Margins.Height;
+    FScrollHeight := inputPanelTemplate.Size.Height +
+      inputPanelTemplate.Margins.Height;
 
   FContentHeight := FContentHeight + FScrollHeight;
   inputPanelTemplate.Position.Y := FContentHeight;
 
   if FContentHeight > Size.Height then
-   scrollProduce.scrollBy(0.0, -FContentHeight);
+    scrollProduce.scrollBy(0.0, -FContentHeight);
 
   scrollProduce.AddObject(AProduce);
   AProduce.Visible := true;
- end;
+end;
 
 procedure TPad.flushPad;
- begin
+begin
   scrollProduce.BeginUpdate;
   scrollProduce.Content.DeleteChildren;
   scrollProduce.RealignContent;
@@ -273,21 +300,23 @@ procedure TPad.flushPad;
 
   FScrollHeight := 0.0;
   FContentHeight := 0.0;
- end;
+end;
 
 function TPad.askUserOrderDelete: Boolean;
- var input: integer;
- const msg = 'Η παραγγελια εχει αποθηκευμενες κινησεις. Να διαγραφει?';
- begin
+var
+  input: integer;
+const
+  msg = 'Η παραγγελια εχει αποθηκευμενες κινησεις. Να διαγραφει?';
+begin
 
   input := TDialogServiceSync.MessageDialog(msg, TMsgDlgType.mtConfirmation,
-      [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], TMsgDlgBtn.mbNo, mrNone);
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], TMsgDlgBtn.mbNo, mrNone);
 
   if (input = mrYes) then
-   result := true
+    result := true
   else
-   result := false;
+    result := false;
 
- end;
+end;
 
 end.

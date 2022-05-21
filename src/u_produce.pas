@@ -3,143 +3,146 @@ unit u_produce;
 interface
 
 uses
- FireDAC.Comp.Client,
- system.DateUtils,
- system.Classes,
- system.Threading,
- system.SysUtils,
- system.UITypes,
- Data.DB,
- FMX.Objects,
- FMX.Dialogs,
- FMX.Controls,
- FMX.Layouts,
- FMX.Types,
- FMX.Edit,
- FMX.StdCtrls,
- FMX.Forms,
- FMX.Graphics,
- FMX.Menus,
- FMX.Controls.Presentation,
- system.Generics.Collections,
- untInput,
- untTRegexpSnippets,
- untTypes;
+  FireDAC.Comp.Client,
+  system.DateUtils,
+  system.Classes,
+  system.Threading,
+  system.SysUtils,
+  system.UITypes,
+  Data.DB,
+  FMX.Objects,
+  FMX.Dialogs,
+  FMX.Controls,
+  FMX.Layouts,
+  FMX.Types,
+  FMX.Edit,
+  FMX.StdCtrls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Menus,
+  FMX.Controls.Presentation,
+  system.Generics.Collections,
+  untInput,
+  untTRegexpSnippets,
+  untTypes;
 
 type
- TProduce = class;
- TListProduce = array of TProduce;
+  TProduce = class;
+  TListProduce = array of TProduce;
 
- TProduce = class(TObject)
- private
-  // Fields & their setters, getters and renders
-  FStockMoveID: TInputText;
-  FStockOrderID: TInputText;
-  FItemCID: TInputText;
-  FItemName: TInputText;
-  FStockBefore: TInputText;
-  FStockIncrease: TInputText;
-  FStockAfter: TInputText;
-  FError: TLabel;
-  procedure setStockMoveID(const stockMoveID: string);
-  procedure setStockOrderID(const stockOrderID: string);
-  procedure setItemCID(const itemCID: string);
-  procedure setItemName(const itemName: string);
-  procedure setStockBefore(const stockBefore: string);
-  procedure setStockIncrease(const stockIncrease: string);
-  procedure setStockAfter(const stockAfter: string);
-  function getStockMoveID: string;
-  function getStockOrderID: string;
-  function getItemCID: string;
-  function getItemName: string;
-  function getStockBefore: string;
-  function getStockIncrease: string;
-  function getStockAfter: string;
-  procedure renderStockMoveID;
-  procedure renderItemCID;
-  procedure renderItemName;
-  procedure renderStockBefore;
-  procedure renderStockIncrease;
-  procedure renderStockAfter;
-  procedure renderError;
+  TProduce = class(TObject)
+  private
+    // Fields & their setters, getters and renders
+    FStockMoveID: TInputText;
+    FStockOrderID: TInputText;
+    FItemCID: TInputText;
+    FItemName: TInputText;
+    FStockBefore: TInputText;
+    FStockIncrease: TInputText;
+    FStockAfter: TInputText;
+    FError: TLabel;
+    procedure setStockMoveID(const stockMoveID: string);
+    procedure setStockOrderID(const stockOrderID: string);
+    procedure setItemCID(const itemCID: string);
+    procedure setItemName(const itemName: string);
+    procedure setStockBefore(const stockBefore: string);
+    procedure setStockIncrease(const stockIncrease: string);
+    procedure setStockAfter(const stockAfter: string);
+    function getStockMoveID: string;
+    function getStockOrderID: string;
+    function getItemCID: string;
+    function getItemName: string;
+    function getStockBefore: string;
+    function getStockIncrease: string;
+    function getStockAfter: string;
+    procedure renderStockMoveID;
+    procedure renderItemCID;
+    procedure renderItemName;
+    procedure renderStockBefore;
+    procedure renderStockIncrease;
+    procedure renderStockAfter;
+    procedure renderError;
 
-  // input validation
-  procedure validateItemCID(Sender: TInputText);
-  procedure validateStockIncrease(Sender: TInputText);
-  procedure handleInputSuccess(Sender: TInputText);
-  procedure handleInputFailure(Sender: TInputText);
+    // input validation
+    procedure validateItemCID(Sender: TInputText);
+    procedure validateStockIncrease(Sender: TInputText);
+    procedure handleInputSuccess(Sender: TInputText);
+    procedure handleInputFailure(Sender: TInputText);
 
-  // interactivity switches
-  procedure enableInteractivity(Target: TInputText);
-  procedure disableInteractivity(Target: TInputText);
-  procedure handleGraphicClick(Sender: TObject);
+    // interactivity switches
+    procedure enableInteractivity(Target: TInputText);
+    procedure disableInteractivity(Target: TInputText);
+    procedure handleGraphicClick(Sender: TObject);
 
-  // actions
-  procedure askItemCID;
-  procedure fetchItem;
-  procedure recordCurrentStockLevels(Data: TFields);
-  procedure askStockIncreaseAmount;
-  procedure cacheUpdatedStockLevels;
-  procedure commitUpdatedStockLevels;
-  procedure displayError(const errMsg: string = '');
+    // actions
+    procedure askItemCID;
+    procedure fetchItem;
+    procedure recordCurrentStockLevels(Data: TFields);
+    procedure askStockIncreaseAmount;
+    procedure cacheUpdatedStockLevels;
+    procedure commitUpdatedStockLevels;
+    procedure displayError(const errMsg: string = '');
 
- public
-  isSelected: Boolean;
-  graphic: TPanel;
-  statusOrder: EStatusOrder;
-  statusProduce: EStatusOrder;
-  onProduceCached: procedure of object;
-  constructor Create(statusOrder: EStatusOrder; template: TPanel;
-   Data: TFields = nil);
-  procedure waitForProduce;
-  procedure setFocus(Sender: TInputText = nil);
+  public
+    isSelected: Boolean;
+    isEdited: Boolean;
+    graphic: TPanel;
+    statusOrder: EStatusOrder;
+    statusProduce: EStatusOrder;
+    onProduceCached: procedure of object;
+    constructor Create(statusOrder: EStatusOrder; template: TPanel;
+      Data: TFields = nil);
+    destructor Destroy; override;
+    procedure waitForProduce;
+    procedure setFocus(Sender: TInputText = nil);
 
-  // properties
-  property stockMoveID: string read getStockMoveID write setStockMoveID;
-  property stockOrderID: string read getStockOrderID write setStockOrderID;
-  property itemCID: string read getItemCID write setItemCID;
-  property itemName: string read getItemName write setItemName;
-  property stockBefore: string read getStockBefore write setStockBefore;
-  property stockIncrease: string read getStockIncrease write setStockIncrease;
-  property stockAfter: string read getStockAfter write setStockAfter;
- end;
+    // properties
+    property stockMoveID: string read getStockMoveID write setStockMoveID;
+    property stockOrderID: string read getStockOrderID write setStockOrderID;
+    property itemCID: string read getItemCID write setItemCID;
+    property itemName: string read getItemName write setItemName;
+    property stockBefore: string read getStockBefore write setStockBefore;
+    property stockIncrease: string read getStockIncrease write setStockIncrease;
+    property stockAfter: string read getStockAfter write setStockAfter;
+  end;
 
 implementation
 
 uses
- udmServerMSSQL;
+  udmServerMSSQL;
 
 var
- regexpSnippets: untTRegexpSnippets.TRegexpSnippets;
+  regexpSnippets: untTRegexpSnippets.TRegexpSnippets;
 
- { TProduce }
+  { TProduce }
 constructor TProduce.Create(statusOrder: EStatusOrder; template: TPanel;
- Data: TFields = nil);
- var
+  Data: TFields = nil);
+var
   edt: TEdit;
- begin
+begin
   inherited Create;
 
   statusOrder := statusOrder;
   statusProduce := statusOrder;
   isSelected := false;
+  isEdited := false;
   graphic := template;
 
   if assigned(Data) then
-   begin
+  begin
     TEdit(graphic.Components[6]).Text :=
-        Data.FieldByName('stockMoveID').AsString;
+      Data.FieldByName('stockMoveID').AsString;
     TEdit(graphic.Components[4]).Text := Data.FieldByName('itemCID').AsString;
     TEdit(graphic.Components[2]).Text := Data.FieldByName('itemName').AsString;
     TEdit(graphic.Components[1]).Text :=
-        Data.FieldByName('stockBefore').AsString;
+      Data.FieldByName('stockBefore').AsString;
     TEdit(graphic.Components[3]).Text :=
-        Data.FieldByName('stockIncrease').AsString;
+      Data.FieldByName('stockIncrease').AsString;
     TEdit(graphic.Components[5]).Text := Data.FieldByName('stockAfter')
-        .AsString;
-   end
+      .AsString;
+  end
   else
-   begin
+  begin
     FStockMoveID := TInputText.Create(graphic);
     FStockOrderID := TInputText.Create(graphic);
     FItemCID := TInputText.Create(graphic);
@@ -166,299 +169,330 @@ constructor TProduce.Create(statusOrder: EStatusOrder; template: TPanel;
     renderStockMoveID;
     renderItemName;
     renderError;
-   end;
+  end;
 
- end;
+end;
+
+destructor TProduce.Destroy;
+begin
+  if assigned(graphic) then
+    FreeAndNil(graphic);
+  inherited Destroy;
+end;
 
 procedure TProduce.waitForProduce;
- begin
+begin
   disableInteractivity(FItemCID);
   disableInteractivity(FStockIncrease);
 
   if (statusProduce = EStatusOrder.scratch) then
-   askItemCID
+    askItemCID
   else
-   askStockIncreaseAmount;
- end;
+    askStockIncreaseAmount;
+end;
 
 procedure TProduce.setFocus(Sender: TInputText = nil);
- begin
+begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-     TThread.Synchronize(nil,
-       procedure
-       begin
-        if (Sender <> nil) then
-         Sender.setFocus
-        else if (statusProduce = EStatusOrder.cached) then
-         FStockIncrease.setFocus
-        else
-         FItemCID.setFocus;
-       end);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          if (Sender <> nil) then
+            Sender.setFocus
+          else if (statusProduce = EStatusOrder.cached) or (statusProduce = EStatusOrder.commited) then
+            FStockIncrease.setFocus
+          else
+            FItemCID.setFocus;
+        end);
     end).Start;
- end;
+end;
 
 // Private Actions
 procedure TProduce.enableInteractivity(Target: TInputText);
- begin
+begin
   Target.OnKeyUp := Target.handleKey;
   Target.Text := '';
   Target.ReadOnly := false;
   Target.HitTest := true;
   setFocus(Target);
- end;
+end;
 
 procedure TProduce.disableInteractivity(Target: TInputText);
- begin
+begin
   Target.OnKeyUp := nil;
   graphic.PopupMenu.Free;
   graphic.OnClick := nil;
   Target.HitTest := false;
   Target.ReadOnly := true;
- end;
+end;
 
 procedure TProduce.askItemCID;
- begin
+begin
   enableInteractivity(FItemCID);
- end;
+end;
 
 procedure TProduce.fetchItem;
- var
+var
   fetched: TDataSource;
- begin
+begin
 
   fetched := DB.fetchItem(itemCID);
 
   if (fetched <> nil) and (fetched.DataSet.RecordCount > 0) then
-   begin
+  begin
     recordCurrentStockLevels(fetched.DataSet.Fields);
     askStockIncreaseAmount;
-   end
+  end
   else
-   begin
-    displayError(itemCID + ' does not exist');
+  begin
+    displayError('Το ειδος ' + itemCID + ' δεν βρεθηκε');
+    //displayError(itemCID + ' does not exist');
     waitForProduce;
-   end;
+  end;
 
- end;
+end;
 
 procedure TProduce.recordCurrentStockLevels(Data: TFields);
- begin
+begin
   setItemName(Data.FieldByName('itemName').AsString);
   setStockBefore(Data.FieldByName('Qnt').AsString);
- end;
+  if stockBefore = '' then stockBefore := '0';
+
+end;
 
 procedure TProduce.askStockIncreaseAmount;
- begin
+begin
   enableInteractivity(FStockIncrease);
- end;
+end;
 
 procedure TProduce.cacheUpdatedStockLevels;
- begin
-  var
-  popup := TPopupMenu.Create(graphic);
-  setStockAfter((strToFloat(stockBefore) + StrToFloat(stockIncrease)).ToString);
-  graphic.PopupMenu := popup;
+begin
+  //var
+  //popup := TPopupMenu.Create(graphic);
   statusProduce := EStatusOrder.cached;
+  //graphic.PopupMenu := popup;
   graphic.OnClick := handleGraphicClick;
-  popup.OnPopup := handleGraphicClick;
+  //popup.OnPopup := handleGraphicClick;
+  {
+  if (statusProduce = EStatusOrder.commited) then
+  begin
+  showMessage('it has been commited');
+    isEdited := true;
+  end
+  else
+  begin
+    statusProduce := EStatusOrder.cached;
+  end;
+  }
+
+   //if isEdited then
+    //setStockAfter((strToFloat(stockIncrease) + strToFloat(stockAfter)).ToString)
+  // else
+    setStockAfter((strToFloat(stockBefore) + strToFloat(stockIncrease)).ToString);
+
 
   onProduceCached;
- end;
+end;
 
 procedure TProduce.commitUpdatedStockLevels;
- begin
- end;
+begin
+end;
 
 procedure TProduce.displayError(const errMsg: string = '');
- begin
+begin
+>>>>>>> 069bfc0243c51a0b1a1ef6f66e85c9c5e1d8f752
   var
   rect := TRectangle(graphic.Components[0]);
 
   if (errMsg = '') then
-   begin
+  begin
     rect.Sides := [];
     rect.Stroke.Color := TAlphaColorRec.White;
     rect.Stroke.thickness := 0.0;
     FError.Text := '-';
     FError.Visible := false;
     graphic.Margins.Bottom := 20.0;
-   end
+  end
   else
-   begin
+  begin
     rect.Sides := [TSide.Top, TSide.Bottom, TSide.Left, TSide.Right];
     rect.Stroke.thickness := 3.0;
     rect.Stroke.Color := TAlphaColorRec.Crimson;
     FError.Text := errMsg;
     FError.Visible := true;
     graphic.Margins.Bottom := 40.0;
-   end;
+  end;
 
- end;
+end;
 
 // Input Validation
 procedure TProduce.validateItemCID(Sender: TInputText);
- begin
+begin
   disableInteractivity(Sender);
   with Sender do
-   begin
+  begin
     if (length(FErrors) = 0) then
-     setLength(FErrors, 2);
+      setLength(FErrors, 2);
 
     regexpSnippets['!iNum'].Subject := Text;
     if (Text = '') then
-     begin
-      FErrors[0] := 'Wrong Input! Name cannot be empty';
+    begin
+      FErrors[0] := 'Ο Κωδικος του ειδους δεν μπόρει να ειναι κενος!';
+      // FErrors[0] := 'Wrong Input! Name cannot be empty';
       isValid := false;
-     end
+    end
     else if (regexpSnippets['!iNum'].Match) then
-     begin
-      FErrors[0] := 'Wrong Input! Name only accepts integers';
+    begin
+      FErrors[0] := 'Ο Κωδικος του ειδους αναγνωριζει μονο νουμερα';
+      //FErrors[0] := 'Wrong Input! Name only accepts integers';
       isValid := false;
-     end;
-   end;
- end;
+    end;
+  end;
+end;
 
 procedure TProduce.validateStockIncrease(Sender: TInputText);
- begin
+begin
   disableInteractivity(Sender);
   with Sender do
-   begin
+  begin
     if length(FErrors) = 0 then
-     setLength(FErrors, 2);
+      setLength(FErrors, 2);
 
     regexpSnippets['!rNum'].Subject := Text;
     if Text = '' then
-     begin
-      FErrors[0] := 'Wrong Input! Ammount cannot be empty';
+    begin
+      FErrors[0] := 'Πρεπει να καταχωρησετε Αυξηση ποσοτητας';
+      //FErrors[0] := 'Wrong Input! Ammount cannot be empty';
       isValid := false;
-     end
+    end
     else if regexpSnippets['!rNum'].Match then
-     begin
-      FErrors[0] := 'Wrong Input! Ammount only accepts integers';
+    begin
+       FErrors[0] := 'Η Αυξηση ποσοτητας αναγνωριζει μονο νουμερα';
+      //FErrors[0] := 'Wrong Input! Ammount only accepts integers';
       isValid := false;
-     end;
+    end;
 
-   end;
- end;
+  end;
+end;
 
 procedure TProduce.handleInputSuccess(Sender: TInputText);
- begin
+begin
   displayError;
   if Sender.Name = 'itemCID' then
-   fetchItem
+    fetchItem
   else
-   cacheUpdatedStockLevels;
- end;
+    cacheUpdatedStockLevels;
+end;
 
 procedure TProduce.handleInputFailure(Sender: TInputText);
- begin
+begin
   displayError(Sender.FErrors[0]);
   enableInteractivity(Sender);
- end;
+end;
 
 procedure TProduce.handleGraphicClick(Sender: TObject);
- begin
+begin
   if (statusProduce = EStatusOrder.scratch) then
-   exit;
+    exit;
 
   if (Sender.ClassName = 'TPopupMenu') then
-   begin
+  begin
     waitForProduce;
     exit;
-   end;
+  end;
 
   with graphic.Components[0] as TRectangle do
-   begin
+  begin
     if isSelected then
-     begin
+    begin
       Fill.Color := TAlphaColorRec.White;
       isSelected := false;
-     end
+    end
     else
-     begin
+    begin
       Fill.Color := TAlphaColorRec.Cornflowerblue;
       isSelected := true;
-     end;
-   end;
- end;
+    end;
+  end;
+end;
 
 // Fields & their setters, getters & renders
 procedure TProduce.setStockMoveID(const stockMoveID: string);
- begin
+begin
   FStockMoveID.Text := stockMoveID;
- end;
+end;
 
 procedure TProduce.setStockOrderID(const stockOrderID: string);
- begin
+begin
   FStockOrderID.Text := stockOrderID;
- end;
+end;
 
 procedure TProduce.setItemCID(const itemCID: string);
- begin
+begin
   FItemCID.Text := itemCID;
- end;
+end;
 
 procedure TProduce.setItemName(const itemName: string);
- begin
+begin
   FItemName.Text := itemName;
- end;
+end;
 
 procedure TProduce.setStockBefore(const stockBefore: string);
- begin
+begin
   FStockBefore.Text := stockBefore;
- end;
+end;
 
 procedure TProduce.setStockIncrease(const stockIncrease: string);
- begin
+begin
   FStockIncrease.Text := stockIncrease;
- end;
+end;
 
 procedure TProduce.setStockAfter(const stockAfter: string);
- begin
+begin
   FStockAfter.Text := stockAfter;
- end;
+end;
 
 function TProduce.getStockMoveID: string;
- begin
+begin
   result := FStockMoveID.Text;
- end;
+end;
 
 function TProduce.getStockOrderID: string;
- begin
+begin
   result := FStockOrderID.Text;
- end;
+end;
 
 function TProduce.getItemCID: string;
- begin
+begin
   result := FItemCID.Text;
- end;
+end;
 
 function TProduce.getItemName: string;
- begin
+begin
   result := FItemName.Text;
- end;
+end;
 
 function TProduce.getStockBefore: string;
- begin
+begin
   result := FStockBefore.Text;
- end;
+end;
 
 function TProduce.getStockIncrease: string;
- begin
+begin
   result := FStockIncrease.Text;
- end;
+end;
 
 function TProduce.getStockAfter: string;
- begin
+begin
   result := FStockAfter.Text;
- end;
+end;
 
 procedure TProduce.renderStockMoveID;
- begin
+begin
   with FStockMoveID do
-   begin
+  begin
     Name := 'stockMoveID';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -473,14 +507,14 @@ procedure TProduce.renderStockMoveID;
     ReadOnly := true;
     HitTest := false;
     tabOrder := 1;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FStockMoveID);
- end;
+end;
 
 procedure TProduce.renderItemCID;
- begin
+begin
   with FItemCID do
-   begin
+  begin
     Name := 'itemCID';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -498,14 +532,14 @@ procedure TProduce.renderItemCID;
     onInputSuccess := self.handleInputSuccess;
     onInputFailure := self.handleInputFailure;
     tabOrder := 2;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FItemCID);
- end;
+end;
 
 procedure TProduce.renderItemName;
- begin
+begin
   with FItemName do
-   begin
+  begin
     name := 'itemName';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -517,14 +551,14 @@ procedure TProduce.renderItemName;
     HitTest := false;
     ReadOnly := true;
     tabOrder := 3;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FItemName);
- end;
+end;
 
 procedure TProduce.renderStockBefore;
- begin
+begin
   with FStockBefore do
-   begin
+  begin
     Name := 'stockBefore';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -539,14 +573,14 @@ procedure TProduce.renderStockBefore;
     ReadOnly := true;
     HitTest := false;
     tabOrder := 4;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FStockBefore);
- end;
+end;
 
 procedure TProduce.renderStockIncrease;
- begin
+begin
   with FStockIncrease do
-   begin
+  begin
     Name := 'stockIncrease';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -564,14 +598,14 @@ procedure TProduce.renderStockIncrease;
     validate := validateStockIncrease;
     onInputSuccess := self.handleInputSuccess;
     onInputFailure := self.handleInputFailure;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FStockIncrease);
- end;
+end;
 
 procedure TProduce.renderStockAfter;
- begin
+begin
   with FStockAfter do
-   begin
+  begin
     Name := 'stockAfter';
     StyleLookup := 'transparentedit';
     StyledSettings := [];
@@ -586,14 +620,14 @@ procedure TProduce.renderStockAfter;
     ReadOnly := true;
     HitTest := false;
     tabOrder := 6;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FStockAfter);
- end;
+end;
 
 procedure TProduce.renderError;
- begin
+begin
   with FError do
-   begin
+  begin
     StyledSettings := [];
     Size.Width := graphic.Size.Width;
     TextAlign := TTextAlign.Center;
@@ -604,26 +638,26 @@ procedure TProduce.renderError;
     AutoSize := true;
     Text := '-';
     Visible := false;
-   end;
+  end;
   TRectangle(graphic.Components[0]).AddObject(FError);
- end;
+end;
 
 initialization
 
 begin
- try
-  regexpSnippets := TRegexpSnippets.Create;
-  regexpSnippets.compileSnippets(['!iNum', '!rNum']);
- except
-  on E: Exception do
-   showMessage(E.Message);
- end;
+  try
+    regexpSnippets := TRegexpSnippets.Create;
+    regexpSnippets.compileSnippets(['!iNum', '!rNum']);
+  except
+    on E: Exception do
+      showMessage(E.Message);
+  end;
 end;
 
 finalization
 
 begin
- regexpSnippets.Free;
+  regexpSnippets.Free;
 end;
 
 end.

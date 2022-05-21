@@ -3,7 +3,7 @@
 # emacs undo tree
 *~undo-tree~
 
-build/
+build/*
 
 # RAD studio files
 __history

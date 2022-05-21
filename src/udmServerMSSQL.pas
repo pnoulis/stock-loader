@@ -3,72 +3,75 @@ unit udmServerMSSQL;
 interface
 
 uses
- FMX.Forms,
- u_order,
- untTypes,
- uDBConnect,
- FMX.dialogs,
- System.Variants,
- System.DateUtils,
- System.SysUtils,
- System.Classes,
- FireDAC.Stan.Intf,
- FireDAC.Stan.Option,
- FireDAC.Stan.Error,
- FireDAC.UI.Intf,
- FireDAC.Phys.Intf,
- FireDAC.Stan.Def,
- FireDAC.Stan.Pool,
- FireDAC.Stan.Async,
- FireDAC.Phys,
- FireDAC.FMXUI.Wait,
- FireDAC.Stan.Param,
- FireDAC.DatS,
- FireDAC.DApt.Intf,
- FireDAC.DApt,
- Data.DB,
- FireDAC.Comp.DataSet,
- FireDAC.Comp.Client,
- FireDAC.Phys.MSSQLDef,
- FireDAC.Phys.ODBCBase,
- FireDAC.Phys.MSSQL,
- FireDAC.VCLUI.Wait;
+  FMX.Forms,
+  u_order,
+  untTypes,
+  uDBConnect,
+  FMX.dialogs,
+  System.Variants,
+  System.DateUtils,
+  System.SysUtils,
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.FMXUI.Wait,
+  FireDAC.Stan.Param,
+  FireDAC.DatS,
+  FireDAC.DApt.Intf,
+  FireDAC.DApt,
+  Data.DB,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
+  FireDAC.Phys.MSSQLDef,
+  FireDAC.Phys.ODBCBase,
+  FireDAC.Phys.MSSQL,
+  FireDAC.VCLUI.Wait;
 
 type
- TOnConnected = reference to procedure;
- TOnConnectionError = procedure(const errMsg: string) of object;
+  TOnConnected = reference to procedure;
+  TOnConnectionError = procedure(const errMsg: string) of object;
 
- TdmServerMSSQL = class(TDataModule)
-  connection: TFDConnection;
-  driverMSSQL: TFDPhysMSSQLDriverLink;
-  tableStockOrders: TFDTable;
-  queryStockMoves: TFDQuery;
-  storedGetStockMove: TFDStoredProc;
-  queryItem: TFDQuery;
-  storedProc: TFDStoredProc;
-  DataSource1: TDataSource;
- private type
-  TAfterFetch = reference to procedure(Data: TDataSource);
+  TdmServerMSSQL = class(TDataModule)
+    connection: TFDConnection;
+    driverMSSQL: TFDPhysMSSQLDriverLink;
+    tableStockOrders: TFDTable;
+    queryStockMoves: TFDQuery;
+    queryItem: TFDQuery;
+    DataSource1: TDataSource;
+    queryAddStockOrder: TFDQuery;
+    queryAddStockMove: TFDQuery;
+    queryDeleteStockOrder: TFDQuery;
+  private type
+    TAfterFetch = reference to procedure(Data: TDataSource);
+    TAfterCommitOrder = reference to procedure(stockOrderID: string;
+      servedDate: TDateTime);
+    TAfterCommitMove = reference to procedure(stockMoveID, stockBefore,
+      stockIncrease, stockAfter: string);
 
- public
-  onConnected: TOnConnected;
-  onConnectionError: TOnConnectionError;
-  currentOrderID: uint32;
-  procedure connect;
-  function fetchOrders: TFDTable;
-  procedure fetchAsyncOrders(cb: TAfterFetch);
-  procedure fetchBetween(cb: TAfterFetch);
-  procedure fetchOrdersFilterDate(dateFrom, dateTo: TDate; cb: TAfterFetch);
-  procedure fetchProduce(const orderID: cardinal; cb: TAfterFetch);
-  function fetchItem(const itemCID: string): TDataSource;
-  function addStockOrder: TFDStoredProc;
-  function addStockMove(const itemCID: string; const stockOrderID: cardinal;
-   const stockIncrease: integer; const storeID: cardinal;
-   const moveID: cardinal = 0): TFDStoredProc;
- end;
+  public
+    onConnected: TOnConnected;
+    onConnectionError: TOnConnectionError;
+    currentOrderID: uint32;
+    procedure connect;
+    procedure fetchAsyncOrders(cb: TAfterFetch);
+    procedure fetchOrdersFilterDate(dateFrom, dateTo: TDate; cb: TAfterFetch);
+    procedure fetchProduce(const orderID: string; cb: TAfterFetch);
+    function fetchItem(const itemCID: string): TDataSource;
+    procedure addStockOrder(cb: TAfterCommitOrder);
+    procedure addStockMove(stockOrderID, itemCID, stockIncrease,
+      stockMoveID: string; cb: TdmServerMSSQL.TAfterCommitMove);
+      procedure deleteStockOrder(stockOrderID: string);
+  end;
 
 var
- DB: TdmServerMSSQL;
+  DB: TdmServerMSSQL;
 
 procedure initialize;
 
@@ -78,231 +81,176 @@ implementation
 {$R *.dfm}
 
 const
- DBCONN_CONFIG_FILEPATH = './config/config.ini';
- DBCONN_CONFIG_INI_SECTION =
-{$IFDEF RELEASE}
-     'DBCONN_MSSQL_RELEASE';
-{$ELSEIF defined(BRATNET)}
-    'DBCONN_MSSQL_DEBUG_BRATNET';
-{$ELSE}
-    'DBCONN_MSSQL_DEBUG';
-{$IFEND}
+  DBCONN_CONFIG_FILEPATH = './config/config.ini';
+  DBCONN_CONFIG_INI_SECTION = 'DBCONN_TEMP';
+  // {$IFDEF RELEASE}
+  // 'DBCONN_MSSQL_RELEASE';
+  // {$ELSEIF defined(BRATNET)}
+  // 'DBCONN_MSSQL_DEBUG_BRATNET';
+  // {$ELSE}
+  // 'DBCONN_MSSQL_DEBUG';
+  // {$IFEND}
 
 var
- connected: Boolean;
- errMsg: string;
- DataSource1: TDataSource;
+  connected: Boolean;
+  errMsg: string;
+  DataSource1: TDataSource;
 
 procedure initialize;
- begin
+begin
   if not assigned(DB) then
-   Application.CreateForm(TdmServerMSSQL, DB);
- end;
+    Application.CreateForm(TdmServerMSSQL, DB);
+end;
 
 procedure TdmServerMSSQL.connect;
- begin
+begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-     if not connected then
+      if not connected then
       begin
 
-       try
-        uDBConnect.setupDBconn(connection, DBCONN_CONFIG_INI_SECTION,
-         DBCONN_CONFIG_FILEPATH);
-        connected := true;
-       except
-        on E: Exception do
-         errMsg := E.Message;
-       end;
+        try
+          uDBConnect.setupDBconn(connection, DBCONN_CONFIG_INI_SECTION,
+            DBCONN_CONFIG_FILEPATH);
+          connected := true;
+        except
+          on E: Exception do
+            errMsg := E.Message;
+        end;
 
       end;
 
-     TThread.Synchronize(nil,
-       procedure
-       begin
+      TThread.Synchronize(nil,
+        procedure
+        begin
 
-        if connected then
-         onConnected()
-        else
-         onConnectionError(errMsg);
+          if connected then
+            onConnected()
+          else
+            onConnectionError(errMsg);
 
-       end);
+        end);
 
     end).Start;
- end;
+end;
 
 function TdmServerMSSQL.fetchItem(const itemCID: string): TDataSource;
- begin
+begin
   var
   query := queryItem;
   try
-   query.Active := false;
-   query.Open
-       ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
-       'a.itemCID = b.itemCID and a.itemCID = ''' + itemCID + '''');
-   query.Active := true;
-   datasource1.DataSet := query;
-   result := datasource1;
+    query.Active := false;
+    query.Open
+      ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
+      'a.itemCID = b.itemCID and a.itemCID = ''' + itemCID + '''');
+    query.Active := true;
+    DataSource1.DataSet := query;
+    result := DataSource1;
   except
-   on E: Exception do
+    on E: Exception do
     begin
-     showMessage(E.Message);
-     result := nil;
+      showMessage(E.Message);
+      result := nil;
     end;
 
   end;
-  {
-  result := queryItem;
-  result.Active := false;
-  result.Open
-      ('select itemCID, itemName, itemAmount from item where itemCID = ''' +
-      itemCID + '''');
-  result.Active := true;
-  }
- end;
-
-function TdmServerMSSQL.fetchOrders: TFDTable;
- begin
-  result := tableStockOrders;
-  result.Active := false;
-  result.IndexFieldNames := 'moveDate:A';
-  result.Active := true;
- end;
+end;
 
 procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
- begin
+begin
   var
   table := tableStockOrders;
 
   try
-   table.Active := false;
-   table.Filter := '';
-   table.Filtered := false;
-   // table.IndexFieldNames := 'moveDate:D';
-   table.Active := true;
-   DataSource1.DataSet := tableStockOrders;
-   cb(DataSource1);
+    table.Active := false;
+    table.Filter := '';
+    table.Filtered := false;
+    table.IndexFieldNames := 'servedDate:D';
+    table.Active := true;
+    DataSource1.DataSet := tableStockOrders;
+    cb(DataSource1);
   except
-   cb(nil);
+    cb(nil);
   end;
 
- end;
-
-procedure TdmServerMSSQL.fetchBetween(cb: TdmServerMSSQL.TAfterFetch);
- begin
-  var
-  table := tableStockOrders;
-  var
-  f1 := '( moveDate >= {d ' + '2022-05-12' + '} )' + ' and ( moveDate <= {d ' +
-      '2022-05-28' + '} )';
-  table.Filtered := false;
-  table.Filter := f1;
-  table.Filtered := true;
-  cb(DataSource1);
- end;
+end;
 
 procedure TdmServerMSSQL.fetchOrdersFilterDate(dateFrom: TDate; dateTo: TDate;
 cb: TdmServerMSSQL.TAfterFetch);
- begin
-
+begin
   var
   table := tableStockOrders;
   table.Filtered := false;
-  table.Filter := '(moveDate >= {d ' + formatDateTime('yyyy-mm-dd', dateFrom) +
-      '})' + ' and (moveDate <= {d ' + formatDateTime('yyyy-mm-dd',
-      IncDay(dateTo)) + '})';
+  table.Filter := '(servedDate >= {d ' + formatDateTime('yyyy-mm-dd', dateFrom) +
+    '})' + ' and (servedDate <= {d ' + formatDateTime('yyyy-mm-dd',
+    IncDay(dateTo)) + '})';
   table.Filtered := true;
   cb(DataSource1);
- end;
+end;
 
-function TdmServerMSSQL.addStockOrder: TFDStoredProc;
- begin
-  storedProc.Close;
-  storedProc.StoredProcName := 'addStockOrder';
-  storedProc.SchemaName := 'dbo';
-  storedProc.Prepare;
-  storedProc.Params[1].value := 1;
-  storedProc.Open;
-  result := storedProc;
- end;
+procedure TdmServerMSSQL.addStockOrder(cb: TdmServerMSSQL.TAfterCommitOrder);
+begin
+  var
+  query := queryAddStockOrder;
+  query.Open('addStockOrder 1');
+  query.Active := true;
+  cb(query.FieldByName('stockOrderID').AsString,
+    query.FieldByName('servedDate').Value);
+  query.Close;
+end;
 
-function TdmServerMSSQL.addStockMove(const itemCID: string;
-const stockOrderID: cardinal; const stockIncrease: integer;
-const storeID: cardinal; const moveID: cardinal = 0): TFDStoredProc;
- begin
-  try
-   var
-   proc := storedGetStockMove;
-   {
-     storedGetStockMove.Close;
-     storedGetStockMove.StoredProcName := 'addStockMove';
-     storedGetStockMove.SchemaName := 'dbo';
-     storedGetStockMove.Prepare;
-     storedGetStockMove.Params[0].value := '00009';
-     storedGetStockMove.Params[1].value := 21;
-     storedGetStockMove.Params[2].value := 100;
-     storedGetStockMove.Params[3].value := 1;
-     storedGetStockMove.ExecProc;
-   }
-
-   proc.Close;
-   proc.Prepare;
-   proc.Params[1].value := itemCID;
-   proc.Params[2].value := stockOrderID;
-   proc.Params[3].value := stockIncrease;
-   proc.Params[4].value := storeID;
-   {
-     if moveID <> 0 then
-     proc.Params[5].Value := moveID;
-   }
-   proc.ExecProc;
-   {
-     proc.Close;
-     proc.Prepare;
-     proc.Params[1].value := '00009';
-     proc.Params[2].value := 21;
-     proc.Params[3].value := 100;
-     proc.Params[4].value := 1;
-     proc.ExecProc;
-     {
-     storedGetStockMove.ParamByName('itemCID').value := itemCID;
-     storedGetStockMove.ParamByName('stockOrderID').value := stockOrderID;
-     storedGetStockMove.ParamByName('stockIncrease').value := stockIncrease;
-     storedGetStockMove.ParamByName('storeID').value := storeID;
-     storedGetStockMove.Params.Delete(4);
-   }
-  except
-   on E: Exception do
-    showMessage('my exception = ' + E.Message);
+procedure TdmServerMSSQL.addStockMove(stockOrderID, itemCID, stockIncrease,
+  stockMoveID: string; cb: TdmServerMSSQL.TAfterCommitMove);
+begin
+  var
+  query := queryAddStockMove;
+  var
+  exe := TStringBuilder.Create;
+  exe.Append('addStockMove ' + stockOrderID + ', ' + itemCID.QuotedString + ', '
+    + stockIncrease);
+  if (stockMoveID <> '') then
+  begin
+    exe.Append(', ' + stockMoveID);
   end;
-  // storedGetSTockMove.ParamByName('moveID').Value := nil;
+  query.Open(exe.ToString);
+  query.Active := true;
+  cb(query.FieldByName('stockMoveID').AsString, query.FieldByName('stockBefore')
+    .AsString, query.FieldByName('stockIncrease').AsString,
+    query.FieldByName('stockAfter').AsString);
+  query.Close;
+end;
 
- end;
+procedure TdmServerMSSQL.deleteStockOrder(stockOrderID: string);
+begin
+  var
+  query := queryDeleteStockOrder;
+  query.ExecSQL('deleteStockOrder ' + stockOrderID);
+  query.Close;
+end;
 
-procedure TdmServerMSSQL.fetchProduce(const orderID: cardinal; cb: TAfterFetch);
- begin
+procedure TdmServerMSSQL.fetchProduce(const orderID: string; cb: TAfterFetch);
+begin
   var
   query := queryStockMoves;
 
   try
-   query.Active := false;
-   query.Open('select * from stockMoves where stockOrderID = ' +
-       orderID.ToString);
-   query.Active := true;
-   DataSource1.DataSet := query;
-   cb(DataSource1);
+    query.Active := false;
+    query.Open('select * from stockMoves where stockOrderID = ' + orderID);
+    query.Active := true;
+    DataSource1.DataSet := query;
+    cb(DataSource1);
   except
-   on E: Exception do
+    on E: Exception do
     begin
-     showMessage(E.Message);
-     cb(nil);
+      showMessage(E.Message);
+      cb(nil);
     end;
   end;
 
- end;
+end;
 
 begin
- connected := false;
+  connected := false;
 
 end.

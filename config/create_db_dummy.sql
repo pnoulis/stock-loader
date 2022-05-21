@@ -106,6 +106,19 @@ FK_itemStg_storeID FOREIGN KEY (storeID) REFERENCES
 dbo.store(storeID);
 GO
 
+-- ADD STOCK ORDER
+CREATE PROCEDURE addStockOrder
+@storeID INT = 1
+AS
+BEGIN
+SET NOCOUNT ON;
+
+INSERT INTO stockOrders (storeID, servedDate)
+VALUES (@storeID, GETDATE());
+SELECT * FROM stockOrders
+WHERE stockOrderID = @@identity;
+END;
+GO
 
 -- ADD STOCK MOVE
 CREATE PROCEDURE addStockMove 
@@ -135,8 +148,18 @@ IF (@stockAfter < 0.0) SET @stockAfter = 0.0;
 
 
 IF (@stockMoveID IS NOT NULL) 
-BEGIN 
+BEGIN
 declare @sameItemCID NVARCHAR(50);
+declare @prevStockIncrease decimal(18,3);
+
+SELECT @prevStockIncrease = stockIncrease FROM stockMoves
+WHERE stockMoveID  = @stockMoveID;
+
+IF (@prevStockIncrease < 0.0 AND @stockIncrease > 0.0)
+BEGIN
+UPDATE stockMoves
+SET stockIncrease = 0  WHERE stockMoveID = @stockMoveID;
+END;
 
 UPDATE stockMoves
 SET @sameItemCID = itemCID, stockBefore = @stockBefore - stockIncrease,
@@ -161,7 +184,11 @@ END;
 
 UPDATE itemStg SET Qnt = @stockAfter WHERE itemCID = @itemCID;
 
-RETURN 0;
+if (@stockmoveid is not null)
+SELECT * from stockMoves where stockMoveID = @stockMoveID;
+ELSE
+SELECT * FROM stockMoves where stockMoveID = @@identity;
+
 END;
 GO
 

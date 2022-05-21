@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="X:\stock-loader"/>
+    <File Path="..\lib"/>
+    <File Path="..\lib\delphi-utils"/>
+    <File Path="..\lib\delphi-utils\src"/>
+    <File Path="..\lib\delphi-utils\src\uDBConnect.pas"/>
+    <File Path="..\lib\delphi-utils\src\uFilesystem.pas"/>
+    <File Path="regexp-snippets"/>
+    <File Path="regexp-snippets\untSnippets.pas"/>
+    <File Path="regexp-snippets\untTRegexpSnippets.pas"/>
+    <File Path="fr_floor.pas"/>
+    <File Path="fr_floor.fmx"/>
+    <File Path="fr_kitchen.pas"/>
+    <File Path="fr_kitchen.fmx"/>
+    <File Path="fr_pad.pas"/>
+    <File Path="fr_pad.fmx"/>
+    <File Path="f_main_form.pas"/>
+    <File Path="f_main_form.fmx"/>
+    <File Path="udmServerMSSQL.pas"/>
+    <File Path="udmServerMSSQL.dfm"/>
+    <File Path="untInput.pas"/>
+    <File Path="untTypes.pas"/>
+    <File Path="u_order.pas"/>
+    <File Path="u_produce.pas"/>
+  </ProjectSortOrder>
+</BorlandProject>

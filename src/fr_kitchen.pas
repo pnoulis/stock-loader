@@ -63,6 +63,7 @@ type
   procedure handleTabMouseLeave(Sender: TObject);
   procedure removeOrder(var KOrder: TKitchenOrder);
   procedure handleOrderCancel(const kitchenID: word);
+  procedure handleOrderCommit(const KitchenID: word);
  public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
@@ -125,7 +126,7 @@ procedure TKitchen.handleOrder(AOrder: TOrder = nil);
   var
   isNew := true;
 
-  if (AOrder.StockOrderID <> 0) then
+  if (AOrder.StockOrderID <> '0') then
    begin
     for var KitchenOrder in ListOrders do
      if KitchenOrder.order.StockOrderID = AOrder.StockOrderID then
@@ -147,12 +148,13 @@ procedure TKitchen.orderToKitchen(var KOrder: TKitchenOrder);
 
    KOrder.tab := createTab;
    KOrder.tab.Tag := nOrders;
-   KOrder.tab.Text := KOrder.order.StockOrderID.ToString;
+   KOrder.tab.Text := KOrder.order.StockOrderID;
 
    inc(nOrders);
 
    KOrder.pad := TPad.Create(KOrder.tab, KOrder.order, KOrder.kitchenID);
    KOrder.pad.onOrderCancel := handleOrderCancel;
+   KOrder.pad.onOrderCommit := handleOrderCommit;
 
    KOrder.tab.AddObject(KOrder.pad);
 
@@ -229,6 +231,25 @@ procedure TKitchen.handleOrderCancel(const kitchenID: word);
     KOrder := KitchenOrder;
 
    removeOrder(KOrder);
+   renderFloor;
+ end;
+
+ procedure TKitchen.handleOrderCommit(const KitchenID: Word);
+ begin
+
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+     TThread.Synchronize(nil,
+       procedure
+       begin
+       for var kitchenOrder in ListOrders do
+         if (KitchenOrder.kitchenID = KitchenID) then
+         KitchenOrder.tab.Text := KitchenOrder.order.StockOrderID;
+       renderFloor;
+       end);
+    end).Start;
+
  end;
 
 end.

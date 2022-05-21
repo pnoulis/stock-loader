@@ -9,6 +9,7 @@ uses
  System.Types,
  System.UITypes,
  System.Classes,
+ System.DateUtils,
  System.Variants,
  FMX.Types,
  FMX.Graphics,
@@ -110,7 +111,6 @@ procedure TFloor.btnApplyFiltersClick(Sender: TObject);
 
 procedure TFloor.handleOrderCommit(success: Boolean);
  begin
-  showMessage('yes it was commited');
  end;
 
 procedure TFloor.btnNewOrderClick(Sender: TObject);
@@ -149,6 +149,8 @@ constructor TFloor.Create(AOwner: TComponent);
   inherited Create(AOwner);
   FScrollHeight := 0.0;
   FContentHeight := 0.0;
+  dateFrom.Date := Today;
+  dateTo.Date := Today;
   fetchOrders;
  end;
 
@@ -213,7 +215,7 @@ const IndexRecord: cardinal);
   var
   Panel := templateFloorOrder.Clone(scrollOrders) as TPanel;
 
-  TLabel(Panel.Components[1]).Text := Order.StockOrderID.ToString;
+  TLabel(Panel.Components[1]).Text := Order.StockOrderID;
   TLabel(Panel.Components[2]).Text := formatDate(Order.Date.commited);
   Panel.Visible := true;
   Panel.TabOrder := IndexRecord;

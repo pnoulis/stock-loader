@@ -45,7 +45,7 @@ object Kitchen: TKitchen
     TabPosition = PlatformDefault
     Sizes = (
       766s
-      623s)
+      622s)
     object Pin: TTabItem
       AutoSize = False
       CustomIcon = <
@@ -56,8 +56,8 @@ object Kitchen: TKitchen
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       StyledSettings = [FontColor]
       IsSelected = True
-      Size.Width = 130.000000000000000000
-      Size.Height = 40.000000000000000000
+      Size.Width = 160.000000000000000000
+      Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
