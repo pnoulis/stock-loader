@@ -1,7 +1,6 @@
 unit untTypes;
 
 interface
-
 uses
   System.Threading,
   System.RegularExpressionsCore,
@@ -9,40 +8,39 @@ uses
 
 type
   TDimensions = record
-    width: single;
-    height: single;
-    clientWidth: single;
-    clientHeight: single;
-    tpadding: single;
-    rpadding: single;
-    bpadding: single;
-    lpadding: single;
-    tmargin: single;
-    rmargin: single;
-    bmargin: single;
-    lmargin: single;
+    Width: Single;
+    Height: Single;
+    ClientWidth: Single;
+    ClientHeight: Single;
+    Tpadding: Single;
+    Rpadding: Single;
+    Bpadding: Single;
+    Lpadding: Single;
+    Tmargin: Single;
+    Rmargin: Single;
+    Bmargin: Single;
+    Lmargin: Single;
   end;
 
   TErrors = array of string;
-  EStatusOrder = (served, commited, cached, scratch);
-  TAsyncCB = reference to procedure;
+  EStatusOrder =(Served, Commited, Cached, Scratch);
+  TAsyncCB = Reference to procedure;
 
-procedure runAsync(const cb: TAsyncCB; const delay: UInt32 = 0);
+procedure RunAsync(const Cb: TAsyncCB;const Delay: UInt32 = 0);
 
 implementation
-
 uses
   System.SysUtils,
   System.Classes;
 
-procedure runAsync(const cb: TAsyncCB; const delay: UInt32 = 0);
+procedure RunAsync(const Cb: TAsyncCB;const Delay: UInt32 = 0);
 begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-      if delay > 0 then
-        sleep(delay);
-        cb();
+      if Delay > 0 then
+        Sleep(Delay);
+      Cb();
       TThread.Synchronize(nil,
         procedure
         begin

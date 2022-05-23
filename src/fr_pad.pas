@@ -1,7 +1,6 @@
 ﻿unit fr_pad;
 
 interface
-
 uses
   U_produce,
   UntTypes,
@@ -66,40 +65,39 @@ type
     procedure BtnDeleteProduceClick(Sender: TObject);
     procedure BtnCommitOrderClick(Sender: TObject);
 
-  private
-  var
-    ListProduce: TObjectList<TProduce>;
-    FOrder: TOrder;
-    FKitchenID: Word;
-    FScrollHeight: Double;
-    FContentHeight: Double;
-    procedure RenderHeaderOrder;
-    function FormatDate(const ADate: TDateTime): string;
-    procedure OrderToFloor;
-    procedure ProduceToFloor(AProduceRecord: TFields;
-        const IndexRecord: Cardinal);
-    procedure SwitchLoading;
-    procedure AddNewProduce;
-    procedure RenderNewProduce(AProduce: TPanel);
-    procedure FlushPad;
-    function AskUserOrderDelete: Boolean;
-  public
-  var
-    OnOrderCancel: procedure(const KitchenID: Word) of object;
-    OnOrderCommit: procedure(const KitchenID: Word) of object;
-    constructor Create(AOwner: TComponent; Order: TOrder;
-        const KitchenID: Word);
-    destructor Destroy; override;
+    private
+    var
+      ListProduce: TObjectList<TProduce>;
+      FOrder: TOrder;
+      FKitchenID: Word;
+      FScrollHeight: Double;
+      FContentHeight: Double;
+      procedure RenderHeaderOrder;
+      function FormatDate(const ADate: TDateTime):string;
+      procedure OrderToFloor;
+      procedure ProduceToFloor(AProduceRecord: TFields;
+          const IndexRecord: Cardinal);
+      procedure SwitchLoading;
+      procedure AddNewProduce;
+      procedure RenderNewProduce(AProduce: TPanel);
+      procedure FlushPad;
+      function AskUserOrderDelete: Boolean;
+    public
+    var
+      OnOrderCancel: procedure(const KitchenID: Word)of object;
+      OnOrderCommit: procedure(const KitchenID: Word)of object;
+      constructor Create(AOwner: TComponent; Order: TOrder;
+          const KitchenID: Word);
+      destructor Destroy; override;
   end;
 
 implementation
-
 {$R *.fmx}
 
 procedure TPad.BtnCancelOrderClick(Sender: TObject);
 begin
 
-  if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
+  if(FOrder.Status = EStatusOrder.Commited)and AskUserOrderDelete then
     FOrder.Delete;
 
   OnOrderCancel(FKitchenID);
@@ -111,7 +109,7 @@ begin
   ToBeRemoved := TList<TProduce>.Create;
 
   for var Produce in ListProduce do
-    if (Produce.IsSelected) and (Produce.StatusProduce <> EStatusOrder.Commited)
+    if(Produce.IsSelected)and(Produce.StatusProduce <> EStatusOrder.Commited)
     then
       ToBeRemoved.Add(Produce);
 
@@ -123,42 +121,19 @@ begin
 end;
 
 procedure TPad.BtnCommitOrderClick(Sender: TObject);
+var
+  LastOrder: TProduce;
 begin
 
-  if (FOrder.Status = EStatusOrder.Served) then
+  if(FOrder.Status = EStatusOrder.Served)then
     Exit;
 
-  var
   LastOrder := ListProduce.Last;
   ListProduce.Extract(LastOrder);
   FOrder.Commit(ListProduce);
   ListProduce.Add(LastOrder);
   RenderHeaderOrder;
   OnOrderCommit(FKitchenID);
-
-  {
-    var
-    toBeCommited := TList<TProduce>.Create;
-    toBeCommited.Capacity := ListProduce.Count;
-
-    if (toBeCommited.Capacity = 1) then
-    exit;
-
-    for var produce in ListProduce do
-    if (produce.isSelected) then
-    toBeCommited.Add(produce);
-
-    if (toBeCommited.Count = 0) then
-    begin
-    lastOrder := ListProduce.ExtractAt(ListProduce.Count - 1);
-    FOrder.commit(ListProduce);
-    ListProduce.Add(lastOrder);
-    end
-    else
-    begin
-    FOrder.commit(toBeCommited)
-    end;
-  }
 end;
 
 constructor TPad.Create(AOwner: TComponent; Order: TOrder;
@@ -173,7 +148,7 @@ begin
   RenderHeaderOrder;
   OrderToFloor;
 
-  if (FOrder.Status = EStatusOrder.Scratch) then
+  if(FOrder.Status = EStatusOrder.Scratch)then
     AddNewProduce;
 end;
 
@@ -189,7 +164,7 @@ begin
 
   MemoOrderID.Lines.Add('Ημερομηνια Εκδοσης:');
 
-  if (FOrder.Date.Commited <> 0) then
+  if(FOrder.Date.Commited <> 0)then
     MemoOrderID.Lines.Add(FormatDate(FOrder.Date.Commited))
   else
     MemoOrderID.Lines.Add('-');
@@ -198,7 +173,7 @@ begin
   MemoOrderID.Lines.Add(FOrder.StockOrderID);
 end;
 
-function TPad.FormatDate(const ADate: TDateTime): string;
+function TPad.FormatDate(const ADate: TDateTime):string;
 begin
   Datetimetostring(Result, 'ddd dd/mm/yy hh:mm', ADate);
 end;
@@ -217,7 +192,7 @@ begin
     procedure(Data: TDataset)
     begin
 
-      if (Data = nil) then
+      if(Data = nil)then
         Exit;
 
       while not Data.Eof do
@@ -247,8 +222,8 @@ var
   Produce: TProduce;
 begin
 
-  if (ScrollProduce.ComponentCount > 1) and
-      (ListProduce.Last.StatusProduce = EStatusOrder.Scratch) then
+  if(ScrollProduce.ComponentCount > 1)and
+      (ListProduce.Last.StatusProduce = EStatusOrder.Scratch)then
   begin
     ListProduce.Last.SetFocus;
     Exit;
@@ -312,7 +287,7 @@ begin
   Input := TDialogServiceSync.MessageDialog(Msg, TMsgDlgType.MtConfirmation,
       [TMsgDlgBtn.MbYes, TMsgDlgBtn.MbNo], TMsgDlgBtn.MbNo, MrNone);
 
-  if (Input = MrYes) then
+  if(Input = MrYes)then
     Result := True
   else
     Result := False;

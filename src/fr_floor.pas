@@ -1,241 +1,239 @@
 unit fr_floor;
 
 interface
-
 uses
- untTypes,
- u_order,
- System.SysUtils,
- System.Types,
- System.UITypes,
- System.Classes,
- System.DateUtils,
- System.Variants,
- FMX.Types,
- FMX.Graphics,
- FMX.Controls,
- FMX.Forms,
- FMX.Dialogs,
- FMX.StdCtrls,
- FireDAC.Comp.Client,
- FMX.Controls.Presentation,
- Data.DB,
- FMX.Layouts,
- FMX.Objects,
- FMX.Calendar,
- FMX.DateTimeCtrls;
+  UntTypes,
+  U_order,
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.DateUtils,
+  System.Variants,
+  FMX.Types,
+  FMX.Graphics,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Dialogs,
+  FMX.StdCtrls,
+  FireDAC.Comp.Client,
+  FMX.Controls.Presentation,
+  Data.DB,
+  FMX.Layouts,
+  FMX.Objects,
+  FMX.Calendar,
+  FMX.DateTimeCtrls;
 
 type
- TFloor = class(TFrame)
-  layoutActions: TLayout;
-  layoutHeader: TLayout;
-  lblOrderID: TLabel;
-  lblOrderDate: TLabel;
-  scrollOrders: TVertScrollBox;
-  Rectangle2: TRectangle;
-  templateFloorOrder: TPanel;
-  Label1: TLabel;
-  Label2: TLabel;
-  Rectangle3: TRectangle;
-  panelDateFilter: TPanel;
-  Rectangle4: TRectangle;
-  btnShowHeader: TButton;
-  Layout1: TLayout;
-  lblDateFilterHeader: TLabel;
-  lblDateFrom: TLabel;
-  dateFrom: TDateEdit;
-  dateTo: TDateEdit;
-  lblDateTo: TLabel;
-  panelActions: TPanel;
-  Rectangle5: TRectangle;
-  btnNewOrder: TButton;
-  btnShowFilters: TButton;
-  btnApplyFilters: TButton;
-  btnResetFilters: TButton;
+  TFloor = class(TFrame)
+    LayoutActions: TLayout;
+    LayoutHeader: TLayout;
+    LblOrderID: TLabel;
+    LblOrderDate: TLabel;
+    ScrollOrders: TVertScrollBox;
+    Rectangle2: TRectangle;
+    TemplateFloorOrder: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Rectangle3: TRectangle;
+    PanelDateFilter: TPanel;
+    Rectangle4: TRectangle;
+    BtnShowHeader: TButton;
+    Layout1: TLayout;
+    LblDateFilterHeader: TLabel;
+    LblDateFrom: TLabel;
+    DateFrom: TDateEdit;
+    DateTo: TDateEdit;
+    LblDateTo: TLabel;
+    PanelActions: TPanel;
+    Rectangle5: TRectangle;
+    BtnNewOrder: TButton;
+    BtnShowFilters: TButton;
+    BtnApplyFilters: TButton;
+    BtnResetFilters: TButton;
     Label3: TLabel;
-  procedure btnShowFiltersClick(Sender: TObject);
-  procedure btnShowHeaderClick(Sender: TObject);
-  procedure btnApplyFiltersClick(Sender: TObject);
-  procedure btnResetFiltersClick(Sender: TObject);
-  procedure dateFromChange(Sender: TObject);
-  procedure btnNewOrderClick(Sender: TObject);
+    procedure BtnShowFiltersClick(Sender: TObject);
+    procedure BtnShowHeaderClick(Sender: TObject);
+    procedure BtnApplyFiltersClick(Sender: TObject);
+    procedure BtnResetFiltersClick(Sender: TObject);
+    procedure DateFromChange(Sender: TObject);
+    procedure BtnNewOrderClick(Sender: TObject);
 
- private type
-  TFloorOrder = record
-   isSelected: Boolean;
-   Order: TOrder;
+    private type
+      TFloorOrder = record
+        IsSelected: Boolean;
+        Order: TOrder;
+      end;
+
+      TListFloorOrders = array of TFloorOrder;
+
+    var
+      FScrollHeight: Double;
+      FContentHeight: Double;
+      ListOrders: TListFloorOrders;
+      procedure FlushFloor;
+      procedure FetchOrders;
+      procedure OrdersToFloor(Data: TDataSet);
+      procedure OrderToFloor(AOrderRecord: TFields;const IndexRecord: Cardinal);
+      procedure RenderOrder(AOrder: TPanel);
+      function FormatDate(const ADate: TDateTime):string;
+      procedure HandlePanelClick(Sender: TObject);
+      procedure HandlePanelDblClick(Sender: TObject);
+    public
+      OnOrder: procedure(Order: TOrder = nil)of object;
+      constructor Create(AOwner: TComponent); override;
+      destructor Destroy; override;
+      procedure HandleOrderCommit(Success: Boolean);
   end;
 
-  TListFloorOrders = array of TFloorOrder;
-
- var
-  FScrollHeight: Double;
-  FContentHeight: Double;
-  ListOrders: TListFloorOrders;
-  procedure flushFloor;
-  procedure fetchOrders;
-  procedure OrdersToFloor(Data: TDataSet);
-  procedure OrderToFloor(AOrderRecord: TFields; const IndexRecord: cardinal);
-  procedure renderOrder(AOrder: TPanel);
-  function formatDate(const ADate: TDateTime): string;
-  procedure handlePanelClick(Sender: TObject);
-  procedure handlePanelDblClick(Sender: TObject);
- public
-  onOrder: procedure(Order: TOrder = nil) of object;
-  constructor Create(AOwner: TComponent); override;
-  destructor Destroy; override;
-  procedure handleOrderCommit(success: Boolean);
- end;
-
 implementation
-
 uses
- udmServerMSSQL;
+  UdmServerMSSQL;
 
 const DEFAULT_STORE_ID = 1;
 
 {$R *.fmx}
- { TFloor }
+  { TFloor }
 
-procedure TFloor.btnApplyFiltersClick(Sender: TObject);
- begin
-  DB.fetchOrdersFilterDate(dateFrom.Date, dateTo.Date,
+procedure TFloor.BtnApplyFiltersClick(Sender: TObject);
+begin
+  DB.FetchOrdersFilterDate(DateFrom.Date, DateTo.Date,
     procedure(Data: TDataSource)
     begin
-     if (Data <> nil) then
-      OrdersToFloor(Data.DataSet)
-     else
-      OrdersToFloor(nil);
+      if(Data <> nil)then
+        OrdersToFloor(Data.DataSet)
+      else
+        OrdersToFloor(nil);
     end);
- end;
+end;
 
-procedure TFloor.handleOrderCommit(success: Boolean);
- begin
- end;
+procedure TFloor.HandleOrderCommit(Success: Boolean);
+begin
+end;
 
-procedure TFloor.btnNewOrderClick(Sender: TObject);
- begin
+procedure TFloor.BtnNewOrderClick(Sender: TObject);
+begin
   var
-  newOrder := TOrder.Create(nil, DEFAULT_STORE_ID);
-  newOrder.onAfterCommit := handleOrderCommit;
-  onOrder(newOrder);
- end;
+  NewOrder := TOrder.Create(nil, DEFAULT_STORE_ID);
+  NewOrder.OnAfterCommit := HandleOrderCommit;
+  OnOrder(NewOrder);
+end;
 
-procedure TFloor.btnResetFiltersClick(Sender: TObject);
- begin
-  fetchOrders;
- end;
+procedure TFloor.BtnResetFiltersClick(Sender: TObject);
+begin
+  FetchOrders;
+end;
 
-procedure TFloor.btnShowFiltersClick(Sender: TObject);
- begin
-  layoutActions.RemoveObject(panelActions);
-  layoutActions.AddObject(panelDateFilter);
-  panelDateFilter.Visible := true;
- end;
+procedure TFloor.BtnShowFiltersClick(Sender: TObject);
+begin
+  LayoutActions.RemoveObject(PanelActions);
+  LayoutActions.AddObject(PanelDateFilter);
+  PanelDateFilter.Visible := True;
+end;
 
-procedure TFloor.btnShowHeaderClick(Sender: TObject);
- begin
-  layoutActions.RemoveObject(panelDateFilter);
-  layoutActions.AddObject(panelActions);
- end;
+procedure TFloor.BtnShowHeaderClick(Sender: TObject);
+begin
+  LayoutActions.RemoveObject(PanelDateFilter);
+  LayoutActions.AddObject(PanelActions);
+end;
 
-procedure TFloor.dateFromChange(Sender: TObject);
- begin
-  dateTo.Date := TDateEdit(Sender).Date;
- end;
+procedure TFloor.DateFromChange(Sender: TObject);
+begin
+  DateTo.Date := TDateEdit(Sender).Date;
+end;
 
 constructor TFloor.Create(AOwner: TComponent);
- begin
+begin
   inherited Create(AOwner);
   FScrollHeight := 0.0;
   FContentHeight := 0.0;
-  dateFrom.Date := Today;
-  dateTo.Date := Today;
-  fetchOrders;
- end;
+  DateFrom.Date := Today;
+  DateTo.Date := Today;
+  FetchOrders;
+end;
 
 destructor TFloor.Destroy;
- begin
-  flushFloor;
+begin
+  FlushFloor;
   inherited Destroy;
- end;
+end;
 
-procedure TFloor.flushFloor;
- begin
+procedure TFloor.FlushFloor;
+begin
 
-  for var i := 0 to High(ListOrders) do
-   FreeAndNil(ListOrders[i].Order);
+  for var I := 0 to high(ListOrders)do
+    FreeAndNil(ListOrders[I].Order);
 
-  setLength(ListOrders, 0);
+  SetLength(ListOrders, 0);
 
-  scrollOrders.BeginUpdate;
-  scrollOrders.Content.DeleteChildren;
-  scrollOrders.RealignContent;
-  scrollOrders.EndUpdate;
+  ScrollOrders.BeginUpdate;
+  ScrollOrders.Content.DeleteChildren;
+  ScrollOrders.RealignContent;
+  ScrollOrders.EndUpdate;
 
   FScrollHeight := 0.0;
   FContentHeight := 0.0;
- end;
+end;
 
-procedure TFloor.fetchOrders;
- begin
+procedure TFloor.FetchOrders;
+begin
 
-  DB.fetchAsyncOrders(
-   procedure(Data: TDataSource)
+  DB.FetchAsyncOrders(
+    procedure(Data: TDataSource)
     begin
-     if (Data <> nil) then
-      OrdersToFloor(Data.DataSet)
-     else
-      OrdersToFloor(nil);
+      if(Data <> nil)then
+        OrdersToFloor(Data.DataSet)
+      else
+        OrdersToFloor(nil);
     end);
 
- end;
+end;
 
 procedure TFloor.OrdersToFloor(Data: TDataSet);
- begin
+begin
 
-  if not assigned(Data) then
-   exit;
+  if not Assigned(Data)then
+    Exit;
 
-  flushFloor;
-  setLength(ListOrders, Data.RecordCount);
+  FlushFloor;
+  SetLength(ListOrders, Data.RecordCount);
   while not Data.Eof do
-   begin
+  begin
     OrderToFloor(Data.Fields, Data.RecNo);
     Data.Next;
-   end;
+  end;
 
- end;
+end;
 
 procedure TFloor.OrderToFloor(AOrderRecord: TFields;
-const IndexRecord: cardinal);
- begin
+const IndexRecord: Cardinal);
+begin
   var
   Order := TOrder.Create(AOrderRecord);
   var
-  Panel := templateFloorOrder.Clone(scrollOrders) as TPanel;
+  Panel := TemplateFloorOrder.Clone(ScrollOrders)as TPanel;
 
   TLabel(Panel.Components[1]).Text := Order.StockOrderID;
-  TLabel(Panel.Components[2]).Text := formatDate(Order.Date.commited);
-  Panel.Visible := true;
+  TLabel(Panel.Components[2]).Text := FormatDate(Order.Date.Commited);
+  Panel.Visible := True;
   Panel.TabOrder := IndexRecord;
   Panel.Tag := IndexRecord;
 
-  Panel.OnDblClick := handlePanelDblClick;
-  if not(Order.Status = EStatusOrder.served) then
-   Panel.OnClick := handlePanelClick;
+  Panel.OnDblClick := HandlePanelDblClick;
+  if not(Order.Status = EStatusOrder.Served)then
+    Panel.OnClick := HandlePanelClick;
 
   ListOrders[IndexRecord - 1].Order := Order;
-  ListOrders[IndexRecord - 1].isSelected := false;
+  ListOrders[IndexRecord - 1].IsSelected := False;
 
-  renderOrder(Panel);
- end;
+  RenderOrder(Panel);
+end;
 
-procedure TFloor.renderOrder(AOrder: TPanel);
- begin
+procedure TFloor.RenderOrder(AOrder: TPanel);
+begin
 
   if FScrollHeight = 0 then
-   FScrollHeight := AOrder.Size.Height + AOrder.Margins.Bottom;
+    FScrollHeight := AOrder.Size.Height + AOrder.Margins.Bottom;
 
   FContentHeight := FContentHeight + FScrollHeight;
   AOrder.Position.Y := FContentHeight;
@@ -245,43 +243,43 @@ procedure TFloor.renderOrder(AOrder: TPanel);
     scrollOrders.scrollBy(0.0, -FContentHeight);
   }
 
-  scrollOrders.AddObject(AOrder);
- end;
+  ScrollOrders.AddObject(AOrder);
+end;
 
-function TFloor.formatDate(const ADate: TDateTime): string;
- Begin
-  datetimetostring(result, 'ddd dd/mm/yy hh:mm', ADate);
- end;
+function TFloor.FormatDate(const ADate: TDateTime):string;
+begin
+  Datetimetostring(Result, 'ddd dd/mm/yy hh:mm', ADate);
+end;
 
-procedure TFloor.handlePanelClick(Sender: TObject);
- var
-  POrder: ^TFloorOrder;
- begin
+procedure TFloor.HandlePanelClick(Sender: TObject);
+var
+  POrder:^TFloorOrder;
+begin
   var
   Style := TRectangle(TPanel(Sender).Components[0]);
-  POrder := @ListOrders[TPanel(Sender).Tag - 1];
+  POrder :=@ListOrders[TPanel(Sender).Tag - 1];
 
-  POrder^.isSelected := not POrder^.isSelected;
+  POrder^.IsSelected := not POrder^.IsSelected;
 
-  if POrder^.isSelected then
-   Style.fill.Color := TAlphaColorRec.Cornflowerblue
+  if POrder^.IsSelected then
+    Style.Fill.Color := TAlphaColorRec.Cornflowerblue
   else
-   Style.fill.Color := TAlphaColorRec.white;
- end;
+    Style.Fill.Color := TAlphaColorRec.White;
+end;
 
-procedure TFloor.handlePanelDblClick(Sender: TObject);
- var
-  POrder: ^TFloorOrder;
- begin
-  POrder := @ListOrders[TPanel(Sender).Tag - 1];
+procedure TFloor.HandlePanelDblClick(Sender: TObject);
+var
+  POrder:^TFloorOrder;
+begin
+  POrder :=@ListOrders[TPanel(Sender).Tag - 1];
 
   // double clicking activates the onClick handler as well
   // this code makes sure to deactivate it
-  POrder^.isSelected := true;
-  handlePanelClick(Sender);
+  POrder^.IsSelected := True;
+  HandlePanelClick(Sender);
 
-  onOrder(POrder^.Order.Clone);
+  OnOrder(POrder^.Order.Clone);
 
- end;
+end;
 
 end.

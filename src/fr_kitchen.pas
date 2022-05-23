@@ -1,255 +1,253 @@
 unit fr_kitchen;
 
 interface
-
 uses
- u_order,
- fr_pad,
- fr_floor,
- udmServerMSSQL,
- System.SysUtils,
- System.DateUtils,
- System.Types,
- System.UITypes,
- System.Classes,
- System.Variants,
- System.Generics.Collections,
- FMX.Types,
- FMX.Graphics,
- FMX.Controls,
- FMX.Forms,
- FMX.Dialogs,
- FMX.StdCtrls,
- FMX.TabControl,
- FireDAC.Comp.Client,
- FMX.Objects,
- FMX.Layouts,
- FMX.Controls.Presentation;
+  U_order,
+  Fr_pad,
+  Fr_floor,
+  UdmServerMSSQL,
+  System.SysUtils,
+  System.DateUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  System.Generics.Collections,
+  FMX.Types,
+  FMX.Graphics,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Dialogs,
+  FMX.StdCtrls,
+  FMX.TabControl,
+  FireDAC.Comp.Client,
+  FMX.Objects,
+  FMX.Layouts,
+  FMX.Controls.Presentation;
 
 type
 
- TListOrders = TList<TOrder>;
+  TListOrders = TList<TOrder>;
 
- TKitchen = class(TFrame)
-  layoutFooter: TLayout;
-  lblTime: TLabel;
-  timerSecond: TTimer;
-  Pass: TTabControl;
-  Pin: TTabItem;
+  TKitchen = class(TFrame)
+    LayoutFooter: TLayout;
+    LblTime: TLabel;
+    TimerSecond: TTimer;
+    Pass: TTabControl;
+    Pin: TTabItem;
 
- private type
-  TKitchenOrder = class
-   isNew: Boolean;
-   isFetching: Boolean;
-   kitchenID: word;
-   tab: TTabItem;
-   order: TOrder;
-   pad: TPad;
+    private type
+      TKitchenOrder = class
+        IsNew: Boolean;
+        IsFetching: Boolean;
+        KitchenID: Word;
+        Tab: TTabItem;
+        Order: TOrder;
+        Pad: TPad;
+      end;
+
+    var
+      ListOrders: TList<TKitchenOrder>;
+      NOrders: Word;
+      Floor: TFloor;
+
+      procedure RenderFloor;
+      procedure StartTimer(Sender: TObject);
+      procedure HandleOrder(AOrder: TOrder = nil);
+      function CreateTab: TTabItem;
+      procedure OrderToKitchen(var KOrder: TKitchenOrder);
+      procedure HandleTabClick(Sender: TObject; Button: TMouseButton;
+          Shift: TShiftState; X, Y: Single);
+      procedure HandleTabMouseEnter(Sender: TObject);
+      procedure HandleTabMouseLeave(Sender: TObject);
+      procedure RemoveOrder(var KOrder: TKitchenOrder);
+      procedure HandleOrderCancel(const KitchenID: Word);
+      procedure HandleOrderCommit(const KitchenID: Word);
+    public
+      constructor Create(AOwner: TComponent); override;
+      destructor Destroy; override;
   end;
 
- var
-  ListOrders: TList<TKitchenOrder>;
-  nOrders: word;
-  Floor: TFloor;
-
-  procedure renderFloor;
-  procedure startTimer(Sender: TObject);
-  procedure handleOrder(AOrder: TOrder = nil);
-  function createTab: TTabItem;
-  procedure orderToKitchen(var KOrder: TKitchenOrder);
-  procedure handleTabClick(Sender: TObject; Button: TMouseButton;
-   Shift: TShiftState; X, Y: Single);
-  procedure handleTabMouseEnter(Sender: TObject);
-  procedure handleTabMouseLeave(Sender: TObject);
-  procedure removeOrder(var KOrder: TKitchenOrder);
-  procedure handleOrderCancel(const kitchenID: word);
-  procedure handleOrderCommit(const KitchenID: word);
- public
-  constructor Create(AOwner: TComponent); override;
-  destructor Destroy; override;
- end;
-
 var
- Kitchen: TKitchen;
+  Kitchen: TKitchen;
 
 implementation
-
 {$R *.fmx}
 { Tkitchen }
 
 constructor TKitchen.Create(AOwner: TComponent);
- begin
+begin
   inherited Create(AOwner);
-  renderFloor;
-  startTimer(self);
-  timerSecond.OnTimer := startTimer;
+  RenderFloor;
+  StartTimer(Self);
+  TimerSecond.OnTimer := StartTimer;
   ListOrders := TList<TKitchenOrder>.Create;
   ListOrders.Capacity := 10;
-  nOrders := 0;
-  Pin.OnMouseEnter := handleTabMouseEnter;
-  Pin.OnMouseLeave := handleTabMouseLeave;
- end;
+  NOrders := 0;
+  Pin.OnMouseEnter := HandleTabMouseEnter;
+  Pin.OnMouseLeave := HandleTabMouseLeave;
+end;
 
 destructor TKitchen.Destroy;
- begin
+begin
 
-  if Assigned(ListOrders) then
-   for var KitchenOrder in ListOrders do
+  if Assigned(ListOrders)then
+    for var KitchenOrder in ListOrders do
     begin
-     FreeAndNil(KitchenOrder.order);
-     KitchenOrder.Free;
+      FreeAndNil(KitchenOrder.Order);
+      KitchenOrder.Free;
     end;
   FreeAndNil(ListOrders);
 
   inherited Destroy;
- end;
+end;
 
-procedure TKitchen.renderFloor;
- begin
-  if Assigned(Floor) then
-   FreeAndNil(Floor);
+procedure TKitchen.RenderFloor;
+begin
+  if Assigned(Floor)then
+    FreeAndNil(Floor);
 
   Floor := TFloor.Create(Pin);
-  Floor.onOrder := handleOrder;
+  Floor.OnOrder := HandleOrder;
   Pin.AddObject(Floor);
- end;
+end;
 
-procedure TKitchen.startTimer(Sender: TObject);
- begin
-  lblTime.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', now)
- end;
+procedure TKitchen.StartTimer(Sender: TObject);
+begin
+  LblTime.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', Now)
+end;
 
-procedure TKitchen.handleOrder(AOrder: TOrder = nil);
- var
+procedure TKitchen.HandleOrder(AOrder: TOrder = nil);
+var
   KOrder: TKitchenOrder;
- begin
+begin
   var
-  isNew := true;
+  IsNew := True;
 
-  if (AOrder.StockOrderID <> '0') then
-   begin
+  if(AOrder.StockOrderID <> '0')then
+  begin
     for var KitchenOrder in ListOrders do
-     if KitchenOrder.order.StockOrderID = AOrder.StockOrderID then
-      exit;
-    isNew := false;
-   end;
+      if KitchenOrder.Order.StockOrderID = AOrder.StockOrderID then
+        Exit;
+    IsNew := False;
+  end;
 
   KOrder := TKitchenOrder.Create;
-  KOrder.isNew := isNew;
-  KOrder.order := AOrder;
-  orderToKitchen(KOrder);
- end;
+  KOrder.IsNew := IsNew;
+  KOrder.Order := AOrder;
+  OrderToKitchen(KOrder);
+end;
 
-procedure TKitchen.orderToKitchen(var KOrder: TKitchenOrder);
- begin
+procedure TKitchen.OrderToKitchen(var KOrder: TKitchenOrder);
+begin
   try
-   ListOrders.Add(KOrder);
-   KOrder.kitchenID := nOrders;
+    ListOrders.Add(KOrder);
+    KOrder.KitchenID := NOrders;
 
-   KOrder.tab := createTab;
-   KOrder.tab.Tag := nOrders;
-   KOrder.tab.Text := KOrder.order.StockOrderID;
+    KOrder.Tab := CreateTab;
+    KOrder.Tab.Tag := NOrders;
+    KOrder.Tab.Text := KOrder.Order.StockOrderID;
 
-   inc(nOrders);
+    Inc(NOrders);
 
-   KOrder.pad := TPad.Create(KOrder.tab, KOrder.order, KOrder.kitchenID);
-   KOrder.pad.onOrderCancel := handleOrderCancel;
-   KOrder.pad.onOrderCommit := handleOrderCommit;
+    KOrder.Pad := TPad.Create(KOrder.Tab, KOrder.Order, KOrder.KitchenID);
+    KOrder.Pad.OnOrderCancel := HandleOrderCancel;
+    KOrder.Pad.OnOrderCommit := HandleOrderCommit;
 
-   KOrder.tab.AddObject(KOrder.pad);
+    KOrder.Tab.AddObject(KOrder.Pad);
 
-   KOrder.isFetching := false;
+    KOrder.IsFetching := False;
 
-   Pass.SetActiveTabWithTransition(KOrder.tab, TTabTransition.None);
+    Pass.SetActiveTabWithTransition(KOrder.Tab, TTabTransition.None);
   except
-   on E: Exception do
-    showMessage(E.Message);
+    on E: Exception do
+      ShowMessage(E.Message);
   end;
- end;
+end;
 
-function TKitchen.createTab: TTabItem;
- const
+function TKitchen.CreateTab: TTabItem;
+const
   TAB_WIDTH = 130.0;
   TAB_HEIGHT = 40.0;
- begin
-  result := Pass.Add(TTabItem);
-  result.StyleLookup := 'tabItemClose';
-  result.AutoSize := false;
-  result.Width := TAB_WIDTH;
-  result.Height := TAB_HEIGHT;
-  result.OnMouseUp := handleTabClick;
-  result.OnMouseEnter := handleTabMouseEnter;
-  result.OnMouseLeave := handleTabMouseLeave;
- end;
+begin
+  Result := Pass.Add(TTabItem);
+  Result.StyleLookup := 'tabItemClose';
+  Result.AutoSize := False;
+  Result.Width := TAB_WIDTH;
+  Result.Height := TAB_HEIGHT;
+  Result.OnMouseUp := HandleTabClick;
+  Result.OnMouseEnter := HandleTabMouseEnter;
+  Result.OnMouseLeave := HandleTabMouseLeave;
+end;
 
-procedure TKitchen.handleTabClick(Sender: TObject; Button: TMouseButton;
- Shift: TShiftState; X: Single; Y: Single);
- var
+procedure TKitchen.HandleTabClick(Sender: TObject; Button: TMouseButton;
+    Shift: TShiftState; X: Single; Y: Single);
+var
   KOrder: TKitchenOrder;
- begin
+begin
   var
-  tab := TTabItem(Sender);
+  Tab := TTabItem(Sender);
   var
-  btn := TButton(tab.FindStyleResource('btnClose'));
+  Btn := TButton(Tab.FindStyleResource('btnClose'));
 
   for var KitchenOrder in ListOrders do
-   if (KitchenOrder.kitchenID = tab.Tag) then
-    KOrder := KitchenOrder;
+    if(KitchenOrder.KitchenID = Tab.Tag)then
+      KOrder := KitchenOrder;
 
-  if KOrder.isFetching then
-   exit;
+  if KOrder.IsFetching then
+    Exit;
 
-  if (X >= btn.boundsRect.left) then
-   removeOrder(KOrder);
- end;
+  if(X >= Btn.BoundsRect.Left)then
+    RemoveOrder(KOrder);
+end;
 
-procedure TKitchen.handleTabMouseEnter(Sender: TObject);
- begin
-  TTabItem(Sender).Cursor := crHandPoint;
- end;
+procedure TKitchen.HandleTabMouseEnter(Sender: TObject);
+begin
+  TTabItem(Sender).Cursor := CrHandPoint;
+end;
 
-procedure TKitchen.handleTabMouseLeave(Sender: TObject);
- begin
-  TTabItem(Sender).Cursor := crArrow;
- end;
+procedure TKitchen.HandleTabMouseLeave(Sender: TObject);
+begin
+  TTabItem(Sender).Cursor := CrArrow;
+end;
 
-procedure TKitchen.removeOrder(var KOrder: TKitchen.TKitchenOrder);
- begin
+procedure TKitchen.RemoveOrder(var KOrder: TKitchen.TKitchenOrder);
+begin
   Pass.First(TTabTransition.None);
-  Pass.Delete(KOrder.tab.Index);
-  FreeAndNil(KOrder.order);
+  Pass.Delete(KOrder.Tab.Index);
+  FreeAndNil(KOrder.Order);
   KOrder.Free;
   ListOrders.Remove(KOrder);
- end;
+end;
 
-procedure TKitchen.handleOrderCancel(const kitchenID: word);
- var
+procedure TKitchen.HandleOrderCancel(const KitchenID: Word);
+var
   KOrder: TKitchenOrder;
- begin
+begin
   for var KitchenOrder in ListOrders do
-   if (KitchenOrder.kitchenID = kitchenID) then
-    KOrder := KitchenOrder;
+    if(KitchenOrder.KitchenID = KitchenID)then
+      KOrder := KitchenOrder;
 
-   removeOrder(KOrder);
-   renderFloor;
- end;
+  RemoveOrder(KOrder);
+  RenderFloor;
+end;
 
- procedure TKitchen.handleOrderCommit(const KitchenID: Word);
- begin
+procedure TKitchen.HandleOrderCommit(const KitchenID: Word);
+begin
 
   TThread.CreateAnonymousThread(
     procedure
     begin
-     TThread.Synchronize(nil,
-       procedure
-       begin
-       for var kitchenOrder in ListOrders do
-         if (KitchenOrder.kitchenID = KitchenID) then
-         KitchenOrder.tab.Text := KitchenOrder.order.StockOrderID;
-       renderFloor;
-       end);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          for var KitchenOrder in ListOrders do
+            if(KitchenOrder.KitchenID = KitchenID)then
+              KitchenOrder.Tab.Text := KitchenOrder.Order.StockOrderID;
+          RenderFloor;
+        end);
     end).Start;
 
- end;
+end;
 
 end.

@@ -1,73 +1,72 @@
 unit untTRegexpSnippets;
 
 interface
-
- uses
+uses
   System.Generics.Collections,
   System.RegularExpressionscore;
 
- type
-  TRegexpSnippets = class(TDictionary<string,TPerlRegEx>)
-   private
-    function getSnippet(const key: string): string;
-   public
-    procedure free;
-    procedure compileSnippets(keys: array of string);
+type
+  TRegexpSnippets = class(TDictionary<string, TPerlRegEx>)
+    private
+      function GetSnippet(const Key:string):string;
+    public
+      procedure Free;
+      procedure CompileSnippets(Keys: array of string);
   end;
 
 implementation
-
- uses
+uses
   System.SysUtils,
   FMX.Dialogs,
-  untSnippets;
+  UntSnippets;
 
- function TRegexpSnippets.getSnippet(const key: string): string;
-  begin
-   for var snippet in untSnippets.LIST_SNIPPET do
-    if key = snippet.key then
-     exit(snippet.value);
-   raise Exception.CreateFmt('Unknown snippet: %s',[key]);
-  end;
+function TRegexpSnippets.GetSnippet(const Key:string):string;
+begin
+  for var Snippet in UntSnippets.LIST_SNIPPET do
+    if Key = Snippet.Key then
+      Exit(Snippet.Value);
+  raise Exception.CreateFmt('Unknown snippet: %s',[Key]);
+end;
 
- procedure TRegexpSnippets.compileSnippets(keys: array of string);
-  begin
-   const
-    i = length(keys);
+procedure TRegexpSnippets.CompileSnippets(Keys: array of string);
+begin
+  const
+    I = Length(Keys);
 
-    if i = 0 then raise Exception.Create('Not Enough actual parameters');
-   Capacity := i;
+    if I = 0 then raise Exception.Create('Not Enough actual parameters');
+  Capacity := I;
 
-   try
-    for var key in keys do
-     begin
-     if self.ContainsKey(key) then continue;
-      self.Add(key,TPerlRegEx.Create);
-      self[key].RegEx := getSnippet(key);
+  try
+    for var Key in Keys do
+    begin
+      if Self.ContainsKey(Key)then
+        Continue;
+      Self.Add(Key, TPerlRegEx.Create);
+      Self[Key].RegEx := GetSnippet(Key);
       // System.regularExpressionsCore suggests that invoking
       // study more than once will increase performance
-      self[key].Study;
-      self[key].Study;
-     end;
-   except
+      Self[Key].Study;
+      Self[Key].Study;
+    end;
+  except
     on Exception do
-     begin
-      for var value in values do
-       if assigned(value) then
-        value.free;
+    begin
+      for var Value in Values do
+        if Assigned(Value)then
+          Value.Free;
       raise;
-     end;
-   end;
-
+    end;
   end;
 
- procedure TRegexpSnippets.free;
-  begin
+end;
 
-   for var snippet in values do
-    snippet.free;
-   inherited;
+procedure TRegexpSnippets.Free;
+begin
 
-  end;
+  for var Snippet in Values do
+    Snippet.Free;
+  inherited;
+
+end;
 
 end.

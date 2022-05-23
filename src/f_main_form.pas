@@ -1,101 +1,99 @@
 unit f_main_form;
 
 interface
-
 uses
- udmServerMSSQL,
- uFilesystem,
- fr_kitchen,
- system.Threading,
- system.SysUtils,
- system.Types,
- system.UITypes,
- system.Classes,
- system.Variants,
- FMX.Types,
- FMX.Controls,
- FMX.Forms,
- FMX.Graphics,
- FMX.Dialogs,
- FMX.Controls.Presentation,
- FMX.StdCtrls,
- FMX.Layouts,
- FMX.Memo.Types,
- FMX.ScrollBox,
- FMX.Memo,
- FMX.TabControl,
- FMX.Objects,
- FMX.DateTimeCtrls;
+  UdmServerMSSQL,
+  UFilesystem,
+  Fr_kitchen,
+  System.Threading,
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  FMX.Types,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Dialogs,
+  FMX.Controls.Presentation,
+  FMX.StdCtrls,
+  FMX.Layouts,
+  FMX.Memo.Types,
+  FMX.ScrollBox,
+  FMX.Memo,
+  FMX.TabControl,
+  FMX.Objects,
+  FMX.DateTimeCtrls;
 
 type
- TmainForm = class(TForm)
-  layoutHeader: TLayout;
-  Spinner: TAniIndicator;
-  lbl1: TLabel;
-  StyleBook1: TStyleBook;
-  Rectangle1: TRectangle;
-  procedure FormCreate(Sender: TObject);
- private
-  procedure connectDB;
-  procedure handleDBConnected;
-  procedure handleDBConnectionError(const errMsg: string);
-  procedure renderKitchen;
- end;
+  TmainForm = class(TForm)
+    LayoutHeader: TLayout;
+    Spinner: TAniIndicator;
+    Lbl1: TLabel;
+    StyleBook1: TStyleBook;
+    Rectangle1: TRectangle;
+    procedure FormCreate(Sender: TObject);
+    private
+      procedure ConnectDB;
+      procedure HandleDBConnected;
+      procedure HandleDBConnectionError(const ErrMsg:string);
+      procedure RenderKitchen;
+  end;
 
 var
- mainForm: TmainForm;
+  MainForm: TmainForm;
 
 implementation
-
 {$R *.fmx}
 
-procedure TmainForm.connectDB;
- begin
-  udmServerMSSQL.initialize;
-  udmServerMSSQL.DB.onConnected := handleDBConnected;
-  udmServerMSSQL.DB.onConnectionError := handleDBConnectionError;
-  udmServerMSSQL.DB.connect;
- end;
+procedure TmainForm.ConnectDB;
+begin
+  UdmServerMSSQL.Initialize;
+  UdmServerMSSQL.DB.OnConnected := HandleDBConnected;
+  UdmServerMSSQL.DB.OnConnectionError := HandleDBConnectionError;
+  UdmServerMSSQL.DB.Connect;
+end;
 
-procedure TmainForm.handleDBConnected;
- begin
+procedure TmainForm.HandleDBConnected;
+begin
   TThread.CreateAnonymousThread(
     procedure
     begin
 {$IFDEF RELEASE}
-     sleep(3000);
+      Sleep(3000);
 {$ENDIF}
-     TThread.Synchronize(nil,
-       procedure
-       begin
-        renderKitchen;
-       end);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          RenderKitchen;
+        end);
     end).Start;
- end;
+end;
 
-procedure TmainForm.handleDBConnectionError(const errMsg: string);
- begin
-  lbl1.Text := 'Failed to connect to database';
-  Spinner.Enabled := false;
-  Spinner.visible := false;
-  showMessage(errMsg);
- end;
+procedure TmainForm.HandleDBConnectionError(const ErrMsg:string);
+begin
+  Lbl1.Text := 'Failed to connect to database';
+  Spinner.Enabled := False;
+  Spinner.Visible := False;
+  ShowMessage(ErrMsg);
+end;
 
-procedure TmainForm.renderKitchen;
- begin
-  lbl1.visible := false;
-  Spinner.Enabled := false;
-  Spinner.visible := false;
+procedure TmainForm.RenderKitchen;
+begin
+  Lbl1.Visible := False;
+  Spinner.Enabled := False;
+  Spinner.Visible := False;
 
   Application.CreateForm(TKitchen, Kitchen);
   Kitchen.Align := TAlignLayout.Client;
-  addObject(Kitchen);
- end;
+  AddObject(Kitchen);
+end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
- begin
-  uFilesystem.anchorProjectRoot('stock-loader');
-  connectDB;
- end;
+begin
+  UFilesystem.AnchorProjectRoot('stock-loader');
+  ConnectDB;
+end;
 
 end.

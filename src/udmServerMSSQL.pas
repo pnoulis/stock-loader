@@ -1,7 +1,6 @@
 unit udmServerMSSQL;
 
 interface
-
 uses
   FMX.Forms,
   U_order,
@@ -76,21 +75,18 @@ var
 procedure Initialize;
 
 implementation
-
 {%CLASSGROUP 'FMX.Controls.TControl'}
 {$R *.dfm}
-
 const
   DBCONN_CONFIG_FILEPATH = './config/config.ini';
-  DBCONN_CONFIG_INI_SECTION =
-{$IFDEF RELEASE}
-      'DBCONN_MSSQL_RELEASE';
-{$ELSEIF defined(BRATNET)}
-    'DBCONN_MSSQL_DEBUG_BRATNET';
-{$ELSE}
-    'DBCONN_MSSQL_DEBUG';
-{$IFEND}
-
+  DBCONN_CONFIG_INI_SECTION = 'DBCONN_MSSQL_DEBUG_BRATNET';
+  // {$IFDEF RELEASE}
+  // 'DBCONN_MSSQL_RELEASE';
+  // {$ELSEIF defined(BRATNET)}
+  // 'DBCONN_MSSQL_DEBUG_BRATNET';
+  // {$ELSE}
+  // 'DBCONN_MSSQL_DEBUG';
+  // {$IFEND}
 var
   Connected: Boolean;
   ErrMsg:string;

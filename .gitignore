@@ -5,6 +5,7 @@
 
 build/*
 scripts/
+tools/
 
 # RAD studio files
 __history
