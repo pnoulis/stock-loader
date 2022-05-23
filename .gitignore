@@ -4,6 +4,7 @@
 *~undo-tree~
 
 build/*
+scripts/
 
 # RAD studio files
 __history

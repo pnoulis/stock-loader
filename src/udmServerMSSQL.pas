@@ -4,10 +4,10 @@ interface
 
 uses
   FMX.Forms,
-  u_order,
-  untTypes,
-  uDBConnect,
-  FMX.dialogs,
+  U_order,
+  UntTypes,
+  UDBConnect,
+  FMX.Dialogs,
   System.Variants,
   System.DateUtils,
   System.SysUtils,
@@ -35,45 +35,45 @@ uses
   FireDAC.VCLUI.Wait;
 
 type
-  TOnConnected = reference to procedure;
-  TOnConnectionError = procedure(const errMsg: string) of object;
+  TOnConnected = Reference to procedure;
+  TOnConnectionError = procedure(const ErrMsg:string)of object;
 
   TdmServerMSSQL = class(TDataModule)
-    connection: TFDConnection;
-    driverMSSQL: TFDPhysMSSQLDriverLink;
-    tableStockOrders: TFDTable;
-    queryStockMoves: TFDQuery;
-    queryItem: TFDQuery;
+    Connection: TFDConnection;
+    DriverMSSQL: TFDPhysMSSQLDriverLink;
+    TableStockOrders: TFDTable;
+    QueryStockMoves: TFDQuery;
+    QueryItem: TFDQuery;
     DataSource1: TDataSource;
-    queryAddStockOrder: TFDQuery;
-    queryAddStockMove: TFDQuery;
-    queryDeleteStockOrder: TFDQuery;
-  private type
-    TAfterFetch = reference to procedure(Data: TDataSource);
-    TAfterCommitOrder = reference to procedure(stockOrderID: string;
-      servedDate: TDateTime);
-    TAfterCommitMove = reference to procedure(stockMoveID, stockBefore,
-      stockIncrease, stockAfter: string);
+    QueryAddStockOrder: TFDQuery;
+    QueryAddStockMove: TFDQuery;
+    QueryDeleteStockOrder: TFDQuery;
+    private type
+      TAfterFetch = Reference to procedure(Data: TDataSource);
+      TAfterCommitOrder = Reference to procedure(StockOrderID:string;
+          ServedDate: TDateTime);
+      TAfterCommitMove = Reference to procedure(StockMoveID, StockBefore,
+          StockIncrease, StockAfter:string);
 
-  public
-    onConnected: TOnConnected;
-    onConnectionError: TOnConnectionError;
-    currentOrderID: uint32;
-    procedure connect;
-    procedure fetchAsyncOrders(cb: TAfterFetch);
-    procedure fetchOrdersFilterDate(dateFrom, dateTo: TDate; cb: TAfterFetch);
-    procedure fetchProduce(const orderID: string; cb: TAfterFetch);
-    function fetchItem(const itemCID: string): TDataSource;
-    procedure addStockOrder(cb: TAfterCommitOrder);
-    procedure addStockMove(stockOrderID, itemCID, stockIncrease,
-      stockMoveID: string; cb: TdmServerMSSQL.TAfterCommitMove);
-      procedure deleteStockOrder(stockOrderID: string);
+    public
+      OnConnected: TOnConnected;
+      OnConnectionError: TOnConnectionError;
+      CurrentOrderID: Uint32;
+      procedure Connect;
+      procedure FetchAsyncOrders(Cb: TAfterFetch);
+      procedure FetchOrdersFilterDate(DateFrom, DateTo: TDate; Cb: TAfterFetch);
+      procedure FetchProduce(const OrderID:string; Cb: TAfterFetch);
+      function FetchItem(const ItemCID:string): TDataSource;
+      procedure AddStockOrder(Cb: TAfterCommitOrder);
+      procedure AddStockMove(StockOrderID, ItemCID, StockIncrease,
+          StockMoveID:string; Cb: TdmServerMSSQL.TAfterCommitMove);
+      procedure DeleteStockOrder(StockOrderID:string);
   end;
 
 var
   DB: TdmServerMSSQL;
 
-procedure initialize;
+procedure Initialize;
 
 implementation
 
@@ -82,41 +82,42 @@ implementation
 
 const
   DBCONN_CONFIG_FILEPATH = './config/config.ini';
-  DBCONN_CONFIG_INI_SECTION = 'DBCONN_TEMP';
-  // {$IFDEF RELEASE}
-  // 'DBCONN_MSSQL_RELEASE';
-  // {$ELSEIF defined(BRATNET)}
-  // 'DBCONN_MSSQL_DEBUG_BRATNET';
-  // {$ELSE}
-  // 'DBCONN_MSSQL_DEBUG';
-  // {$IFEND}
+  DBCONN_CONFIG_INI_SECTION =
+{$IFDEF RELEASE}
+      'DBCONN_MSSQL_RELEASE';
+{$ELSEIF defined(BRATNET)}
+    'DBCONN_MSSQL_DEBUG_BRATNET';
+{$ELSE}
+    'DBCONN_MSSQL_DEBUG';
+{$IFEND}
 
 var
-  connected: Boolean;
-  errMsg: string;
+  Connected: Boolean;
+  ErrMsg:string;
   DataSource1: TDataSource;
 
-procedure initialize;
+procedure Initialize;
 begin
-  if not assigned(DB) then
+  if not Assigned(DB)then
     Application.CreateForm(TdmServerMSSQL, DB);
 end;
 
-procedure TdmServerMSSQL.connect;
+procedure TdmServerMSSQL.Connect;
 begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-      if not connected then
+
+      if not Connected then
       begin
 
         try
-          uDBConnect.setupDBconn(connection, DBCONN_CONFIG_INI_SECTION,
-            DBCONN_CONFIG_FILEPATH);
-          connected := true;
+          UDBConnect.SetupDBconn(Connection, DBCONN_CONFIG_INI_SECTION,
+              DBCONN_CONFIG_FILEPATH);
+          Connected := True;
         except
           on E: Exception do
-            errMsg := E.Message;
+            ErrMsg := E.Message;
         end;
 
       end;
@@ -125,132 +126,132 @@ begin
         procedure
         begin
 
-          if connected then
-            onConnected()
+          if Connected then
+            OnConnected()
           else
-            onConnectionError(errMsg);
+            OnConnectionError(ErrMsg);
 
         end);
 
     end).Start;
 end;
 
-function TdmServerMSSQL.fetchItem(const itemCID: string): TDataSource;
+function TdmServerMSSQL.FetchItem(const ItemCID:string): TDataSource;
 begin
   var
-  query := queryItem;
+  Query := QueryItem;
   try
-    query.Active := false;
-    query.Open
-      ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
-      'a.itemCID = b.itemCID and a.itemCID = ''' + itemCID + '''');
-    query.Active := true;
-    DataSource1.DataSet := query;
-    result := DataSource1;
+    Query.Active := False;
+    Query.Open
+        ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
+        'a.itemCID = b.itemCID and a.itemCID = ''' + ItemCID + '''');
+    Query.Active := True;
+    DataSource1.DataSet := Query;
+    Result := DataSource1;
   except
     on E: Exception do
     begin
-      showMessage(E.Message);
-      result := nil;
+      ShowMessage(E.Message);
+      Result := nil;
     end;
 
   end;
 end;
 
-procedure TdmServerMSSQL.fetchAsyncOrders(cb: TAfterFetch);
+procedure TdmServerMSSQL.FetchAsyncOrders(Cb: TAfterFetch);
 begin
   var
-  table := tableStockOrders;
+  Table := TableStockOrders;
 
   try
-    table.Active := false;
-    table.Filter := '';
-    table.Filtered := false;
-    table.IndexFieldNames := 'servedDate:D';
-    table.Active := true;
-    DataSource1.DataSet := tableStockOrders;
-    cb(DataSource1);
+    Table.Active := False;
+    Table.Filter := '';
+    Table.Filtered := False;
+    Table.IndexFieldNames := 'servedDate:D';
+    Table.Active := True;
+    DataSource1.DataSet := TableStockOrders;
+    Cb(DataSource1);
   except
-    cb(nil);
+    Cb(nil);
   end;
 
 end;
 
-procedure TdmServerMSSQL.fetchOrdersFilterDate(dateFrom: TDate; dateTo: TDate;
-cb: TdmServerMSSQL.TAfterFetch);
+procedure TdmServerMSSQL.FetchOrdersFilterDate(DateFrom: TDate; DateTo: TDate;
+Cb: TdmServerMSSQL.TAfterFetch);
 begin
   var
-  table := tableStockOrders;
-  table.Filtered := false;
-  table.Filter := '(servedDate >= {d ' + formatDateTime('yyyy-mm-dd', dateFrom) +
-    '})' + ' and (servedDate <= {d ' + formatDateTime('yyyy-mm-dd',
-    IncDay(dateTo)) + '})';
-  table.Filtered := true;
-  cb(DataSource1);
+  Table := TableStockOrders;
+  Table.Filtered := False;
+  Table.Filter := '(servedDate >= {d ' + FormatDateTime('yyyy-mm-dd', DateFrom)+
+      '})' + ' and (servedDate <= {d ' + FormatDateTime('yyyy-mm-dd',
+      IncDay(DateTo))+ '})';
+  Table.Filtered := True;
+  Cb(DataSource1);
 end;
 
-procedure TdmServerMSSQL.addStockOrder(cb: TdmServerMSSQL.TAfterCommitOrder);
+procedure TdmServerMSSQL.AddStockOrder(Cb: TdmServerMSSQL.TAfterCommitOrder);
 begin
   var
-  query := queryAddStockOrder;
-  query.Open('addStockOrder 1');
-  query.Active := true;
-  cb(query.FieldByName('stockOrderID').AsString,
-    query.FieldByName('servedDate').Value);
-  query.Close;
+  Query := QueryAddStockOrder;
+  Query.Open('addStockOrder 1');
+  Query.Active := True;
+  Cb(Query.FieldByName('stockOrderID').AsString,
+      Query.FieldByName('servedDate').Value);
+  Query.Close;
 end;
 
-procedure TdmServerMSSQL.addStockMove(stockOrderID, itemCID, stockIncrease,
-  stockMoveID: string; cb: TdmServerMSSQL.TAfterCommitMove);
+procedure TdmServerMSSQL.AddStockMove(StockOrderID, ItemCID, StockIncrease,
+    StockMoveID:string; Cb: TdmServerMSSQL.TAfterCommitMove);
 begin
   var
-  query := queryAddStockMove;
+  Query := QueryAddStockMove;
   var
-  exe := TStringBuilder.Create;
-  exe.Append('addStockMove ' + stockOrderID + ', ' + itemCID.QuotedString + ', '
-    + stockIncrease);
-  if (stockMoveID <> '') then
+  Exe := TStringBuilder.Create;
+  Exe.Append('addStockMove ' + StockOrderID + ', ' + ItemCID.QuotedString + ', '
+      + StockIncrease);
+  if(StockMoveID <> '')then
   begin
-    exe.Append(', ' + stockMoveID);
+    Exe.Append(', ' + StockMoveID);
   end;
-  query.Open(exe.ToString);
-  query.Active := true;
-  cb(query.FieldByName('stockMoveID').AsString, query.FieldByName('stockBefore')
-    .AsString, query.FieldByName('stockIncrease').AsString,
-    query.FieldByName('stockAfter').AsString);
-  query.Close;
+  Query.Open(Exe.ToString);
+  Query.Active := True;
+  Cb(Query.FieldByName('stockMoveID').AsString, Query.FieldByName('stockBefore')
+      .AsString, Query.FieldByName('stockIncrease').AsString,
+      Query.FieldByName('stockAfter').AsString);
+  Query.Close;
 end;
 
-procedure TdmServerMSSQL.deleteStockOrder(stockOrderID: string);
+procedure TdmServerMSSQL.DeleteStockOrder(StockOrderID:string);
 begin
   var
-  query := queryDeleteStockOrder;
-  query.ExecSQL('deleteStockOrder ' + stockOrderID);
-  query.Close;
+  Query := QueryDeleteStockOrder;
+  Query.ExecSQL('deleteStockOrder ' + StockOrderID);
+  Query.Close;
 end;
 
-procedure TdmServerMSSQL.fetchProduce(const orderID: string; cb: TAfterFetch);
+procedure TdmServerMSSQL.FetchProduce(const OrderID:string; Cb: TAfterFetch);
 begin
   var
-  query := queryStockMoves;
+  Query := QueryStockMoves;
 
   try
-    query.Active := false;
-    query.Open('select * from stockMoves where stockOrderID = ' + orderID);
-    query.Active := true;
-    DataSource1.DataSet := query;
-    cb(DataSource1);
+    Query.Active := False;
+    Query.Open('select * from stockMoves where stockOrderID = ' + OrderID);
+    Query.Active := True;
+    DataSource1.DataSet := Query;
+    Cb(DataSource1);
   except
     on E: Exception do
     begin
-      showMessage(E.Message);
-      cb(nil);
+      ShowMessage(E.Message);
+      Cb(nil);
     end;
   end;
 
 end;
 
 begin
-  connected := false;
+  Connected := False;
 
 end.

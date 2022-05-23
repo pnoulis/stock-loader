@@ -1,4 +1,4 @@
-unit u_produce;
+﻿unit u_produce;
 
 interface
 
@@ -302,7 +302,6 @@ end;
 
 procedure TProduce.displayError(const errMsg: string = '');
 begin
->>>>>>> 069bfc0243c51a0b1a1ef6f66e85c9c5e1d8f752
   var
   rect := TRectangle(graphic.Components[0]);
 

@@ -3,15 +3,15 @@ unit u_order;
 interface
 
 uses
-  data.DB,
-  u_produce,
-  untTypes,
+  Data.DB,
+  U_produce,
+  UntTypes,
   FireDAC.Comp.Client,
-  system.DateUtils,
-  system.Classes,
-  system.SysUtils,
-  system.Rtti,
-  system.UITypes,
+  System.DateUtils,
+  System.Classes,
+  System.SysUtils,
+  System.Rtti,
+  System.UITypes,
   FMX.Objects,
   FMX.Dialogs,
   FMX.Controls,
@@ -23,179 +23,179 @@ uses
   FMX.Graphics,
   FMX.Menus,
   FMX.Controls.Presentation,
-  system.Generics.Collections;
+  System.Generics.Collections;
 
 type
 
   TOrder = class(TObject)
-  private type
-    TOrderDate = record
-      commited: TDateTime;
-      issued: TDateTime;
-    end;
+    private type
+      TOrderDate = record
+        Commited: TDateTime;
+        Issued: TDateTime;
+      end;
 
-    TAfterOperation = procedure(success: Boolean) of object;
-    TAfterFetch = reference to procedure(data: TDataset);
+      TAfterOperation = procedure(Success: Boolean) of object;
+      TAfterFetch = Reference to procedure(Data: TDataset);
 
-  var
-    FDate: TOrderDate;
-    FStockOrderID: string;
-    FStoreID: byte;
-    FStatus: EStatusOrder;
-    FProduce: TDataSource;
-    FListOnAfterCommit: array of TAfterOperation;
-    FListOnAfterDelete: array of TAfterOperation;
+    var
+      FDate: TOrderDate;
+      FStockOrderID: string;
+      FStoreID: Byte;
+      FStatus: EStatusOrder;
+      FProduce: TDataSource;
+      FListOnAfterCommit: array of TAfterOperation;
+      FListOnAfterDelete: array of TAfterOperation;
 
-    procedure registerAfterCommit(cb: TAfterOperation);
-    procedure registerAfterDelete(cb: TAfterOperation);
+      procedure RegisterAfterCommit (Cb: TAfterOperation);
+      procedure RegisterAfterDelete (Cb: TAfterOperation);
 
-    function fetchProduce: TDataSource;
-    procedure commitOrder;
-    procedure commitProduce(ListProduce: TList<TProduce>);
-    procedure deleteOrder;
-    procedure deleteProduce(ListProduce: TListProduce);
-  public
-  var
-    constructor Create(data: TFields = nil; const storeID: byte = 0);
-    procedure commit(ListProduce: TList<TProduce> = nil);
-    procedure delete(ListProduce: TList<TProduce> = nil);
-    function clone: TOrder;
-    procedure fetch(cb: TAfterFetch);
+      function FetchProduce: TDataSource;
+      procedure CommitOrder;
+      procedure CommitProduce (ListProduce: TList<TProduce>);
+      procedure DeleteOrder;
+      procedure DeleteProduce (ListProduce: TListProduce);
+    public
+    var
+      constructor Create (Data: TFields = nil; const StoreID: Byte = 0);
+      procedure Commit (ListProduce: TList<TProduce> = nil);
+      procedure Delete (ListProduce: TList<TProduce> = nil);
+      function Clone: TOrder;
+      procedure Fetch (Cb: TAfterFetch);
 
-    property Date: TOrderDate read FDate;
-    property StockOrderID: string read FStockOrderID;
-    property storeID: byte read FStoreID;
-    property Status: EStatusOrder read FStatus;
-    property onAfterCommit: TAfterOperation write registerAfterCommit;
-    property onAfterDelete: TAfterOperation write registerAfterDelete;
-    property produce: TDataSource read fetchProduce;
+      property Date: TOrderDate read FDate;
+      property StockOrderID: string read FStockOrderID;
+      property StoreID: Byte read FStoreID;
+      property Status: EStatusOrder read FStatus;
+      property OnAfterCommit: TAfterOperation write RegisterAfterCommit;
+      property OnAfterDelete: TAfterOperation write RegisterAfterDelete;
+      property Produce: TDataSource read FetchProduce;
   end;
 
 implementation
 
 uses
-  udmServerMSSQL;
+  UdmServerMSSQL;
 { TOrder }
 
-procedure TOrder.commit(ListProduce: TList<TProduce> = nil);
+procedure TOrder.Commit (ListProduce: TList<TProduce> = nil);
 begin
 
-  if Status <> EStatusOrder.commited then
-    commitOrder;
+  if Status <> EStatusOrder.Commited then
+    CommitOrder;
 
-  commitProduce(ListProduce);
+  CommitProduce (ListProduce);
 end;
 
-procedure TOrder.delete(ListProduce: TList<TProduce> = nil);
+procedure TOrder.Delete (ListProduce: TList<TProduce> = nil);
 begin
-  DB.deleteStockOrder(StockOrderID);
+  DB.DeleteStockOrder (StockOrderID);
 end;
 
-function TOrder.clone: TOrder;
+function TOrder.Clone: TOrder;
 begin
-  result := TOrder.Create(nil, FStoreID);
-  result.FDate := self.Date;
-  result.FStockOrderID := self.FStockOrderID;
-  result.FStatus := self.FStatus;
+  Result := TOrder.Create (nil, FStoreID);
+  Result.FDate := Self.Date;
+  Result.FStockOrderID := Self.FStockOrderID;
+  Result.FStatus := Self.FStatus;
 end;
 
-procedure TOrder.fetch(cb: TAfterFetch);
+procedure TOrder.Fetch (Cb: TAfterFetch);
 begin
 
   if FStockOrderID = '0' then
-    cb(nil);
+    Cb (nil);
 
-  DB.fetchProduce(FStockOrderID,
-    procedure(data: TDataSource)
+  DB.FetchProduce (FStockOrderID,
+    procedure(Data: TDataSource)
     begin
-      if (data <> nil) then
-        cb(data.DataSet)
+      if (Data <> nil) then
+        Cb(Data.DataSet)
       else
-        cb(nil);
+        Cb(nil);
     end);
 
 end;
 
-procedure TOrder.commitOrder;
+procedure TOrder.CommitOrder;
 begin
-  DB.addStockOrder(
-    procedure(StockOrderID: string; servedDate: TDateTime)
+  DB.AddStockOrder (
+    procedure(StockOrderID: string; ServedDate: TDateTime)
     begin
       FStockOrderID := StockOrderID;
-      FDate.commited := servedDate;
-      FStatus := EStatusOrder.commited;
+      FDate.Commited := ServedDate;
+      FStatus := EStatusOrder.Commited;
     end);
 end;
 
-procedure TOrder.commitProduce(ListProduce: TList<TProduce>);
+procedure TOrder.CommitProduce (ListProduce: TList<TProduce>);
 begin
-  for var produce in ListProduce do
-    if (produce.statusProduce <> EStatusOrder.commited) then
-      DB.addStockMove(FStockOrderID, produce.itemCID, produce.stockIncrease,
-        '',
-        procedure(stockMoveID, stockBefore, stockIncrease, stockAfter: string)
+  for var Produce in ListProduce do
+    if (Produce.StatusProduce <> EStatusOrder.Commited) then
+      DB.AddStockMove (FStockOrderID, Produce.ItemCID,
+          Produce.StockIncrease, '',
+        procedure(StockMoveID, StockBefore, StockIncrease, StockAfter: string)
         begin
-          produce.statusProduce := EStatusOrder.commited;
-          produce.stockMoveID := stockMoveID;
-          produce.stockBefore := stockBefore;
-          produce.stockIncrease := stockIncrease;
-          produce.stockAfter := stockAfter;
+          Produce.StatusProduce := EStatusOrder.Commited;
+          Produce.StockMoveID := StockMoveID;
+          Produce.StockBefore := StockBefore;
+          Produce.StockIncrease := StockIncrease;
+          Produce.StockAfter := StockAfter;
         end)
 end;
 
-procedure TOrder.deleteOrder;
+procedure TOrder.DeleteOrder;
 begin
-  showMessage('delete order');
+  ShowMessage ('delete order');
 end;
 
-procedure TOrder.deleteProduce(ListProduce: TListProduce);
+procedure TOrder.DeleteProduce (ListProduce: TListProduce);
 begin
-  showMessage('delete produce');
+  ShowMessage ('delete produce');
 end;
 
-procedure TOrder.registerAfterCommit(cb: TAfterOperation);
-begin
-  var
-  index := Length(FListOnAfterCommit);
-
-  SetLength(FListOnAfterCommit, index + 1);
-  FListOnAfterCommit[index] := cb;
-end;
-
-procedure TOrder.registerAfterDelete(cb: TAfterOperation);
+procedure TOrder.RegisterAfterCommit (Cb: TAfterOperation);
 begin
   var
-  index := Length(FListOnAfterDelete);
+  index := Length (FListOnAfterCommit);
 
-  SetLength(FListOnAfterDelete, index + 1);
-  FListOnAfterDelete[index] := cb;
+  SetLength (FListOnAfterCommit, index + 1);
+  FListOnAfterCommit[index] := Cb;
 end;
 
-constructor TOrder.Create(data: TFields = nil; const storeID: byte = 0);
+procedure TOrder.RegisterAfterDelete (Cb: TAfterOperation);
+begin
+  var
+  index := Length (FListOnAfterDelete);
+
+  SetLength (FListOnAfterDelete, index + 1);
+  FListOnAfterDelete[index] := Cb;
+end;
+
+constructor TOrder.Create (Data: TFields = nil; const StoreID: Byte = 0);
 begin
   inherited Create;
 
-  if assigned(data) then
+  if Assigned (Data) then
   begin
-    FStockOrderID := data.FieldByName('stockOrderID').AsString;
-    FDate.commited := data.FieldByName('servedDate').Value;
-    FStoreID := data.FieldByName('storeID').Value;
+    FStockOrderID := Data.FieldByName ('stockOrderID').AsString;
+    FDate.Commited := Data.FieldByName ('servedDate').Value;
+    FStoreID := Data.FieldByName ('storeID').Value;
 
-    if isToday(FDate.commited) then
-      FStatus := EStatusOrder.commited
+    if IsToday (FDate.Commited) then
+      FStatus := EStatusOrder.Commited
     else
-      FStatus := EStatusOrder.served;
+      FStatus := EStatusOrder.Served;
   end
   else // is a new order
   begin
     FStockOrderID := '0';
-    FStatus := EStatusOrder.scratch;
-    FStoreID := storeID;
+    FStatus := EStatusOrder.Scratch;
+    FStoreID := StoreID;
   end;
 
 end;
 
-function TOrder.fetchProduce: TDataSource;
+function TOrder.FetchProduce: TDataSource;
 begin
 
 end;

@@ -1,5 +1,5 @@
 USE MASTER;
-GO 
+GO
 
 IF EXISTS (
 SELECT  1
@@ -29,24 +29,24 @@ IF EXISTS (
 SELECT  1
 FROM sys.procedures
 WHERE NAME = 'deleteStockOrder' )
-DROP PROCEDURE dbo.deleteStockOrder 
-GO  
+DROP PROCEDURE dbo.deleteStockOrder
+GO
 
 
 CREATE DATABASE dummy COLLATE Latin1_General_100_CI_AI_SC_UTF8; 
-GO 
+GO
 USE dummy;
 GO
 
-CREATE TABLE Store ( 
+CREATE TABLE Store (
   storeId INT NOT NULL -- PK
   CONSTRAINT PK_Store_storeId PRIMARY KEY CLUSTERED (storeId) 
 );
 GO
 
-CREATE TABLE item ( 
+CREATE TABLE item (
   itemCID NVARCHAR(50) NOT NULL, -- PK
-  itemName NVARCHAR(200) NOT NULL, 
+  itemName NVARCHAR(200) NOT NULL,
   CONSTRAINT PK_Item_itemCID PRIMARY KEY CLUSTERED (itemCID) 
 );
 GO
@@ -85,24 +85,24 @@ GO
 
 
 -- FOREIGN KEYS
-ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT 
-FK_stockMoves_stockOrderID FOREIGN KEY (stockOrderID) REFERENCES 
+ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT
+FK_stockMoves_stockOrderID FOREIGN KEY (stockOrderID) REFERENCES
 dbo.stockOrders(stockOrderID);
 
-ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT 
-FK_stockMoves_itemCID FOREIGN KEY (itemCID) REFERENCES 
+ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT
+FK_stockMoves_itemCID FOREIGN KEY (itemCID) REFERENCES
 dbo.Item(ItemCID);
 
-ALTER TABLE dbo.stockOrders WITH CHECK ADD CONSTRAINT 
-FK_stockOrders_storeID FOREIGN KEY (storeID) REFERENCES 
+ALTER TABLE dbo.stockOrders WITH CHECK ADD CONSTRAINT
+FK_stockOrders_storeID FOREIGN KEY (storeID) REFERENCES
 dbo.store(StoreId);
 
-ALTER TABLE dbo.itemStg WITH CHECK ADD CONSTRAINT 
-FK_itemStg_itemCID FOREIGN KEY (itemCID) REFERENCES 
+ALTER TABLE dbo.itemStg WITH CHECK ADD CONSTRAINT
+FK_itemStg_itemCID FOREIGN KEY (itemCID) REFERENCES
 dbo.item(itemCID);
 
-ALTER TABLE dbo.itemStg WITH CHECK ADD CONSTRAINT 
-FK_itemStg_storeID FOREIGN KEY (storeID) REFERENCES 
+ALTER TABLE dbo.itemStg WITH CHECK ADD CONSTRAINT
+FK_itemStg_storeID FOREIGN KEY (storeID) REFERENCES
 dbo.store(storeID);
 GO
 
@@ -121,12 +121,12 @@ END;
 GO
 
 -- ADD STOCK MOVE
-CREATE PROCEDURE addStockMove 
+CREATE PROCEDURE addStockMove
 @stockOrderID BIGINT
 ,@itemCID NVARCHAR(50)
 ,@stockIncrease DECIMAL(18, 3)
-,@stockMoveID BIGINT = NULL 
-AS 
+,@stockMoveID BIGINT = NULL
+AS
 BEGIN
 SET NOCOUNT ON;
 
@@ -147,7 +147,7 @@ SET @stockAfter = @stockBefore + @stockIncrease;
 IF (@stockAfter < 0.0) SET @stockAfter = 0.0;
 
 
-IF (@stockMoveID IS NOT NULL) 
+IF (@stockMoveID IS NOT NULL)
 BEGIN
 declare @sameItemCID NVARCHAR(50);
 declare @prevStockIncrease decimal(18,3);
@@ -171,7 +171,7 @@ WHERE stockMoveID = @stockMoveID AND itemCID = @itemCID;
 IF (@sameItemCID IS NULL) RETURN 1;
 
 END
-ELSE 
+ELSE
 BEGIN
 
 INSERT INTO stockMoves (
@@ -194,10 +194,10 @@ GO
 
 
 -- SUBTRACT
-CREATE PROCEDURE subtract 
+CREATE PROCEDURE subtract
 @term1 DECIMAL(18, 3)
-,@term2 DECIMAL(18, 3) 
-AS 
+,@term2 DECIMAL(18, 3)
+AS
 BEGIN
 SET NOCOUNT ON;
 SET @term1 = (@term1 - @term2);
@@ -208,9 +208,9 @@ GO
 
 
 -- REVERSE STOCK MOVE
-CREATE PROCEDURE reverseStockMove 
-@stockMoveID BIGINT 
-AS 
+CREATE PROCEDURE reverseStockMove
+@stockMoveID BIGINT
+AS
 BEGIN
 SET NOCOUNT ON;
 
@@ -242,16 +242,16 @@ END;
 GO
 
 -- DELETE STOCK ORDER
-CREATE PROCEDURE deleteStockOrder 
-@stockOrderID BIGINT 
-AS 
+CREATE PROCEDURE deleteStockOrder
+@stockOrderID BIGINT
+AS
 BEGIN
 SET NOCOUNT ON;
 
 DECLARE @stockMoveID BIGINT;
 
 DECLARE n CURSOR FAST_FORWARD FOR
-SELECT stockMoveID 
+SELECT stockMoveID
 FROM stockMoves
 WHERE stockOrderID = @stockOrderID;
 
@@ -259,8 +259,8 @@ OPEN n;
 
 FETCH NEXT FROM n INTO @stockMoveID;
 
-WHILE @@FETCH_STATUS = 0 
-BEGIN 
+WHILE @@FETCH_STATUS = 0
+BEGIN
 EXEC reverseStockMove @stockMoveID;
 FETCH NEXT FROM n INTO @stockMoveID;
 END;

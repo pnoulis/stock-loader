@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<ProjectSortOrder AutoSort="0" SortType="0">
-    <File Path="X:\stock-loader"/>
+    <File Path="..\..\stock-loader"/>
     <File Path="..\lib"/>
     <File Path="..\lib\delphi-utils"/>
     <File Path="..\lib\delphi-utils\src"/>

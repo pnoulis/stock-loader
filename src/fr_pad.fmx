@@ -1,7 +1,7 @@
 object Pad: TPad
   Align = Client
-  Size.Width = 799.000000000000000000
-  Size.Height = 754.000000000000000000
+  Size.Width = 800.000000000000000000
+  Size.Height = 752.000000000000000000
   Size.PlatformDefault = False
   object Rectangle1: TRectangle
     Align = Client
@@ -10,8 +10,8 @@ object Pad: TPad
     Padding.Right = 5.000000000000000000
     Padding.Bottom = 20.000000000000000000
     Sides = []
-    Size.Width = 799.000000000000000000
-    Size.Height = 754.000000000000000000
+    Size.Width = 800.000000000000000000
+    Size.Height = 752.000000000000000000
     Size.PlatformDefault = False
     Stroke.Kind = None
     Stroke.Thickness = 0.000000000000000000
@@ -19,7 +19,7 @@ object Pad: TPad
       Align = Top
       Position.X = 20.000000000000000000
       Position.Y = 15.000000000000000000
-      Size.Width = 774.000000000000000000
+      Size.Width = 775.000000000000000000
       Size.Height = 65.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
@@ -27,7 +27,7 @@ object Pad: TPad
         Align = Client
         Fill.Kind = None
         Sides = []
-        Size.Width = 774.000000000000000000
+        Size.Width = 775.000000000000000000
         Size.Height = 65.000000000000000000
         Size.PlatformDefault = False
         Stroke.Kind = None
@@ -88,7 +88,7 @@ object Pad: TPad
           Anchors = []
           CanFocus = False
           Cursor = crArrow
-          Position.X = 538.493835449218800000
+          Position.X = 539.357543945312500000
           Position.Y = -15.000000000000000000
           Size.Width = 260.000000000000000000
           Size.Height = 108.000000000000000000
@@ -106,7 +106,7 @@ object Pad: TPad
       Margins.Top = 40.000000000000000000
       Position.X = 20.000000000000000000
       Position.Y = 120.000000000000000000
-      Size.Width = 774.000000000000000000
+      Size.Width = 775.000000000000000000
       Size.Height = 70.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
@@ -126,7 +126,7 @@ object Pad: TPad
       object lblStockIncrease: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 574.000000000000000000
+        Position.X = 575.000000000000000000
         Size.Width = 90.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
@@ -139,7 +139,7 @@ object Pad: TPad
       object lblStockBefore: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 484.000000000000000000
+        Position.X = 485.000000000000000000
         Size.Width = 90.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
@@ -152,7 +152,7 @@ object Pad: TPad
       object lblItemName: TLabel
         Align = Client
         StyledSettings = [FontColor]
-        Size.Width = 304.000000000000000000
+        Size.Width = 305.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Family = 'Comic Sans MS'
@@ -164,7 +164,7 @@ object Pad: TPad
       object lblStockAfter: TLabel
         Align = Right
         StyledSettings = [FontColor]
-        Position.X = 664.000000000000000000
+        Position.X = 665.000000000000000000
         Size.Width = 90.000000000000000000
         Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
@@ -191,19 +191,19 @@ object Pad: TPad
       Align = Client
       Margins.Top = 20.000000000000000000
       Margins.Right = 5.000000000000000000
-      Size.Width = 769.000000000000000000
-      Size.Height = 524.000000000000000000
+      Size.Width = 770.000000000000000000
+      Size.Height = 522.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
       object scrollProduce: TVertScrollBox
         Align = Client
         Padding.Right = 10.000000000000000000
-        Size.Width = 769.000000000000000000
-        Size.Height = 524.000000000000000000
+        Size.Width = 770.000000000000000000
+        Size.Height = 522.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        Viewport.Width = 769.000000000000000000
-        Viewport.Height = 524.000000000000000000
+        Viewport.Width = 770.000000000000000000
+        Viewport.Height = 522.000000000000000000
       end
       object loader: TAniIndicator
         Align = Center
