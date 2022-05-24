@@ -2,9 +2,8 @@ unit untTypes;
 
 interface
 uses
-  System.Threading,
-  System.RegularExpressionsCore,
-  System.Generics.Collections;
+  System.SysUtils,
+  System.RegularExpressionsCore;
 
 type
   TDimensions = record
@@ -23,29 +22,13 @@ type
   end;
 
   TErrors = array of string;
-  EStatusOrder =(Served, Commited, Cached, Scratch);
+  EStatusOrder = (Served, Commited, Cached, Scratch);
   TAsyncCB = Reference to procedure;
-
-procedure RunAsync(const Cb: TAsyncCB;const Delay: UInt32 = 0);
+var
+  GLocaleFormat: TFormatSettings;
 
 implementation
-uses
-  System.SysUtils,
-  System.Classes;
-
-procedure RunAsync(const Cb: TAsyncCB;const Delay: UInt32 = 0);
 begin
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      if Delay > 0 then
-        Sleep(Delay);
-      Cb();
-      TThread.Synchronize(nil,
-        procedure
-        begin
-        end);
-    end).Start;
-end;
-
+  GLocaleFormat := TFormatSettings.Create;
+  GLocaleFormat.DecimalSeparator := '.';
 end.

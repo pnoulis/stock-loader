@@ -35,7 +35,7 @@ uses
 
 type
   TOnConnected = Reference to procedure;
-  TOnConnectionError = procedure(const ErrMsg:string)of object;
+  TOnConnectionError = procedure(const ErrMsg: string) of object;
 
   TdmServerMSSQL = class(TDataModule)
     Connection: TFDConnection;
@@ -49,10 +49,10 @@ type
     QueryDeleteStockOrder: TFDQuery;
     private type
       TAfterFetch = Reference to procedure(Data: TDataSource);
-      TAfterCommitOrder = Reference to procedure(StockOrderID:string;
+      TAfterCommitOrder = Reference to procedure(StockOrderID: string;
           ServedDate: TDateTime);
-      TAfterCommitMove = Reference to procedure(StockMoveID, StockBefore,
-          StockIncrease, StockAfter:string);
+      TAfterCommitMove = Reference to procedure(StockMoveID: string;
+          StockBefore, StockIncrease, StockAfter: Double);
 
     public
       OnConnected: TOnConnected;
@@ -61,12 +61,12 @@ type
       procedure Connect;
       procedure FetchAsyncOrders(Cb: TAfterFetch);
       procedure FetchOrdersFilterDate(DateFrom, DateTo: TDate; Cb: TAfterFetch);
-      procedure FetchProduce(const OrderID:string; Cb: TAfterFetch);
-      function FetchItem(const ItemCID:string): TDataSource;
+      procedure FetchProduce(const OrderID: string; Cb: TAfterFetch);
+      function FetchItem(const ItemCID: string): TDataSource;
       procedure AddStockOrder(Cb: TAfterCommitOrder);
       procedure AddStockMove(StockOrderID, ItemCID, StockIncrease,
-          StockMoveID:string; Cb: TdmServerMSSQL.TAfterCommitMove);
-      procedure DeleteStockOrder(StockOrderID:string);
+          StockMoveID: string; Cb: TdmServerMSSQL.TAfterCommitMove);
+      procedure DeleteStockOrder(StockOrderID: string);
   end;
 
 var
@@ -89,12 +89,12 @@ const
   // {$IFEND}
 var
   Connected: Boolean;
-  ErrMsg:string;
+  ErrMsg: string;
   DataSource1: TDataSource;
 
 procedure Initialize;
 begin
-  if not Assigned(DB)then
+  if not Assigned(DB) then
     Application.CreateForm(TdmServerMSSQL, DB);
 end;
 
@@ -132,7 +132,7 @@ begin
     end).Start;
 end;
 
-function TdmServerMSSQL.FetchItem(const ItemCID:string): TDataSource;
+function TdmServerMSSQL.FetchItem(const ItemCID: string): TDataSource;
 begin
   var
   Query := QueryItem;
@@ -163,7 +163,7 @@ begin
     Table.Active := False;
     Table.Filter := '';
     Table.Filtered := False;
-    Table.IndexFieldNames := 'servedDate:D';
+    Table.IndexFieldNames := 'stockOrderID:D';
     Table.Active := True;
     DataSource1.DataSet := TableStockOrders;
     Cb(DataSource1);
@@ -179,9 +179,9 @@ begin
   var
   Table := TableStockOrders;
   Table.Filtered := False;
-  Table.Filter := '(servedDate >= {d ' + FormatDateTime('yyyy-mm-dd', DateFrom)+
-      '})' + ' and (servedDate <= {d ' + FormatDateTime('yyyy-mm-dd',
-      IncDay(DateTo))+ '})';
+  Table.Filter := '(servedDate >= {d ' + FormatDateTime('yyyy-mm-dd', DateFrom)
+      + '})' + ' and (servedDate <= {d ' + FormatDateTime('yyyy-mm-dd',
+      IncDay(DateTo)) + '})';
   Table.Filtered := True;
   Cb(DataSource1);
 end;
@@ -198,7 +198,7 @@ begin
 end;
 
 procedure TdmServerMSSQL.AddStockMove(StockOrderID, ItemCID, StockIncrease,
-    StockMoveID:string; Cb: TdmServerMSSQL.TAfterCommitMove);
+    StockMoveID: string; Cb: TdmServerMSSQL.TAfterCommitMove);
 begin
   var
   Query := QueryAddStockMove;
@@ -206,19 +206,19 @@ begin
   Exe := TStringBuilder.Create;
   Exe.Append('addStockMove ' + StockOrderID + ', ' + ItemCID.QuotedString + ', '
       + StockIncrease);
-  if(StockMoveID <> '')then
+  if (StockMoveID <> '') then
   begin
     Exe.Append(', ' + StockMoveID);
   end;
   Query.Open(Exe.ToString);
   Query.Active := True;
   Cb(Query.FieldByName('stockMoveID').AsString, Query.FieldByName('stockBefore')
-      .AsString, Query.FieldByName('stockIncrease').AsString,
-      Query.FieldByName('stockAfter').AsString);
+      .Value, Query.FieldByName('stockIncrease').Value,
+      Query.FieldByName('stockAfter').Value);
   Query.Close;
 end;
 
-procedure TdmServerMSSQL.DeleteStockOrder(StockOrderID:string);
+procedure TdmServerMSSQL.DeleteStockOrder(StockOrderID: string);
 begin
   var
   Query := QueryDeleteStockOrder;
@@ -226,7 +226,7 @@ begin
   Query.Close;
 end;
 
-procedure TdmServerMSSQL.FetchProduce(const OrderID:string; Cb: TAfterFetch);
+procedure TdmServerMSSQL.FetchProduce(const OrderID: string; Cb: TAfterFetch);
 begin
   var
   Query := QueryStockMoves;

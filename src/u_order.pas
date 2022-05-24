@@ -33,12 +33,12 @@ type
         Issued: TDateTime;
       end;
 
-      TAfterOperation = procedure(Success: Boolean)of object;
+      TAfterOperation = procedure(Success: Boolean) of object;
       TAfterFetch = Reference to procedure(Data: TDataset);
 
     var
       FDate: TOrderDate;
-      FStockOrderID:string;
+      FStockOrderID: string;
       FStoreID: Byte;
       FStatus: EStatusOrder;
       FProduce: TDataSource;
@@ -48,26 +48,22 @@ type
       procedure RegisterAfterCommit(Cb: TAfterOperation);
       procedure RegisterAfterDelete(Cb: TAfterOperation);
 
-      function FetchProduce: TDataSource;
       procedure CommitOrder;
       procedure CommitProduce(ListProduce: TList<TProduce>);
-      procedure DeleteOrder;
-      procedure DeleteProduce(ListProduce: TListProduce);
     public
     var
-      constructor Create(Data: TFields = nil;const StoreID: Byte = 0);
+      constructor Create(Data: TFields = nil; const StoreID: Byte = 0);
       procedure Commit(ListProduce: TList<TProduce> = nil);
       procedure Delete(ListProduce: TList<TProduce> = nil);
       function Clone: TOrder;
       procedure Fetch(Cb: TAfterFetch);
 
       property Date: TOrderDate read FDate;
-      property StockOrderID:string read FStockOrderID;
+      property StockOrderID: string read FStockOrderID;
       property StoreID: Byte read FStoreID;
       property Status: EStatusOrder read FStatus;
       property OnAfterCommit: TAfterOperation write RegisterAfterCommit;
       property OnAfterDelete: TAfterOperation write RegisterAfterDelete;
-      property Produce: TDataSource read FetchProduce;
   end;
 
 implementation
@@ -106,7 +102,7 @@ begin
   DB.FetchProduce(FStockOrderID,
     procedure(Data: TDataSource)
     begin
-      if(Data <> nil)then
+      if (Data <> nil) then
         Cb(Data.DataSet)
       else
         Cb(nil);
@@ -117,7 +113,7 @@ end;
 procedure TOrder.CommitOrder;
 begin
   DB.AddStockOrder(
-    procedure(StockOrderID:string; ServedDate: TDateTime)
+    procedure(StockOrderID: string; ServedDate: TDateTime)
     begin
       FStockOrderID := StockOrderID;
       FDate.Commited := ServedDate;
@@ -128,9 +124,12 @@ end;
 procedure TOrder.CommitProduce(ListProduce: TList<TProduce>);
 begin
   for var Produce in ListProduce do
-    if(Produce.StatusProduce <> EStatusOrder.Commited)then
-      DB.AddStockMove(FStockOrderID, Produce.ItemCID, Produce.StockIncrease, '',
-        procedure(StockMoveID, StockBefore, StockIncrease, StockAfter:string)
+    if (Produce.StatusProduce <> EStatusOrder.Commited) then
+    begin
+      DB.AddStockMove(FStockOrderID, Produce.ItemCID,
+          FloatToStr(Produce.StockIncrease, GLocaleFormat), '',
+        procedure(StockMoveID: string; StockBefore, StockIncrease,
+            StockAfter: Double)
         begin
           Produce.StatusProduce := EStatusOrder.Commited;
           Produce.StockMoveID := StockMoveID;
@@ -138,16 +137,7 @@ begin
           Produce.StockIncrease := StockIncrease;
           Produce.StockAfter := StockAfter;
         end)
-end;
-
-procedure TOrder.DeleteOrder;
-begin
-  ShowMessage('delete order');
-end;
-
-procedure TOrder.DeleteProduce(ListProduce: TListProduce);
-begin
-  ShowMessage('delete produce');
+    end;
 end;
 
 procedure TOrder.RegisterAfterCommit(Cb: TAfterOperation);
@@ -156,7 +146,7 @@ begin
   index := Length(FListOnAfterCommit);
 
   SetLength(FListOnAfterCommit, index + 1);
-  FListOnAfterCommit[index]:= Cb;
+  FListOnAfterCommit[index] := Cb;
 end;
 
 procedure TOrder.RegisterAfterDelete(Cb: TAfterOperation);
@@ -165,35 +155,30 @@ begin
   index := Length(FListOnAfterDelete);
 
   SetLength(FListOnAfterDelete, index + 1);
-  FListOnAfterDelete[index]:= Cb;
+  FListOnAfterDelete[index] := Cb;
 end;
 
-constructor TOrder.Create(Data: TFields = nil;const StoreID: Byte = 0);
+constructor TOrder.Create(Data: TFields = nil; const StoreID: Byte = 0);
 begin
   inherited Create;
 
-  if Assigned(Data)then
+  if Assigned(Data) then
   begin
     FStockOrderID := Data.FieldByName('stockOrderID').AsString;
     FDate.Commited := Data.FieldByName('servedDate').Value;
     FStoreID := Data.FieldByName('storeID').Value;
 
-    if IsToday(FDate.Commited)then
+    if IsToday(FDate.Commited) then
       FStatus := EStatusOrder.Commited
     else
       FStatus := EStatusOrder.Served;
   end
-  else// is a new order
+  else // is a new order
   begin
     FStockOrderID := '0';
     FStatus := EStatusOrder.Scratch;
     FStoreID := StoreID;
   end;
-
-end;
-
-function TOrder.FetchProduce: TDataSource;
-begin
 
 end;
 
