@@ -2,6 +2,8 @@
 *#
 # emacs undo tree
 *~undo-tree~
+# vscode
+.vscode
 
 build/*
 

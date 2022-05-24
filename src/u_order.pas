@@ -5,23 +5,8 @@ uses
   Data.DB,
   U_produce,
   UntTypes,
-  FireDAC.Comp.Client,
   System.DateUtils,
-  System.Classes,
   System.SysUtils,
-  System.Rtti,
-  System.UITypes,
-  FMX.Objects,
-  FMX.Dialogs,
-  FMX.Controls,
-  FMX.Layouts,
-  FMX.Types,
-  FMX.Edit,
-  FMX.StdCtrls,
-  FMX.Forms,
-  FMX.Graphics,
-  FMX.Menus,
-  FMX.Controls.Presentation,
   System.Generics.Collections;
 
 type
@@ -42,11 +27,6 @@ type
       FStoreID: Byte;
       FStatus: EStatusOrder;
       FProduce: TDataSource;
-      FListOnAfterCommit: array of TAfterOperation;
-      FListOnAfterDelete: array of TAfterOperation;
-
-      procedure RegisterAfterCommit(Cb: TAfterOperation);
-      procedure RegisterAfterDelete(Cb: TAfterOperation);
 
       procedure CommitOrder;
       procedure CommitProduce(ListProduce: TList<TProduce>);
@@ -62,8 +42,6 @@ type
       property StockOrderID: string read FStockOrderID;
       property StoreID: Byte read FStoreID;
       property Status: EStatusOrder read FStatus;
-      property OnAfterCommit: TAfterOperation write RegisterAfterCommit;
-      property OnAfterDelete: TAfterOperation write RegisterAfterDelete;
   end;
 
 implementation
@@ -138,24 +116,6 @@ begin
           Produce.StockAfter := StockAfter;
         end)
     end;
-end;
-
-procedure TOrder.RegisterAfterCommit(Cb: TAfterOperation);
-begin
-  var
-  index := Length(FListOnAfterCommit);
-
-  SetLength(FListOnAfterCommit, index + 1);
-  FListOnAfterCommit[index] := Cb;
-end;
-
-procedure TOrder.RegisterAfterDelete(Cb: TAfterOperation);
-begin
-  var
-  index := Length(FListOnAfterDelete);
-
-  SetLength(FListOnAfterDelete, index + 1);
-  FListOnAfterDelete[index] := Cb;
 end;
 
 constructor TOrder.Create(Data: TFields = nil; const StoreID: Byte = 0);

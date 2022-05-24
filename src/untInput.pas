@@ -2,7 +2,6 @@ unit untInput;
 
 interface
 uses
-  System.SysUtils,
   System.Classes,
   FMX.Edit,
   FMX.Menus,
@@ -23,16 +22,16 @@ type
     public
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
-      procedure HandleKey(Sender: TObject;var Key: Word;var KeyChar: Char;
+      procedure HandleKey(Sender: TObject; var Key: Word; var KeyChar: Char;
           Shift: TShiftState);
 
-    var// event emitters
-      OnInputSuccess: procedure(Sender: TInputText)of object;
-      OnInputFailure: procedure(Sender: TInputText)of object;
+    var // event emitters
+      OnInputSuccess: procedure(Sender: TInputText) of object;
+      OnInputFailure: procedure(Sender: TInputText) of object;
 
       FSnippets: TRegexpSnippets;
       IsValid: Boolean;
-      Validate: procedure(Sender: TInputText)of object;
+      Validate: procedure(Sender: TInputText) of object;
       FErrors: TErrors;
   end;
 
@@ -59,10 +58,10 @@ begin
   inherited;
 end;
 
-procedure TInputText.HandleKey(Sender: TObject;var Key: Word;var KeyChar: Char;
-    Shift: TShiftState);
+procedure TInputText.HandleKey(Sender: TObject; var Key: Word;
+    var KeyChar: Char; Shift: TShiftState);
 begin
-  if not(Key = KEY_ENTER)then
+  if not(Key = KEY_ENTER) then
     Exit;
 
   Self.OnKeyUp := nil;

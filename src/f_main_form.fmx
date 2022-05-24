@@ -3,7 +3,7 @@ object mainForm: TmainForm
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'stockLoader'
-  ClientHeight = 850
+  ClientHeight = 852
   ClientWidth = 900
   Position = ScreenCenter
   StyleBook = StyleBook1
@@ -1601,7 +1601,7 @@ object mainForm: TmainForm
     HitTest = False
     Sides = []
     Size.Width = 900.000000000000000000
-    Size.Height = 850.000000000000000000
+    Size.Height = 852.000000000000000000
     Size.PlatformDefault = False
     Stroke.Kind = None
     Stroke.Thickness = 0.000000000000000000
@@ -1614,9 +1614,13 @@ object mainForm: TmainForm
       TabOrder = 0
       object lbl1: TLabel
         Align = Client
+        StyledSettings = [FontColor]
         Size.Width = 900.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
+        TextSettings.Font.Family = 'Comic Sans MS'
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Loading'
         TabOrder = 0

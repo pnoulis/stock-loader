@@ -5,32 +5,23 @@ uses
   U_produce,
   UntTypes,
   U_order,
-  UdmServerMSSQL,
   System.SysUtils,
   Data.DB,
-  System.Types,
-  System.DateUtils,
   System.UITypes,
   System.Classes,
-  System.Variants,
   System.Generics.Collections,
-  System.UIConsts,
-  FMX.Types,
-  FMX.Graphics,
-  FMX.TabControl,
-  FMX.Controls,
   FMX.Forms,
-  FMX.Dialogs,
   FMX.StdCtrls,
   FMX.Controls.Presentation,
   FMX.Objects,
   FMX.Layouts,
   FMX.DialogService.Sync,
-  FireDAC.Comp.Client,
   FMX.Memo.Types,
   FMX.ScrollBox,
   FMX.Memo,
-  FMX.Edit;
+  FMX.Edit,
+  FMX.Controls,
+  FMX.Types;
 
 type
   TPad = class(TFrame)
@@ -54,7 +45,6 @@ type
     LblItemName: TLabel;
     InputPanelTemplate: TPanel;
     Rectangle3: TRectangle;
-    Loader: TAniIndicator;
     LayoutBody: TLayout;
     ScrollProduce: TVertScrollBox;
     LblStockAfter: TLabel;
@@ -77,8 +67,6 @@ type
       procedure OrderToFloor;
       procedure ProduceToFloor(AProduceRecord: TFields;
           const IndexRecord: Cardinal);
-      procedure SwitchLoading;
-      procedure AddNewProduce;
       procedure RenderNewProduce(AProduce: TPanel);
       procedure FlushPad;
       function AskUserOrderDelete: Boolean;
@@ -89,6 +77,7 @@ type
       constructor Create(AOwner: TComponent; Order: TOrder;
           const KitchenID: Word);
       destructor Destroy; override;
+      procedure AddNewProduce;
   end;
 
 implementation
@@ -187,13 +176,6 @@ begin
   Datetimetostring(Result, 'ddd dd/mm/yy hh:mm', ADate);
 end;
 
-procedure TPad.SwitchLoading;
-begin
-  ScrollProduce.Visible := not ScrollProduce.Visible;
-  Loader.Visible := not Loader.Visible;
-  Loader.Enabled := not Loader.Enabled;
-end;
-
 procedure TPad.OrderToFloor;
 begin
 
@@ -265,7 +247,8 @@ begin
         InputPanelTemplate.Margins.Height;
 
   FContentHeight := FContentHeight + FScrollHeight;
-  InputPanelTemplate.Position.Y := FContentHeight + InputPanelTemplate.Size.Height;
+  InputPanelTemplate.Position.Y := FContentHeight +
+      InputPanelTemplate.Size.Height;
 
   ScrollProduce.AddObject(AProduce);
   AProduce.Visible := True;

@@ -2,28 +2,18 @@
 
 interface
 uses
-  FireDAC.Comp.Client,
-  System.DateUtils,
-  System.Classes,
-  System.Threading,
-  System.SysUtils,
-  System.UITypes,
-  Data.DB,
-  FMX.Objects,
-  FMX.Dialogs,
-  FMX.Controls,
-  FMX.Layouts,
-  FMX.Types,
-  FMX.Edit,
-  FMX.StdCtrls,
-  FMX.Forms,
-  FMX.Graphics,
-  FMX.Menus,
-  FMX.Controls.Presentation,
-  System.Generics.Collections,
   UntInput,
   UntTRegexpSnippets,
-  UntTypes;
+  UntTypes,
+  Data.DB,
+  System.Classes,
+  System.SysUtils,
+  System.UITypes,
+  FMX.Objects,
+  FMX.Dialogs,
+  FMX.Types,
+  FMX.Edit,
+  FMX.StdCtrls;
 
 type
   TProduce = class;

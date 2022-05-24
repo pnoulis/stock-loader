@@ -2,16 +2,21 @@ unit udmServerMSSQL;
 
 interface
 uses
-  FMX.Forms,
   U_order,
-  UntTypes,
+  FMX.Forms,
   UDBConnect,
   FMX.Dialogs,
-  System.Variants,
   System.DateUtils,
   System.SysUtils,
   System.Classes,
   FireDAC.Stan.Intf,
+  Data.DB,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
+  FireDAC.Phys.MSSQLDef,
+  FireDAC.Phys.ODBCBase,
+  FireDAC.Phys.MSSQL,
+  FireDAC.VCLUI.Wait,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
   FireDAC.UI.Intf,
@@ -24,14 +29,7 @@ uses
   FireDAC.Stan.Param,
   FireDAC.DatS,
   FireDAC.DApt.Intf,
-  FireDAC.DApt,
-  Data.DB,
-  FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client,
-  FireDAC.Phys.MSSQLDef,
-  FireDAC.Phys.ODBCBase,
-  FireDAC.Phys.MSSQL,
-  FireDAC.VCLUI.Wait;
+  FireDAC.DApt;
 
 type
   TOnConnected = Reference to procedure;
@@ -79,7 +77,7 @@ implementation
 {$R *.dfm}
 const
   DBCONN_CONFIG_FILEPATH = './config/config.ini';
-  DBCONN_CONFIG_INI_SECTION = 'DBCONN_MSSQL_DEBUG_BRATNET';
+  DBCONN_CONFIG_INI_SECTION = 'DBCONN_MSSQL_DEBUG';
   // {$IFDEF RELEASE}
   // 'DBCONN_MSSQL_RELEASE';
   // {$ELSEIF defined(BRATNET)}
@@ -103,7 +101,6 @@ begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-
       if not Connected then
       begin
 
@@ -211,7 +208,6 @@ begin
     Exe.Append(', ' + StockMoveID);
   end;
   Query.Open(Exe.ToString);
-  Query.Active := True;
   Cb(Query.FieldByName('stockMoveID').AsString, Query.FieldByName('stockBefore')
       .Value, Query.FieldByName('stockIncrease').Value,
       Query.FieldByName('stockAfter').Value);

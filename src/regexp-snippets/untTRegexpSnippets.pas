@@ -8,7 +8,7 @@ uses
 type
   TRegexpSnippets = class(TDictionary<string, TPerlRegEx>)
     private
-      function GetSnippet(const Key:string):string;
+      function GetSnippet(const Key: string): string;
     public
       procedure Free;
       procedure CompileSnippets(Keys: array of string);
@@ -17,15 +17,14 @@ type
 implementation
 uses
   System.SysUtils,
-  FMX.Dialogs,
   UntSnippets;
 
-function TRegexpSnippets.GetSnippet(const Key:string):string;
+function TRegexpSnippets.GetSnippet(const Key: string): string;
 begin
   for var Snippet in UntSnippets.LIST_SNIPPET do
     if Key = Snippet.Key then
       Exit(Snippet.Value);
-  raise Exception.CreateFmt('Unknown snippet: %s',[Key]);
+  raise Exception.CreateFmt('Unknown snippet: %s', [Key]);
 end;
 
 procedure TRegexpSnippets.CompileSnippets(Keys: array of string);
@@ -39,7 +38,7 @@ begin
   try
     for var Key in Keys do
     begin
-      if Self.ContainsKey(Key)then
+      if Self.ContainsKey(Key) then
         Continue;
       Self.Add(Key, TPerlRegEx.Create);
       Self[Key].RegEx := GetSnippet(Key);
@@ -52,7 +51,7 @@ begin
     on Exception do
     begin
       for var Value in Values do
-        if Assigned(Value)then
+        if Assigned(Value) then
           Value.Free;
       raise;
     end;

@@ -1,33 +1,26 @@
 unit fr_kitchen;
 
 interface
+
 uses
   U_order,
   Fr_pad,
   Fr_floor,
-  UdmServerMSSQL,
   System.SysUtils,
-  System.DateUtils,
   System.Types,
   System.UITypes,
   System.Classes,
-  System.Variants,
   System.Generics.Collections,
   FMX.Types,
-  FMX.Graphics,
-  FMX.Controls,
   FMX.Forms,
   FMX.Dialogs,
   FMX.StdCtrls,
   FMX.TabControl,
-  FireDAC.Comp.Client,
-  FMX.Objects,
   FMX.Layouts,
-  FMX.Controls.Presentation;
+  FMX.Controls.Presentation,
+  FMX.Controls;
 
 type
-
-  TListOrders = TList<TOrder>;
 
   TKitchen = class(TFrame)
     LayoutFooter: TLayout;
@@ -36,42 +29,41 @@ type
     Pass: TTabControl;
     Pin: TTabItem;
 
-    private type
-      TKitchenOrder = class
-        IsNew: Boolean;
-        IsFetching: Boolean;
-        KitchenID: Word;
-        Tab: TTabItem;
-        Order: TOrder;
-        Pad: TPad;
-      end;
+  private type
+    TKitchenOrder = class
+      KitchenID: Word;
+      Tab: TTabItem;
+      Order: TOrder;
+      Pad: TPad;
+    end;
 
-    var
-      ListOrders: TList<TKitchenOrder>;
-      NOrders: Word;
-      Floor: TFloor;
+  var
+    ListOrders: TList<TKitchenOrder>;
+    NOrders: Word;
+    Floor: TFloor;
 
-      procedure RenderFloor;
-      procedure StartTimer(Sender: TObject);
-      procedure HandleOrder(AOrder: TOrder = nil);
-      function CreateTab: TTabItem;
-      procedure OrderToKitchen(var KOrder: TKitchenOrder);
-      procedure HandleTabClick(Sender: TObject; Button: TMouseButton;
-          Shift: TShiftState; X, Y: Single);
-      procedure HandleTabMouseEnter(Sender: TObject);
-      procedure HandleTabMouseLeave(Sender: TObject);
-      procedure RemoveOrder(var KOrder: TKitchenOrder);
-      procedure HandleOrderCancel(const KitchenID: Word);
-      procedure HandleOrderCommit(const KitchenID: Word);
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
+    procedure RenderFloor;
+    procedure StartTimer(Sender: TObject);
+    procedure HandleOrder(AOrder: TOrder = nil);
+    function CreateTab: TTabItem;
+    procedure OrderToKitchen(var KOrder: TKitchenOrder);
+    procedure HandleTabClick(Sender: TObject; Button: TMouseButton;
+        Shift: TShiftState; X, Y: Single);
+    procedure HandleTabMouseEnter(Sender: TObject);
+    procedure HandleTabMouseLeave(Sender: TObject);
+    procedure RemoveOrder(var KOrder: TKitchenOrder);
+    procedure HandleOrderCancel(const KitchenID: Word);
+    procedure HandleOrderCommit(const KitchenID: Word);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 var
   Kitchen: TKitchen;
 
 implementation
+
 {$R *.fmx}
 { Tkitchen }
 
@@ -91,7 +83,7 @@ end;
 destructor TKitchen.Destroy;
 begin
 
-  if Assigned(ListOrders)then
+  if Assigned(ListOrders) then
     for var KitchenOrder in ListOrders do
     begin
       FreeAndNil(KitchenOrder.Order);
@@ -104,7 +96,7 @@ end;
 
 procedure TKitchen.RenderFloor;
 begin
-  if Assigned(Floor)then
+  if Assigned(Floor) then
     FreeAndNil(Floor);
 
   Floor := TFloor.Create(Pin);
@@ -121,19 +113,13 @@ procedure TKitchen.HandleOrder(AOrder: TOrder = nil);
 var
   KOrder: TKitchenOrder;
 begin
-  var
-  IsNew := True;
 
-  if(AOrder.StockOrderID <> '0')then
-  begin
+  if (AOrder.StockOrderID <> '0') then
     for var KitchenOrder in ListOrders do
       if KitchenOrder.Order.StockOrderID = AOrder.StockOrderID then
         Exit;
-    IsNew := False;
-  end;
 
   KOrder := TKitchenOrder.Create;
-  KOrder.IsNew := IsNew;
   KOrder.Order := AOrder;
   OrderToKitchen(KOrder);
 end;
@@ -155,8 +141,6 @@ begin
     KOrder.Pad.OnOrderCommit := HandleOrderCommit;
 
     KOrder.Tab.AddObject(KOrder.Pad);
-
-    KOrder.IsFetching := False;
 
     Pass.SetActiveTabWithTransition(KOrder.Tab, TTabTransition.None);
   except
@@ -191,13 +175,13 @@ begin
   Btn := TButton(Tab.FindStyleResource('btnClose'));
 
   for var KitchenOrder in ListOrders do
-    if(KitchenOrder.KitchenID = Tab.Tag)then
+    if (KitchenOrder.KitchenID = Tab.Tag) then
+    begin
       KOrder := KitchenOrder;
+      KOrder.Pad.AddNewProduce;
+    end;
 
-  if KOrder.IsFetching then
-    Exit;
-
-  if(X >= Btn.BoundsRect.Left)then
+  if (X >= Btn.BoundsRect.Left) then
     RemoveOrder(KOrder);
 end;
 
@@ -225,7 +209,7 @@ var
   KOrder: TKitchenOrder;
 begin
   for var KitchenOrder in ListOrders do
-    if(KitchenOrder.KitchenID = KitchenID)then
+    if (KitchenOrder.KitchenID = KitchenID) then
       KOrder := KitchenOrder;
 
   RemoveOrder(KOrder);
@@ -242,7 +226,7 @@ begin
         procedure
         begin
           for var KitchenOrder in ListOrders do
-            if(KitchenOrder.KitchenID = KitchenID)then
+            if (KitchenOrder.KitchenID = KitchenID) then
               KitchenOrder.Tab.Text := KitchenOrder.Order.StockOrderID;
           RenderFloor;
         end);

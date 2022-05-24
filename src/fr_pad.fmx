@@ -205,14 +205,6 @@ object Pad: TPad
         Viewport.Width = 770.000000000000000000
         Viewport.Height = 522.000000000000000000
       end
-      object loader: TAniIndicator
-        Align = Center
-        Size.Width = 100.000000000000000000
-        Size.Height = 100.000000000000000000
-        Size.PlatformDefault = False
-        Style = Circular
-        Visible = False
-      end
     end
     object panelProduceTemplate: TPanel
       Align = Top

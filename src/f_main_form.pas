@@ -5,26 +5,17 @@ uses
   UdmServerMSSQL,
   UFilesystem,
   Fr_kitchen,
-  System.Threading,
   System.SysUtils,
-  System.Types,
-  System.UITypes,
   System.Classes,
-  System.Variants,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
-  FMX.Graphics,
   FMX.Dialogs,
   FMX.Controls.Presentation,
   FMX.StdCtrls,
   FMX.Layouts,
-  FMX.Memo.Types,
-  FMX.ScrollBox,
   FMX.Memo,
-  FMX.TabControl,
-  FMX.Objects,
-  FMX.DateTimeCtrls;
+  FMX.Objects;
 
 type
   TmainForm = class(TForm)
@@ -37,7 +28,7 @@ type
     private
       procedure ConnectDB;
       procedure HandleDBConnected;
-      procedure HandleDBConnectionError(const ErrMsg:string);
+      procedure HandleDBConnectionError(const ErrMsg: string);
       procedure RenderKitchen;
   end;
 
@@ -71,7 +62,7 @@ begin
     end).Start;
 end;
 
-procedure TmainForm.HandleDBConnectionError(const ErrMsg:string);
+procedure TmainForm.HandleDBConnectionError(const ErrMsg: string);
 begin
   Lbl1.Text := 'Failed to connect to database';
   Spinner.Enabled := False;

@@ -4,25 +4,22 @@ interface
 uses
   UntTypes,
   U_order,
+  Data.DB,
   System.SysUtils,
   System.Types,
   System.UITypes,
   System.Classes,
   System.DateUtils,
-  System.Variants,
   FMX.Types,
   FMX.Graphics,
   FMX.Controls,
   FMX.Forms,
-  FMX.Dialogs,
   FMX.StdCtrls,
-  FireDAC.Comp.Client,
-  FMX.Controls.Presentation,
-  Data.DB,
   FMX.Layouts,
   FMX.Objects,
   FMX.Calendar,
-  FMX.DateTimeCtrls;
+  FMX.DateTimeCtrls,
+  FMX.Controls.Presentation;
 
 type
   TFloor = class(TFrame)
@@ -74,23 +71,24 @@ type
       procedure FlushFloor;
       procedure FetchOrders;
       procedure OrdersToFloor(Data: TDataSet);
-      procedure OrderToFloor(AOrderRecord: TFields;const IndexRecord: Cardinal);
+      procedure OrderToFloor(AOrderRecord: TFields;
+          const IndexRecord: Cardinal);
       procedure RenderOrder(AOrder: TPanel);
-      function FormatDate(const ADate: TDateTime):string;
+      function FormatDate(const ADate: TDateTime): string;
       procedure HandlePanelClick(Sender: TObject);
       procedure HandlePanelDblClick(Sender: TObject);
     public
-      OnOrder: procedure(Order: TOrder = nil)of object;
+      OnOrder: procedure(Order: TOrder = nil) of object;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
-      procedure HandleOrderCommit(Success: Boolean);
   end;
 
 implementation
 uses
   UdmServerMSSQL;
 
-const DEFAULT_STORE_ID = 1;
+const
+  DEFAULT_STORE_ID = 1;
 
 {$R *.fmx}
   { TFloor }
@@ -100,23 +98,16 @@ begin
   DB.FetchOrdersFilterDate(DateFrom.Date, DateTo.Date,
     procedure(Data: TDataSource)
     begin
-      if(Data <> nil)then
+      if (Data <> nil) then
         OrdersToFloor(Data.DataSet)
       else
         OrdersToFloor(nil);
     end);
 end;
 
-procedure TFloor.HandleOrderCommit(Success: Boolean);
-begin
-end;
-
 procedure TFloor.BtnNewOrderClick(Sender: TObject);
 begin
-  var
-  NewOrder := TOrder.Create(nil, DEFAULT_STORE_ID);
-  NewOrder.OnAfterCommit := HandleOrderCommit;
-  OnOrder(NewOrder);
+  OnOrder(TOrder.Create(nil, DEFAULT_STORE_ID));
 end;
 
 procedure TFloor.BtnResetFiltersClick(Sender: TObject);
@@ -161,7 +152,7 @@ end;
 procedure TFloor.FlushFloor;
 begin
 
-  for var I := 0 to high(ListOrders)do
+  for var I := 0 to high(ListOrders) do
     FreeAndNil(ListOrders[I].Order);
 
   SetLength(ListOrders, 0);
@@ -181,7 +172,7 @@ begin
   DB.FetchAsyncOrders(
     procedure(Data: TDataSource)
     begin
-      if(Data <> nil)then
+      if (Data <> nil) then
         OrdersToFloor(Data.DataSet)
       else
         OrdersToFloor(nil);
@@ -192,7 +183,7 @@ end;
 procedure TFloor.OrdersToFloor(Data: TDataSet);
 begin
 
-  if not Assigned(Data)then
+  if not Assigned(Data) then
     Exit;
 
   FlushFloor;
@@ -211,7 +202,7 @@ begin
   var
   Order := TOrder.Create(AOrderRecord);
   var
-  Panel := TemplateFloorOrder.Clone(ScrollOrders)as TPanel;
+  Panel := TemplateFloorOrder.Clone(ScrollOrders) as TPanel;
 
   TLabel(Panel.Components[1]).Text := Order.StockOrderID;
   TLabel(Panel.Components[2]).Text := FormatDate(Order.Date.Commited);
@@ -220,7 +211,7 @@ begin
   Panel.Tag := IndexRecord;
 
   Panel.OnDblClick := HandlePanelDblClick;
-  if not(Order.Status = EStatusOrder.Served)then
+  if not(Order.Status = EStatusOrder.Served) then
     Panel.OnClick := HandlePanelClick;
 
   ListOrders[IndexRecord - 1].Order := Order;
@@ -238,26 +229,21 @@ begin
   FContentHeight := FContentHeight + FScrollHeight;
   AOrder.Position.Y := FContentHeight;
 
-  {
-    if FContentHeight > scrollOrders.Height then
-    scrollOrders.scrollBy(0.0, -FContentHeight);
-  }
-
   ScrollOrders.AddObject(AOrder);
 end;
 
-function TFloor.FormatDate(const ADate: TDateTime):string;
+function TFloor.FormatDate(const ADate: TDateTime): string;
 begin
   Datetimetostring(Result, 'ddd dd/mm/yy hh:mm', ADate);
 end;
 
 procedure TFloor.HandlePanelClick(Sender: TObject);
 var
-  POrder:^TFloorOrder;
+  POrder: ^TFloorOrder;
 begin
   var
   Style := TRectangle(TPanel(Sender).Components[0]);
-  POrder :=@ListOrders[TPanel(Sender).Tag - 1];
+  POrder := @ListOrders[TPanel(Sender).Tag - 1];
 
   POrder^.IsSelected := not POrder^.IsSelected;
 
@@ -269,9 +255,9 @@ end;
 
 procedure TFloor.HandlePanelDblClick(Sender: TObject);
 var
-  POrder:^TFloorOrder;
+  POrder: ^TFloorOrder;
 begin
-  POrder :=@ListOrders[TPanel(Sender).Tag - 1];
+  POrder := @ListOrders[TPanel(Sender).Tag - 1];
 
   // double clicking activates the onClick handler as well
   // this code makes sure to deactivate it
