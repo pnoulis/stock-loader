@@ -45,6 +45,7 @@ type
     QueryAddStockOrder: TFDQuery;
     QueryAddStockMove: TFDQuery;
     QueryDeleteStockOrder: TFDQuery;
+    Query: TFDQuery;
     private type
       TAfterFetch = Reference to procedure(Data: TDataSource);
       TAfterCommitOrder = Reference to procedure(StockOrderID: string;
@@ -61,6 +62,7 @@ type
       procedure FetchOrdersFilterDate(DateFrom, DateTo: TDate; Cb: TAfterFetch);
       procedure FetchProduce(const OrderID: string; Cb: TAfterFetch);
       function FetchItem(const ItemCID: string): TDataSource;
+      function CountRecords(const Table: string): Cardinal;
       procedure AddStockOrder(Cb: TAfterCommitOrder);
       procedure AddStockMove(StockOrderID, ItemCID, StockIncrease,
           StockMoveID: string; Cb: TdmServerMSSQL.TAfterCommitMove);
@@ -127,6 +129,21 @@ begin
         end);
 
     end).Start;
+end;
+
+function TdmServerMSSQL.CountRecords(const Table: string): Cardinal;
+begin
+  var
+  Command := TStringBuilder.Create('SELECT COUNT_BIG(*) FROM ');
+
+  if (Table = '') then
+    raise Exception.Create('CountRecords empty table arg');
+
+  Command.Append(Table);
+
+  Query.Open(Command.ToString);
+  result := Query.FieldList.Fields[0].Value;
+  Query.Close;
 end;
 
 function TdmServerMSSQL.FetchItem(const ItemCID: string): TDataSource;

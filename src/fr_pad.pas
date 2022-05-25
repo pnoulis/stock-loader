@@ -70,7 +70,7 @@ type
           const IndexRecord: Cardinal);
       procedure RenderNewProduce(AProduce: TPanel);
       procedure FlushPad;
-      function AskUserOrderDelete: Boolean;
+      procedure HandleOrderError(Err: EOrder);
     public
     var
       OnOrderCancel: procedure(const KitchenID: Word) of object;
@@ -87,10 +87,20 @@ implementation
 procedure TPad.BtnCancelOrderClick(Sender: TObject);
 begin
 
-  if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
+  {
+    if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
     FOrder.Delete;
-
+  }
+{
+  try
+    FOrder.Delete;
+  except
+    on E: EOrder do
+      HandleOrderError(E);
+  end;
+  }
   OnOrderCancel(FKitchenID);
+  // OnOrderCancel(FKitchenID);
 end;
 
 procedure TPad.BtnDeleteProduceClick(Sender: TObject);
@@ -135,6 +145,14 @@ begin
   RenderHeaderOrder;
   OnOrderCommit(FKitchenID);
   AddNewProduce;
+end;
+
+procedure TPad.HandleOrderError(Err: EOrder);
+begin
+  if (Err.Name = 'EOrderDeleteNotLast') then
+  begin
+  showMessage('Μπορειτε να διαγραψεται μια παραγγελια μονο υπο την προυποθεση οτι ειναι η τελευταια στην αριθμιση');
+  end;
 end;
 
 constructor TPad.Create(AOwner: TComponent; Order: TOrder;
@@ -271,23 +289,6 @@ begin
 
   FScrollHeight := 0.0;
   FContentHeight := 0.0;
-end;
-
-function TPad.AskUserOrderDelete: Boolean;
-var
-  Input: Integer;
-const
-  Msg = 'Η παραγγελια εχει αποθηκευμενες κινησεις. Να διαγραφει?';
-begin
-
-  Input := TDialogServiceSync.MessageDialog(Msg, TMsgDlgType.MtConfirmation,
-      [TMsgDlgBtn.MbYes, TMsgDlgBtn.MbNo], TMsgDlgBtn.MbNo, MrNone);
-
-  if (Input = MrYes) then
-    Result := True
-  else
-    Result := False;
-
 end;
 
 end.

@@ -16,6 +16,7 @@ uses
   FMX.Dialogs,
   FMX.StdCtrls,
   FMX.TabControl,
+  FMX.DialogService.Sync,
   FMX.Layouts,
   FMX.Controls.Presentation,
   FMX.Controls;
@@ -54,6 +55,7 @@ type
     procedure RemoveOrder(var KOrder: TKitchenOrder);
     procedure HandleOrderCancel(const KitchenID: Word);
     procedure HandleOrderCommit(const KitchenID: Word);
+    function askUserOrderDelete: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -208,12 +210,29 @@ procedure TKitchen.HandleOrderCancel(const KitchenID: Word);
 var
   KOrder: TKitchenOrder;
 begin
+askUserOrderDelete;
+
+  {
+    if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
+    FOrder.Delete;
+  }
+{
+  try
+    FOrder.Delete;
+  except
+    on E: EOrder do
+      HandleOrderError(E);
+  end;
+  }
+  // OnOrderCancel(FKitchenID);
+{
   for var KitchenOrder in ListOrders do
     if (KitchenOrder.KitchenID = KitchenID) then
       KOrder := KitchenOrder;
 
   RemoveOrder(KOrder);
   RenderFloor;
+  }
 end;
 
 procedure TKitchen.HandleOrderCommit(const KitchenID: Word);
@@ -233,5 +252,23 @@ begin
     end).Start;
 
 end;
+
+function TKitchen.AskUserOrderDelete: Boolean;
+var
+  Input: Integer;
+const
+  Msg = 'Η παραγγελια εχει αποθηκευμενες κινησεις. Να διαγραφει?';
+begin
+
+  Input := TDialogServiceSync.MessageDialog(Msg, TMsgDlgType.MtConfirmation,
+      [TMsgDlgBtn.MbYes, TMsgDlgBtn.MbNo], TMsgDlgBtn.MbNo, MrNone);
+
+  if (Input = MrYes) then
+    Result := True
+  else
+    Result := False;
+
+end;
+
 
 end.

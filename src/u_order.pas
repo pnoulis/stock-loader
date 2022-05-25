@@ -5,11 +5,25 @@ uses
   Data.DB,
   U_produce,
   UntTypes,
+  FMX.Dialogs,
   System.DateUtils,
   System.SysUtils,
   System.Generics.Collections;
 
 type
+
+  EOrder = class(Exception)
+    ErrorCode: word;
+    name: string;
+  end;
+
+  EOrderDeleteNotLast = class(EOrder)
+    public const
+      message = 'Trying do delete not last stockOrderID : %d';
+      ErrorCode = 1;
+      name = 'EOrderDeleteNotLast';
+      constructor Create(const StockOrderID: Cardinal);
+  end;
 
   TOrder = class(TObject)
     private type
@@ -49,6 +63,16 @@ uses
   UdmServerMSSQL;
 { TOrder }
 
+constructor EOrderDeleteNotLast.Create(const StockOrderID: Cardinal);
+begin
+  inherited CreateFmt(message, [StockOrderID]);
+  with self as EOrder do
+  begin
+    ErrorCode := self.ErrorCode;
+    name := self.name;
+  end;
+end;
+
 procedure TOrder.Commit(ListProduce: TListProduce = nil);
 begin
 
@@ -59,8 +83,12 @@ begin
 end;
 
 procedure TOrder.Delete(ListProduce: TListProduce = nil);
+var
+  Res: Cardinal;
 begin
-  DB.DeleteStockOrder(StockOrderID);
+  if (StockOrderID.ToInt64 < DB.CountRecords('stockOrders')) then
+    raise EOrderDeleteNotLast.Create(StockOrderID.ToInt64);
+  // DB.DeleteStockOrder(StockOrderID);
 end;
 
 function TOrder.Clone: TOrder;
@@ -141,5 +169,4 @@ begin
   end;
 
 end;
-
 end.

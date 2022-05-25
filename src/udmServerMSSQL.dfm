@@ -48,4 +48,9 @@ object dmServerMSSQL: TdmServerMSSQL
     Left = 304
     Top = 97
   end
+  object query: TFDQuery
+    Connection = connection
+    Left = 272
+    Top = 320
+  end
 end
