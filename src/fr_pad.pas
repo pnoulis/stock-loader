@@ -21,6 +21,7 @@ uses
   FMX.Memo,
   FMX.Edit,
   FMX.Controls,
+  FMX.Dialogs,
   FMX.Types;
 
 type
@@ -111,24 +112,26 @@ end;
 
 procedure TPad.BtnCommitOrderClick(Sender: TObject);
 var
-  LastOrder: TProduce;
+  ToCommit: TListProduce;
 begin
 
   if (FOrder.Status = EStatusOrder.Served) then
     Exit;
 
-  LastOrder := ListProduce.Last;
-  ListProduce.Extract(LastOrder);
+  for var I := 0 to ListProduce.Count - 1 do
+    if (ListProduce[I].StatusProduce < EStatusOrder.Scratch) then
+    begin
+      Setlength(ToCommit, I + 1);
+      ToCommit[I] := ListProduce[I];
+    end;
 
-  if (ListProduce.Count < 1) then
+  if Length(ToCommit) = 0 then
   begin
-    ListProduce.Add(LastOrder);
     AddNewProduce;
     Exit;
   end;
 
-  FOrder.Commit(ListProduce);
-  ListProduce.Add(LastOrder);
+  FOrder.Commit(ToCommit);
   RenderHeaderOrder;
   OnOrderCommit(FKitchenID);
   AddNewProduce;
@@ -148,6 +151,7 @@ begin
 
   if (FOrder.Status > EStatusOrder.Served) then
     AddNewProduce;
+
 end;
 
 destructor TPad.Destroy;

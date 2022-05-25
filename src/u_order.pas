@@ -29,12 +29,12 @@ type
       FProduce: TDataSource;
 
       procedure CommitOrder;
-      procedure CommitProduce(ListProduce: TList<TProduce>);
+      procedure CommitProduce(ListProduce: TListProduce);
     public
     var
       constructor Create(Data: TFields = nil; const StoreID: Byte = 0);
-      procedure Commit(ListProduce: TList<TProduce> = nil);
-      procedure Delete(ListProduce: TList<TProduce> = nil);
+      procedure Commit(ListProduce: TListProduce = nil);
+      procedure Delete(ListProduce: TListProduce = nil);
       function Clone: TOrder;
       procedure Fetch(Cb: TAfterFetch);
 
@@ -49,7 +49,7 @@ uses
   UdmServerMSSQL;
 { TOrder }
 
-procedure TOrder.Commit(ListProduce: TList<TProduce> = nil);
+procedure TOrder.Commit(ListProduce: TListProduce = nil);
 begin
 
   if Status <> EStatusOrder.Commited then
@@ -58,7 +58,7 @@ begin
   CommitProduce(ListProduce);
 end;
 
-procedure TOrder.Delete(ListProduce: TList<TProduce> = nil);
+procedure TOrder.Delete(ListProduce: TListProduce = nil);
 begin
   DB.DeleteStockOrder(StockOrderID);
 end;
@@ -99,7 +99,7 @@ begin
     end);
 end;
 
-procedure TOrder.CommitProduce(ListProduce: TList<TProduce>);
+procedure TOrder.CommitProduce(ListProduce: TListProduce);
 begin
   for var Produce in ListProduce do
     if (Produce.StatusProduce <> EStatusOrder.Commited) then

@@ -13,6 +13,7 @@ uses
   FMX.Dialogs,
   FMX.Types,
   FMX.Edit,
+  FMX.Menus,
   FMX.StdCtrls;
 
 type
@@ -203,6 +204,11 @@ end;
 // Private Actions
 procedure TProduce.EnableInteractivity(Target: TInputText);
 begin
+  var
+  Popup := TPopupMenu.Create(Graphic);
+  Popup.OnPopup := HandleGraphicClick;
+  Graphic.PopupMenu := Popup;
+
   Target.OnKeyUp := Target.HandleKey;
   Target.Text := '';
   Target.ReadOnly := False;
@@ -213,7 +219,6 @@ end;
 procedure TProduce.DisableInteractivity(Target: TInputText);
 begin
   Target.OnKeyUp := nil;
-  Graphic.PopupMenu.Free;
   Graphic.OnClick := nil;
   Target.HitTest := False;
   Target.ReadOnly := True;
@@ -253,6 +258,7 @@ end;
 
 procedure TProduce.AskStockIncreaseAmount;
 begin
+  StatusProduce := EStatusOrder.Scratch;
   EnableInteractivity(FStockIncrease);
 end;
 
@@ -363,7 +369,10 @@ begin
 
   if (Sender.ClassName = 'TPopupMenu') then
   begin
-    WaitForProduce;
+    if (StatusProduce = EStatusOrder.Commited) then
+      Graphic.PopupMenu.Free
+    else
+      WaitForProduce;
     Exit;
   end;
 
