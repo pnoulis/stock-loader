@@ -1,7 +1,6 @@
-unit fr_kitchen;
+ο»Ώunit fr_kitchen;
 
 interface
-
 uses
   U_order,
   Fr_pad,
@@ -30,42 +29,41 @@ type
     Pass: TTabControl;
     Pin: TTabItem;
 
-  private type
-    TKitchenOrder = class
-      KitchenID: Word;
-      Tab: TTabItem;
-      Order: TOrder;
-      Pad: TPad;
-    end;
+    private type
+      TKitchenOrder = class
+        KOrderID: Word;
+        Tab: TTabItem;
+        Order: TOrder;
+        Pad: TPad;
+      end;
 
-  var
-    ListOrders: TList<TKitchenOrder>;
-    NOrders: Word;
-    Floor: TFloor;
+    var
+      ListOrders: TList<TKitchenOrder>;
+      NOrders: Word;
+      Floor: TFloor;
 
-    procedure RenderFloor;
-    procedure StartTimer(Sender: TObject);
-    procedure HandleOrder(AOrder: TOrder = nil);
-    function CreateTab: TTabItem;
-    procedure OrderToKitchen(var KOrder: TKitchenOrder);
-    procedure HandleTabClick(Sender: TObject; Button: TMouseButton;
-        Shift: TShiftState; X, Y: Single);
-    procedure HandleTabMouseEnter(Sender: TObject);
-    procedure HandleTabMouseLeave(Sender: TObject);
-    procedure RemoveOrder(var KOrder: TKitchenOrder);
-    procedure HandleOrderCancel(const KitchenID: Word);
-    procedure HandleOrderCommit(const KitchenID: Word);
-    function askUserOrderDelete: Boolean;
-  public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
+      procedure RenderFloor;
+      procedure StartTimer(Sender: TObject);
+      function CreateTab: TTabItem;
+      procedure OrderToKitchen(var KOrder: TKitchenOrder);
+      procedure HandleTabClick(Sender: TObject; Button: TMouseButton;
+          Shift: TShiftState; X, Y: Single);
+      procedure HandleTabMouseEnter(Sender: TObject);
+      procedure HandleTabMouseLeave(Sender: TObject);
+      procedure RemoveOrder(var KOrder: TKitchenOrder);
+      procedure HandleOrderNew(AOrder: TOrder = nil);
+      procedure HandleOrderCancel(var AOrder: TOrder);
+      procedure HandleOrderCommit(var AOrder: TOrder);
+      function AskUserOrderDelete: Boolean;
+    public
+      constructor Create(AOwner: TComponent); override;
+      destructor Destroy; override;
   end;
 
 var
   Kitchen: TKitchen;
 
 implementation
-
 {$R *.fmx}
 { Tkitchen }
 
@@ -102,7 +100,7 @@ begin
     FreeAndNil(Floor);
 
   Floor := TFloor.Create(Pin);
-  Floor.OnOrder := HandleOrder;
+  Floor.OnOrder := HandleOrderNew;
   Pin.AddObject(Floor);
 end;
 
@@ -111,26 +109,12 @@ begin
   LblTime.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', Now)
 end;
 
-procedure TKitchen.HandleOrder(AOrder: TOrder = nil);
-var
-  KOrder: TKitchenOrder;
-begin
-
-  if (AOrder.StockOrderID <> '0') then
-    for var KitchenOrder in ListOrders do
-      if KitchenOrder.Order.StockOrderID = AOrder.StockOrderID then
-        Exit;
-
-  KOrder := TKitchenOrder.Create;
-  KOrder.Order := AOrder;
-  OrderToKitchen(KOrder);
-end;
 
 procedure TKitchen.OrderToKitchen(var KOrder: TKitchenOrder);
 begin
   try
     ListOrders.Add(KOrder);
-    KOrder.KitchenID := NOrders;
+    KOrder.KOrderID := NOrders;
 
     KOrder.Tab := CreateTab;
     KOrder.Tab.Tag := NOrders;
@@ -138,7 +122,7 @@ begin
 
     Inc(NOrders);
 
-    KOrder.Pad := TPad.Create(KOrder.Tab, KOrder.Order, KOrder.KitchenID);
+    KOrder.Pad := TPad.Create(KOrder.Tab, KOrder.Order, KOrder.KOrderID);
     KOrder.Pad.OnOrderCancel := HandleOrderCancel;
     KOrder.Pad.OnOrderCommit := HandleOrderCommit;
 
@@ -177,7 +161,7 @@ begin
   Btn := TButton(Tab.FindStyleResource('btnClose'));
 
   for var KitchenOrder in ListOrders do
-    if (KitchenOrder.KitchenID = Tab.Tag) then
+    if (KitchenOrder.KOrderID = Tab.Tag) then
     begin
       KOrder := KitchenOrder;
       KOrder.Pad.AddNewProduce;
@@ -206,37 +190,53 @@ begin
   ListOrders.Remove(KOrder);
 end;
 
-procedure TKitchen.HandleOrderCancel(const KitchenID: Word);
+
+procedure TKitchen.HandleOrderNew(AOrder: TOrder = nil);
 var
   KOrder: TKitchenOrder;
 begin
-askUserOrderDelete;
+  if (AOrder.StockOrderID <> '0') then
+    for var KitchenOrder in ListOrders do
+      if KitchenOrder.Order.StockOrderID = AOrder.StockOrderID then
+        Exit;
+
+  KOrder := TKitchenOrder.Create;
+  KOrder.Order := AOrder;
+  OrderToKitchen(KOrder);
+end;
+
+procedure TKitchen.HandleOrderCancel(var AOrder: TOrder);
+var
+  KOrder: TKitchenOrder;
+begin
+//  AskUserOrderDelete;
 
   {
     if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
     FOrder.Delete;
   }
-{
-  try
+  {
+    try
     FOrder.Delete;
-  except
+    except
     on E: EOrder do
-      HandleOrderError(E);
-  end;
+    HandleOrderError(E);
+    end;
   }
-  // OnOrderCancel(FKitchenID);
-{
-  for var KitchenOrder in ListOrders do
-    if (KitchenOrder.KitchenID = KitchenID) then
-      KOrder := KitchenOrder;
+  // OnOrderCancel(FKOrderID);
+  {
+    for var KitchenOrder in ListOrders do
+    if (KitchenOrder.KOrderID = KOrderID) then
+    KOrder := KitchenOrder;
 
-  RemoveOrder(KOrder);
-  RenderFloor;
+    RemoveOrder(KOrder);
+    RenderFloor;
   }
 end;
 
-procedure TKitchen.HandleOrderCommit(const KitchenID: Word);
+procedure TKitchen.HandleOrderCommit(var AOrder: TOrder);
 begin
+{
 
   TThread.CreateAnonymousThread(
     procedure
@@ -245,11 +245,12 @@ begin
         procedure
         begin
           for var KitchenOrder in ListOrders do
-            if (KitchenOrder.KitchenID = KitchenID) then
+            if (KitchenOrder.KOrderID = KOrderID) then
               KitchenOrder.Tab.Text := KitchenOrder.Order.StockOrderID;
           RenderFloor;
         end);
     end).Start;
+    }
 
 end;
 
@@ -257,7 +258,7 @@ function TKitchen.AskUserOrderDelete: Boolean;
 var
   Input: Integer;
 const
-  Msg = 'Η παραγγελια εχει αποθηκευμενες κινησεις. Να διαγραφει?';
+  Msg = 'Γ‡ Γ°Γ΅Γ±Γ΅Γ£Γ£Γ¥Γ«Γ©Γ΅ Γ¥Γ·Γ¥Γ© Γ΅Γ°Γ―Γ¨Γ§ΓªΓ¥ΓµΓ¬Γ¥Γ­Γ¥Γ² ΓªΓ©Γ­Γ§Γ³Γ¥Γ©Γ². ΓΓ΅ Γ¤Γ©Γ΅Γ£Γ±Γ΅Γ¶Γ¥Γ©?';
 begin
 
   Input := TDialogServiceSync.MessageDialog(Msg, TMsgDlgType.MtConfirmation,
@@ -269,6 +270,5 @@ begin
     Result := False;
 
 end;
-
 
 end.

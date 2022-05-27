@@ -52,15 +52,11 @@ type
     LblStockMoveID: TLabel;
     EdtStockAfter: TEdit;
     EdtStockMoveID: TEdit;
-    procedure BtnCancelOrderClick(Sender: TObject);
-    procedure BtnDeleteProduceClick(Sender: TObject);
-    procedure BtnCommitOrderClick(Sender: TObject);
 
     private
     var
       ListProduce: TObjectList<TProduce>;
       FOrder: TOrder;
-      FKitchenID: Word;
       FScrollHeight: Double;
       FContentHeight: Double;
       procedure RenderHeaderOrder;
@@ -71,62 +67,44 @@ type
       procedure RenderNewProduce(AProduce: TPanel);
       procedure FlushPad;
       procedure HandleOrderError(Err: EOrder);
+      function AskOrderCancelConfirmation: Boolean;
+      procedure HandleBtnOrderCancelClick(Sender: TObject);
+      procedure HandleBtnOrderCommitClick(Sender: TObject);
+      procedure HandleBtnProduceDeleteClick(Sender: TObject);
     public
     var
-      OnOrderCancel: procedure(const KitchenID: Word) of object;
-      OnOrderCommit: procedure(const KitchenID: Word) of object;
+      OnOrderCancel: procedure(var Order: TOrder) of object;
+      OnOrderCommit: procedure(var Order: TOrder) of object;
       constructor Create(AOwner: TComponent; Order: TOrder;
-          const KitchenID: Word);
+          const KOrderID: Word);
       destructor Destroy; override;
       procedure AddNewProduce;
+      procedure SetFocus;
   end;
 
 implementation
 {$R *.fmx}
 
-procedure TPad.BtnCancelOrderClick(Sender: TObject);
-begin
-
-  {
-    if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
-    FOrder.Delete;
-  }
-{
-  try
-    FOrder.Delete;
-  except
-    on E: EOrder do
-      HandleOrderError(E);
-  end;
-  }
-  OnOrderCancel(FKitchenID);
-  // OnOrderCancel(FKitchenID);
-end;
-
-procedure TPad.BtnDeleteProduceClick(Sender: TObject);
+procedure TPad.HandleBtnOrderCancelClick(Sender: TObject);
 begin
   var
-  ToBeRemoved := TList<TProduce>.Create;
+  Cancel := True;
 
   for var Produce in ListProduce do
-    if (Produce.IsSelected) and (Produce.StatusProduce <> EStatusOrder.Commited)
-    then
-      ToBeRemoved.Add(Produce);
+    if (Produce.StatusProduce <= EStatusOrder.Commited) then
+    begin
+      Cancel := AskOrderCancelConfirmation;
+      Break;
+    end;
 
-  for var Produce in ToBeRemoved do
-    ListProduce.Remove(Produce);
-
-  ToBeRemoved.Free;
-  AddNewProduce;
+  if Cancel then
+    OnOrderCancel(FOrder);
 end;
 
-procedure TPad.BtnCommitOrderClick(Sender: TObject);
+procedure TPad.HandleBtnOrderCommitClick(Sender: TObject);
 var
   ToCommit: TListProduce;
 begin
-
-  if (FOrder.Status = EStatusOrder.Served) then
-    Exit;
 
   for var I := 0 to ListProduce.Count - 1 do
     if (ListProduce[I].StatusProduce < EStatusOrder.Scratch) then
@@ -143,24 +121,62 @@ begin
 
   FOrder.Commit(ToCommit);
   RenderHeaderOrder;
-  OnOrderCommit(FKitchenID);
+  OnOrderCommit(FOrder);
   AddNewProduce;
+end;
+
+procedure TPad.HandleBtnProduceDeleteClick(Sender: TObject);
+begin
+  var
+  ToBeRemoved := TList<TProduce>.Create;
+
+  for var Produce in ListProduce do
+    if (Produce.IsSelected) and (Produce.StatusProduce <> EStatusOrder.Commited)
+    then
+      ToBeRemoved.Add(Produce);
+
+  for var Produce in ToBeRemoved do
+    ListProduce.Remove(Produce);
+
+  ToBeRemoved.Free;
+  AddNewProduce;
+end;
+
+function TPad.AskOrderCancelConfirmation: Boolean;
+var
+  Input: Integer;
+const
+  Msg = 'Η Παραγγελια εχει καταχωρημενες κινησεις. Να ακυρωθει?';
+begin
+
+  Input := TDialogServiceSync.MessageDialog(Msg, TMsgDlgType.MtConfirmation,
+      [TMsgDlgBtn.MbYes, TMsgDlgBtn.MbNo], TMsgDlgBtn.MbNo, MrNone);
+
+  if (Input = MrYes) then
+    Result := True
+  else
+    Result := False;
 end;
 
 procedure TPad.HandleOrderError(Err: EOrder);
 begin
   if (Err.Name = 'EOrderDeleteNotLast') then
   begin
-  showMessage('Μπορειτε να διαγραψεται μια παραγγελια μονο υπο την προυποθεση οτι ειναι η τελευταια στην αριθμιση');
+    ShowMessage
+        ('Μπορειτε να διαγραψεται μια παραγγελια μονο υπο την προυποθεση οτι ειναι η τελευταια στην αριθμιση');
   end;
 end;
 
+procedure TPad.SetFocus;
+begin
+
+end;
+
 constructor TPad.Create(AOwner: TComponent; Order: TOrder;
-    const KitchenID: Word);
+    const KOrderID: Word);
 begin
   inherited Create(AOwner);
   FOrder := Order;
-  FKitchenID := KitchenID;
   ListProduce := TObjectList<TProduce>.Create;
   ListProduce.Capacity := 10;
   ListProduce.OwnsObjects := True;
@@ -168,8 +184,12 @@ begin
   OrderToFloor;
 
   if (FOrder.Status > EStatusOrder.Served) then
+  begin
+    BtnCommitOrder.OnClick := HandleBtnOrderCommitClick;
+    BtnCancelOrder.OnClick := HandleBtnOrderCancelClick;
+    BtnDeleteProduce.OnClick := HandleBtnProduceDeleteClick;
     AddNewProduce;
-
+  end;
 end;
 
 destructor TPad.Destroy;

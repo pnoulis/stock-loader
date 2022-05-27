@@ -4,9 +4,27 @@ if some error occurs then user should be notified.
 means read a configuration file
 
 * have the ability to select an order to fullfill
-* create a tabbed ui where each order new or old fill a new tab
+* DONE create a tabbed ui where each order new or old fill a new tab
+CLOSED: [2022-05-26 Thu 21:59]
 the first tab cannot be closed and always displays the same body
 every tab that opens is attached with event handlers to delete the tab
 a tab can only be deleted if all of its produce has been commited
 a tab that displays a yesterday's order cannot have its produce edited.
 If a tab displayes a todays order it can be edited.
+* TPad
+The user often removes focus from the produce being edited through various
+actions such as switching tabs, commiting the pad, deleting a produce etc.
+
+Program must be aware which actions remove focus from the pad and the produce
+and reinstate it when its appropriate.
+
+the setfocus function is used to redirect focus to the pad.
+* TOrder
+
+* when can an order be deleted?
+An order may only be deleted under two circumstances.
+
+1. It has not been served
+2. It is the last order to have been issued
+   This might 
+

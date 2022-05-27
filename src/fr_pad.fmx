@@ -44,7 +44,6 @@ object Pad: TPad
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
-          OnClick = btnCommitOrderClick
         end
         object btnCancelOrder: TButton
           Align = Vertical
@@ -59,7 +58,6 @@ object Pad: TPad
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
-          OnClick = btnCancelOrderClick
         end
         object btnDeleteProduce: TButton
           Align = Vertical
@@ -74,7 +72,6 @@ object Pad: TPad
           TextSettings.Font.Family = 'Comic Sans MS'
           TextSettings.Font.Size = 16.000000000000000000
           TextSettings.Font.StyleExt = {00070000000000000004000000}
-          OnClick = btnDeleteProduceClick
         end
         object memoOrderID: TMemo
           Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
