@@ -148,36 +148,11 @@ end;
 
 function TdmServerMSSQL.FetchItem(const ItemCID: string): TDataSource;
 begin
-var
-Command := TStringBuilder.Create('fetchItem ' + itemCID.QuotedString);
-showMessage('fetchItem ' + itemCId.QuotedString);
+query.Close;
 Query.open('fetchItem ' + itemCID.QuotedString);
 Query.Active;
 Datasource1.DataSet := Query;
 Result := DataSource1;
-Query.Close;
-{
-  var
-  Query := QueryItem;
-  try
-    Query.Active := False;
-    Query.Open('select a.itemCID, a.itemName, b.qnt from item
-    {
-    Query.Open
-        ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
-        'a.itemCID = b.itemCID and a.itemCID = ''' + ItemCID + '''');
-    Query.Active := True;
-    DataSource1.DataSet := Query;
-    Result := DataSource1;
-  except
-    on E: Exception do
-    begin
-      ShowMessage(E.Message);
-      Result := nil;
-    end;
-
-  end;
-  }
 end;
 
 procedure TdmServerMSSQL.FetchAsyncOrders(Cb: TAfterFetch);
@@ -216,7 +191,7 @@ procedure TdmServerMSSQL.AddStockOrder(Cb: TdmServerMSSQL.TAfterCommitOrder);
 begin
   var
   Query := QueryAddStockOrder;
-  Query.Open('addStockOrder 1');
+  Query.Open('addStockOrder 5');
   Query.Active := True;
   Cb(Query.FieldByName('stockOrderID').AsString,
       Query.FieldByName('servedDate').Value);
