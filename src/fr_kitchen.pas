@@ -210,8 +210,16 @@ begin
     if (KitchenOrder.KOrderID = KOrderID) then
       KOrder := KitchenOrder;
 
-  RemoveOrder(KOrder);
-  RenderFloor;
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+       TThread.Synchronize(nil,
+       procedure
+       begin
+       RemoveOrder(KOrder);
+       RenderFloor;
+       end);
+    end).Start;
 end;
 
 procedure TKitchen.HandleOrderCommit(var KOrderID: Word);

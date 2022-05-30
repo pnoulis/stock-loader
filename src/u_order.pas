@@ -86,9 +86,7 @@ procedure TOrder.Delete(ListProduce: TListProduce = nil);
 var
   Res: Cardinal;
 begin
-  if (StockOrderID.ToInt64 < DB.CountRecords('stockOrders')) then
-    raise EOrderDeleteNotLast.Create(StockOrderID.ToInt64);
-  // DB.DeleteStockOrder(StockOrderID);
+   DB.DeleteStockOrder(StockOrderID);
 end;
 
 function TOrder.Clone: TOrder;

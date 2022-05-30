@@ -99,7 +99,10 @@ begin
     end;
 
   if Cancel then
+  begin
+    FOrder.Delete;
     OnOrderCancel(FKOrderID);
+  end;
 end;
 
 procedure TPad.HandleBtnOrderCommitClick(Sender: TObject);
