@@ -52,9 +52,8 @@ type
       procedure HandleTabMouseLeave(Sender: TObject);
       procedure RemoveOrder(var KOrder: TKitchenOrder);
       procedure HandleOrderNew(AOrder: TOrder = nil);
-      procedure HandleOrderCancel(var AOrder: TOrder);
-      procedure HandleOrderCommit(var AOrder: TOrder);
-      function AskUserOrderDelete: Boolean;
+      procedure HandleOrderCancel(var KOrderID: Word);
+      procedure HandleOrderCommit(var KOrderID: Word);
     public
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -108,7 +107,6 @@ procedure TKitchen.StartTimer(Sender: TObject);
 begin
   LblTime.Text := FormatDateTime('ddd dd/mm/yy hh:mm:ss', Now)
 end;
-
 
 procedure TKitchen.OrderToKitchen(var KOrder: TKitchenOrder);
 begin
@@ -190,7 +188,6 @@ begin
   ListOrders.Remove(KOrder);
 end;
 
-
 procedure TKitchen.HandleOrderNew(AOrder: TOrder = nil);
 var
   KOrder: TKitchenOrder;
@@ -205,70 +202,24 @@ begin
   OrderToKitchen(KOrder);
 end;
 
-procedure TKitchen.HandleOrderCancel(var AOrder: TOrder);
+procedure TKitchen.HandleOrderCancel(var KOrderID: Word);
 var
   KOrder: TKitchenOrder;
 begin
-//  AskUserOrderDelete;
-
-  {
-    if (FOrder.Status = EStatusOrder.Commited) and AskUserOrderDelete then
-    FOrder.Delete;
-  }
-  {
-    try
-    FOrder.Delete;
-    except
-    on E: EOrder do
-    HandleOrderError(E);
-    end;
-  }
-  // OnOrderCancel(FKOrderID);
-  {
-    for var KitchenOrder in ListOrders do
+  for var KitchenOrder in ListOrders do
     if (KitchenOrder.KOrderID = KOrderID) then
-    KOrder := KitchenOrder;
+      KOrder := KitchenOrder;
 
-    RemoveOrder(KOrder);
-    RenderFloor;
-  }
+  RemoveOrder(KOrder);
+  RenderFloor;
 end;
 
-procedure TKitchen.HandleOrderCommit(var AOrder: TOrder);
+procedure TKitchen.HandleOrderCommit(var KOrderID: Word);
 begin
-{
-
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          for var KitchenOrder in ListOrders do
-            if (KitchenOrder.KOrderID = KOrderID) then
-              KitchenOrder.Tab.Text := KitchenOrder.Order.StockOrderID;
-          RenderFloor;
-        end);
-    end).Start;
-    }
-
-end;
-
-function TKitchen.AskUserOrderDelete: Boolean;
-var
-  Input: Integer;
-const
-  Msg = 'Ç ðáñáããåëéá å÷åé áðïèçêåõìåíåò êéíçóåéò. Íá äéáãñáöåé?';
-begin
-
-  Input := TDialogServiceSync.MessageDialog(Msg, TMsgDlgType.MtConfirmation,
-      [TMsgDlgBtn.MbYes, TMsgDlgBtn.MbNo], TMsgDlgBtn.MbNo, MrNone);
-
-  if (Input = MrYes) then
-    Result := True
-  else
-    Result := False;
-
+  for var KitchenOrder in ListOrders do
+    if (KitchenOrder.KOrderID = KOrderID) then
+      KitchenOrder.Tab.Text := KitchenOrder.Order.StockOrderID;
+  RenderFloor;
 end;
 
 end.

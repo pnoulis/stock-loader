@@ -73,8 +73,9 @@ type
       procedure HandleBtnProduceDeleteClick(Sender: TObject);
     public
     var
-      OnOrderCancel: procedure(var Order: TOrder) of object;
-      OnOrderCommit: procedure(var Order: TOrder) of object;
+      FKOrderID: Word;
+      OnOrderCancel: procedure(var KOrderID: Word) of object;
+      OnOrderCommit: procedure(var KOrderID: Word) of object;
       constructor Create(AOwner: TComponent; Order: TOrder;
           const KOrderID: Word);
       destructor Destroy; override;
@@ -98,7 +99,7 @@ begin
     end;
 
   if Cancel then
-    OnOrderCancel(FOrder);
+    OnOrderCancel(FKOrderID);
 end;
 
 procedure TPad.HandleBtnOrderCommitClick(Sender: TObject);
@@ -121,7 +122,7 @@ begin
 
   FOrder.Commit(ToCommit);
   RenderHeaderOrder;
-  OnOrderCommit(FOrder);
+  OnOrderCommit(FKOrderID);
   AddNewProduce;
 end;
 
@@ -177,6 +178,7 @@ constructor TPad.Create(AOwner: TComponent; Order: TOrder;
 begin
   inherited Create(AOwner);
   FOrder := Order;
+  FKOrderID := KOrderID;
   ListProduce := TObjectList<TProduce>.Create;
   ListProduce.Capacity := 10;
   ListProduce.OwnsObjects := True;
