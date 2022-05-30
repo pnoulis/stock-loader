@@ -213,12 +213,12 @@ begin
   TThread.CreateAnonymousThread(
     procedure
     begin
-       TThread.Synchronize(nil,
-       procedure
-       begin
-       RemoveOrder(KOrder);
-       RenderFloor;
-       end);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          RemoveOrder(KOrder);
+          RenderFloor;
+        end);
     end).Start;
 end;
 

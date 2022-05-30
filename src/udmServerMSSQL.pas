@@ -79,7 +79,7 @@ implementation
 {$R *.dfm}
 const
   DBCONN_CONFIG_FILEPATH = './config/config.ini';
-  DBCONN_CONFIG_INI_SECTION = 'DBCONN_MSSQL_DEBUG_BRATNET';
+  DBCONN_CONFIG_INI_SECTION = 'DBCONN_MSSQL_RELEASE';
   // {$IFDEF RELEASE}
   // 'DBCONN_MSSQL_RELEASE';
   // {$ELSEIF defined(BRATNET)}
@@ -142,16 +142,27 @@ begin
   Command.Append(Table);
 
   Query.Open(Command.ToString);
-  result := Query.FieldList.Fields[0].Value;
+  Result := Query.FieldList.Fields[0].Value;
   Query.Close;
 end;
 
 function TdmServerMSSQL.FetchItem(const ItemCID: string): TDataSource;
 begin
+var
+Command := TStringBuilder.Create('fetchItem ' + itemCID.QuotedString);
+showMessage('fetchItem ' + itemCId.QuotedString);
+Query.open('fetchItem ' + itemCID.QuotedString);
+Query.Active;
+Datasource1.DataSet := Query;
+Result := DataSource1;
+Query.Close;
+{
   var
   Query := QueryItem;
   try
     Query.Active := False;
+    Query.Open('select a.itemCID, a.itemName, b.qnt from item
+    {
     Query.Open
         ('select a.itemCID, a.itemName, b.qnt from item a, itemStg b where ' +
         'a.itemCID = b.itemCID and a.itemCID = ''' + ItemCID + '''');
@@ -166,6 +177,7 @@ begin
     end;
 
   end;
+  }
 end;
 
 procedure TdmServerMSSQL.FetchAsyncOrders(Cb: TAfterFetch);

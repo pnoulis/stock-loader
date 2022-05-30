@@ -13,8 +13,8 @@ uses
 type
 
   EOrder = class(Exception)
-    ErrorCode: word;
-    name: string;
+    ErrorCode: Word;
+    Name: string;
   end;
 
   EOrderDeleteNotLast = class(EOrder)
@@ -66,10 +66,10 @@ uses
 constructor EOrderDeleteNotLast.Create(const StockOrderID: Cardinal);
 begin
   inherited CreateFmt(message, [StockOrderID]);
-  with self as EOrder do
+  with Self as EOrder do
   begin
-    ErrorCode := self.ErrorCode;
-    name := self.name;
+    ErrorCode := Self.ErrorCode;
+    name := Self.Name;
   end;
 end;
 
@@ -86,7 +86,7 @@ procedure TOrder.Delete(ListProduce: TListProduce = nil);
 var
   Res: Cardinal;
 begin
-   DB.DeleteStockOrder(StockOrderID);
+  DB.DeleteStockOrder(StockOrderID);
 end;
 
 function TOrder.Clone: TOrder;

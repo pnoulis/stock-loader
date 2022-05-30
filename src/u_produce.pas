@@ -314,12 +314,14 @@ begin
     begin
       FErrors[0] := 'Ο Κωδικος του ειδους δεν μπόρει να ειναι κενος!';
       IsValid := False;
-    end
+    end;
+    {
     else if (RegexpSnippets['!iNum'].Match) then
     begin
       FErrors[0] := 'Ο Κωδικος του ειδους αναγνωριζει μονο νουμερα';
       IsValid := False;
     end;
+    }
   end;
 end;
 
