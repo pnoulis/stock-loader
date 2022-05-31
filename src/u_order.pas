@@ -83,10 +83,18 @@ begin
 end;
 
 procedure TOrder.Delete(ListProduce: TListProduce = nil);
-var
-  Res: Cardinal;
 begin
-  DB.DeleteStockOrder(StockOrderID);
+
+  if Assigned(ListProduce) then
+  begin
+    for var Produce in ListProduce do
+      if (Produce.StatusProduce = EStatusOrder.Commited) then
+        Db.DeleteStockMove(Produce.StockMoveID);
+  end
+  else
+  begin
+    DB.DeleteStockOrder(StockOrderID);
+  end;
 end;
 
 function TOrder.Clone: TOrder;

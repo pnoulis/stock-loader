@@ -22,32 +22,32 @@ DROP PROCEDURE dbo.reverseStockMove;
 IF EXISTS (
 SELECT  1
 FROM sys.procedures
-WHERE NAME = 'subtract' )
-DROP PROCEDURE dbo.subtract;
+WHERE NAME = 'deleteStockOrder' )
+DROP PROCEDURE dbo.deleteStockOrder
 
 IF EXISTS (
 SELECT  1
 FROM sys.procedures
-WHERE NAME = 'deleteStockOrder' )
-DROP PROCEDURE dbo.deleteStockOrder
+WHERE NAME = 'fetchItem' )
+DROP PROCEDURE dbo.fetchItem;
 GO
 
 
-CREATE DATABASE dummy COLLATE Latin1_General_100_CI_AI_SC_UTF8; 
+CREATE DATABASE dummy COLLATE Latin1_General_100_CI_AI_SC_UTF8;
 GO
 USE dummy;
 GO
 
 CREATE TABLE Store (
   storeId INT NOT NULL -- PK
-  CONSTRAINT PK_Store_storeId PRIMARY KEY CLUSTERED (storeId) 
+  CONSTRAINT PK_Store_storeId PRIMARY KEY CLUSTERED (storeId)
 );
 GO
 
 CREATE TABLE item (
   itemCID NVARCHAR(50) NOT NULL, -- PK
   itemName NVARCHAR(200) NOT NULL,
-  CONSTRAINT PK_Item_itemCID PRIMARY KEY CLUSTERED (itemCID) 
+  CONSTRAINT PK_Item_itemCID PRIMARY KEY CLUSTERED (itemCID)
 );
 GO
 
@@ -108,15 +108,15 @@ GO
 
 -- ADD STOCK ORDER
 CREATE PROCEDURE addStockOrder
-@storeID INT = 1
+  @storeID INT = 5
 AS
 BEGIN
-SET NOCOUNT ON;
+  SET NOCOUNT ON;
 
-INSERT INTO stockOrders (storeID, servedDate)
-VALUES (@storeID, GETDATE());
-SELECT * FROM stockOrders
-WHERE stockOrderID = @@identity;
+  INSERT INTO stockOrders (storeID, servedDate)
+  VALUES (@storeID, GETDATE());
+  SELECT * FROM stockOrders
+   WHERE stockOrderID = @@identity;
 END;
 GO
 
@@ -192,21 +192,6 @@ SELECT * FROM stockMoves where stockMoveID = @@identity;
 END;
 GO
 
-
--- SUBTRACT
-CREATE PROCEDURE subtract
-@term1 DECIMAL(18, 3)
-,@term2 DECIMAL(18, 3)
-AS
-BEGIN
-SET NOCOUNT ON;
-SET @term1 = (@term1 - @term2);
-IF (@term1 <= 0.0) RETURN 0
-ELSE RETURN @term1;
-END;
-GO
-
-
 -- REVERSE STOCK MOVE
 CREATE PROCEDURE reverseStockMove
 @stockMoveID BIGINT
@@ -229,8 +214,8 @@ SELECT @stockBefore = Qnt
 FROM itemStg
 WHERE itemCID = @itemCID;
 
-EXEC @stockAfter = subtract @stockBefore, @stockDecrease;
-
+SET @stockAfter = (@stockBefore - @stockDecrease);
+IF (@stockAfter < 0) SET @stockAfter = 0;
 IF (@stockAfter IS NULL) SET @stockAfter = 0;
 
 UPDATE itemStg SET Qnt = @stockAfter WHERE itemCID = @itemCID;
@@ -272,3 +257,35 @@ DELETE FROM stockOrders WHERE stockOrderID = @stockOrderID;
 RETURN 0;
 END;
 GO
+
+
+-- FETCH ITEM
+CREATE PROCEDURE FetchItem
+  @itemCID nvarchar(255)
+AS
+BEGIN
+SET nocount on;
+DECLARE @storeID int;
+DECLARE @command nvarchar(255);
+
+SET @command = 'select a.itemCID, a.itemName, b.qnt from item a, itemStg b where a.itemCID = b.itemCID and a.itemCID = ''' + @itemCID + '';
+
+IF NOT EXISTS (SELECT itemCID FROM item WHERE itemCID = @itemCID)
+BEGIN
+SELECT * FROM item WHERE itemCID = @itemCID;
+END
+ELSE
+BEGIN
+
+IF NOT EXISTS (SELECT itemCID FROM itemSTG WHERE itemCid = @itemCId)
+BEGIN
+SELECT TOP 1 @storeID = storeID FROM store;
+INSERT INTO itemStg (itemCID, storeID, qnt) VALUES (@itemCID, @storeID, 0.0);
+END;
+
+SELECT a.itemCId, a.itemName, b.qnt FROM item a, itemstg b WHERE a.itemCId = b.itemCID AND a.itemCId = @itemCID;
+
+END;
+END;
+GO
+

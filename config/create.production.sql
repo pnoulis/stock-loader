@@ -16,12 +16,7 @@ SELECT  1
 FROM sys.procedures
 WHERE name = 'reverseStockMove' )
 DROP PROCEDURE dbo.reverseStockMove;
-
-IF EXISTS (
-SELECT  1
-FROM sys.procedures
-WHERE NAME = 'subtract' )
-DROP PROCEDURE dbo.subtract;
+GO
 
 IF EXISTS (
 SELECT  1
@@ -29,6 +24,46 @@ FROM sys.procedures
 WHERE NAME = 'deleteStockOrder' )
 DROP PROCEDURE dbo.deleteStockOrder
 GO
+
+IF EXISTS (
+SELECT 1
+FROM sys.procedures
+WHERE NAME = 'addStockOrder' )
+DROP PROCEDURE dbo.addStockOrder
+GO
+
+
+IF (OBJECT_ID('dbo.FK_stockMoves_stockOrderID', 'F') IS NOT NULL)
+BEGIN
+  ALTER TABLE dbo.stockMoves DROP CONSTRAINT FK_stockMoves_stockOrderID;
+END
+GO
+
+IF (OBJECT_ID('dbo.FK_stockMoves_itemCID', 'F') IS NOT NULL)
+BEGIN
+  ALTER TABLE dbo.stockMoves DROP CONSTRAINT FK_stockMoves_itemCID;
+END
+GO
+
+IF (OBJECT_ID('dbo.FK_stockOrders_storeID', 'F') IS NOT NULL)
+BEGIN
+  ALTER TABLE dbo.stockOrders DROP CONSTRAINT FK_stockOrders_storeID
+END
+GO
+
+
+IF OBJECT_ID('dbo.stockMoves', 'U') IS NOT NULL
+BEGIN
+  DROP TABLE dbo.stockMoves;
+END
+GO
+
+IF OBJECT_ID('dbo.stockOrders', 'U') IS NOT NULL
+BEGIN
+  DROP TABLE dbo.stockOrders;
+END
+GO
+
 
 CREATE TABLE dbo.stockOrders (
 stockOrderID BIGINT IDENTITY(1, 1) NOT NULL, -- PK
@@ -43,103 +78,96 @@ CONSTRAINT PK_stockOrders_stockOrderID PRIMARY KEY CLUSTERED (stockOrderID)
 GO
 
 
-  CREATE TABLE dbo.stockMoves (
-    stockMoveID BIGINT IDENTITY(1, 1) NOT NULL, -- PK
-    stockOrderID BIGINT NOT NULL, --FK
-    itemCID NVARCHAR(50) NOT NULL, -- FK
-    itemName NVARCHAR(200) NOT NULL,
-    stockBefore DECIMAL(18, 3) NOT NULL,
-    stockIncrease DECIMAL(18, 3) NOT NULL,
-    stockAfter DECIMAL(18, 3) NOT NULL,
-    CONSTRAINT PK_stockMoves_stockMoveID PRIMARY KEY CLUSTERED (stockMoveID)
-  );
-  GO
+CREATE TABLE dbo.stockMoves (
+stockMoveID BIGINT IDENTITY(1, 1) NOT NULL, -- PK
+stockOrderID BIGINT NOT NULL, --FK
+itemCID NVARCHAR(50) NOT NULL, -- FK
+itemName NVARCHAR(200) NOT NULL,
+stockBefore DECIMAL(18, 3) NOT NULL,
+stockIncrease DECIMAL(18, 3) NOT NULL,
+stockAfter DECIMAL(18, 3) NOT NULL,
+CONSTRAINT PK_stockMoves_stockMoveID PRIMARY KEY CLUSTERED (stockMoveID)
+);
+GO
 
-    -- FOREIGN KEYS
-    ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT
-    FK_stockMoves_stockOrderID FOREIGN KEY (stockOrderID) REFERENCES
-    dbo.stockOrders(stockOrderID);
+-- FOREIGN KEYS
+ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT
+  FK_stockMoves_stockOrderID FOREIGN KEY (stockOrderID) REFERENCES
+  dbo.stockOrders(stockOrderID);
 
-  ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT
-    FK_stockMoves_itemCID FOREIGN KEY (itemCID) REFERENCES
-    dbo.Item(ItemCID);
+ALTER TABLE dbo.stockMoves WITH CHECK ADD CONSTRAINT
+  FK_stockMoves_itemCID FOREIGN KEY (itemCID) REFERENCES
+  dbo.Item(ItemCID);
 
-  ALTER TABLE dbo.stockOrders WITH CHECK ADD CONSTRAINT
-    FK_stockOrders_storeID FOREIGN KEY (storeID) REFERENCES
-    dbo.store(StoreId);
+ALTER TABLE dbo.stockOrders WITH CHECK ADD CONSTRAINT
+  FK_stockOrders_storeID FOREIGN KEY (storeID) REFERENCES
+  dbo.store(StoreId);
 
-  ALTER TABLE dbo.itemStg WITH CHECK ADD CONSTRAINT
-    FK_itemStg_itemCID FOREIGN KEY (itemCID) REFERENCES
-    dbo.item(itemCID);
+GO
 
-  ALTER TABLE dbo.itemStg WITH CHECK ADD CONSTRAINT
-    FK_itemStg_storeID FOREIGN KEY (storeID) REFERENCES
-    dbo.store(storeID);
-  GO
+-- ADD STOCK ORDER
+CREATE PROCEDURE addStockOrder
+  @storeID INT = 5
+AS
+BEGIN
+  SET NOCOUNT ON;
 
-    -- ADD STOCK ORDER
-    CREATE PROCEDURE addStockOrder
-    @storeID INT = 5
-    AS
-    BEGIN
-      SET NOCOUNT ON;
+  INSERT INTO stockOrders (storeID, servedDate)
+  VALUES (@storeID, GETDATE());
+  SELECT * FROM stockOrders
+   WHERE stockOrderID = @@identity;
+END;
+GO
 
-      INSERT INTO stockOrders (storeID, servedDate)
-      VALUES (@storeID, GETDATE());
-      SELECT * FROM stockOrders
-       WHERE stockOrderID = @@identity;
-    END;
-  GO
+-- ADD STOCK MOVE
+CREATE PROCEDURE addStockMove
+@stockOrderID BIGINT
+,@itemCID NVARCHAR(50)
+,@stockIncrease DECIMAL(18, 3)
+,@stockMoveID BIGINT = NULL
+AS
+BEGIN
+SET NOCOUNT ON;
 
-    -- ADD STOCK MOVE
-    CREATE PROCEDURE addStockMove
-    @stockOrderID BIGINT
-    ,@itemCID NVARCHAR(50)
-    ,@stockIncrease DECIMAL(18, 3)
-    ,@stockMoveID BIGINT = NULL
-    AS
-    BEGIN
-      SET NOCOUNT ON;
+declare @itemName nvarchar(200);
+declare @stockBefore decimal(18, 3);
+declare @stockAfter decimal(18, 3);
 
-      declare @itemName nvarchar(200);
-      declare @stockBefore decimal(18, 3);
-      declare @stockAfter decimal(18, 3);
+SELECT @stockOrderID = stockOrderID
+FROM stockOrders
+WHERE stockOrderID = @stockOrderID;
 
-      SELECT @stockOrderID = stockOrderID
-        FROM stockOrders
-       WHERE stockOrderID = @stockOrderID;
+SELECT @itemName = a.itemName, @stockBefore = b.Qnt
+FROM item a, itemStg b
+WHERE a.itemCID = b.itemCID AND a.itemCID = @itemCID;
 
-      SELECT @itemName = a.itemName, @stockBefore = b.Qnt
-        FROM item a, itemStg b
-       WHERE a.itemCID = b.itemCID AND a.itemCID = @itemCID;
-
-      IF (@stockBefore IS NULL) SET @stockBefore = 0.0;
-        SET @stockAfter = @stockBefore + @stockIncrease;
-        IF (@stockAfter < 0.0) SET @stockAfter = 0.0;
+IF (@stockBefore IS NULL) SET @stockBefore = 0.0;
+SET @stockAfter = @stockBefore + @stockIncrease;
+IF (@stockAfter < 0.0) SET @stockAfter = 0.0;
 
 
-          IF (@stockMoveID IS NOT NULL)
-            BEGIN
-              declare @sameItemCID NVARCHAR(50);
-              declare @prevStockIncrease decimal(18,3);
+IF (@stockMoveID IS NOT NULL)
+BEGIN
+declare @sameItemCID NVARCHAR(50);
+declare @prevStockIncrease decimal(18,3);
 
-              SELECT @prevStockIncrease = stockIncrease FROM stockMoves
-               WHERE stockMoveID  = @stockMoveID;
+SELECT @prevStockIncrease = stockIncrease FROM stockMoves
+WHERE stockMoveID  = @stockMoveID;
 
-              IF (@prevStockIncrease < 0.0 AND @stockIncrease > 0.0)
-                BEGIN
-                  UPDATE stockMoves
-                     SET stockIncrease = 0  WHERE stockMoveID = @stockMoveID;
-                END;
+IF (@prevStockIncrease < 0.0 AND @stockIncrease > 0.0)
+BEGIN
+UPDATE stockMoves
+SET stockIncrease = 0  WHERE stockMoveID = @stockMoveID;
+END;
 
-                UPDATE stockMoves
-                   SET @sameItemCID = itemCID, stockBefore = @stockBefore - stockIncrease,
-                       stockIncrease = @stockIncrease + stockIncrease, stockAfter = @stockAfter
-                 WHERE stockMoveID = @stockMoveID AND itemCID = @itemCID;
+UPDATE stockMoves
+SET @sameItemCID = itemCID, stockBefore = @stockBefore - stockIncrease,
+stockIncrease = @stockIncrease + stockIncrease, stockAfter = @stockAfter
+WHERE stockMoveID = @stockMoveID AND itemCID = @itemCID;
 
-                -- case where the stockMove exists but the previous
-                -- item the stockMove 'moved' was not the same
-                IF (@sameItemCID IS NULL) RETURN 1;
+-- case where the stockMove exists but the previous
+-- item the stockMove 'moved' was not the same
+IF (@sameItemCID IS NULL) RETURN 1;
 
 END
 ELSE
@@ -163,21 +191,6 @@ SELECT * FROM stockMoves where stockMoveID = @@identity;
 END;
 GO
 
-
--- SUBTRACT
-CREATE PROCEDURE subtract
-@term1 DECIMAL(18, 3)
-,@term2 DECIMAL(18, 3)
-AS
-BEGIN
-SET NOCOUNT ON;
-SET @term1 = (@term1 - @term2);
-IF (@term1 <= 0.0) RETURN 0
-ELSE RETURN @term1;
-END;
-GO
-
-
 -- REVERSE STOCK MOVE
 CREATE PROCEDURE reverseStockMove
 @stockMoveID BIGINT
@@ -200,8 +213,8 @@ SELECT @stockBefore = Qnt
 FROM itemStg
 WHERE itemCID = @itemCID;
 
-EXEC @stockAfter = subtract @stockBefore, @stockDecrease;
-
+SET @stockAfter = (@stockBefore - @stockDecrease);
+IF (@stockAfter < 0) SET @stockAfter = 0;
 IF (@stockAfter IS NULL) SET @stockAfter = 0;
 
 UPDATE itemStg SET Qnt = @stockAfter WHERE itemCID = @itemCID;
@@ -246,32 +259,32 @@ GO
 
 
 -- FETCH ITEM
-  create procedure fetchItem
+CREATE PROCEDURE FetchItem
   @itemCID nvarchar(255)
-  as
-  begin
-    set nocount on;
-    declare @storeID int;
-    declare @command nvarchar(255);
+AS
+BEGIN
+SET nocount on;
+DECLARE @storeID int;
+DECLARE @command nvarchar(255);
 
-    set @command = 'select a.itemCID, a.itemName, b.qnt from item a, itemStg b where a.itemCID = b.itemCID and a.itemCID = ''' + @itemCID + '';
+SET @command = 'select a.itemCID, a.itemName, b.qnt from item a, itemStg b where a.itemCID = b.itemCID and a.itemCID = ''' + @itemCID + '';
 
-    if not exists (select itemCID from item where itemCID = @itemCID)
-      begin
-        select * from item where itemCID = @itemCID;
-end
-    else
-      begin
+IF NOT EXISTS (SELECT itemCID FROM item WHERE itemCID = @itemCID)
+BEGIN
+SELECT * FROM item WHERE itemCID = @itemCID;
+END
+ELSE
+BEGIN
 
-        if not exists (select itemCID from itemSTG where itemCid = @itemCId)
-          begin
-            select top 1 @storeID = storeID from store;
-            insert into itemStg (itemCID, storeID, qnt) values (@itemCID, @storeID, 0.0);
-          end;
+IF NOT EXISTS (SELECT itemCID FROM itemSTG WHERE itemCid = @itemCId)
+BEGIN
+SELECT TOP 1 @storeID = storeID FROM store;
+INSERT INTO itemStg (itemCID, storeID, qnt) VALUES (@itemCID, @storeID, 0.0);
+END;
 
-          select a.itemCId, a.itemName, b.qnt from item a, itemstg b where a.itemCId = b.itemCID and a.itemCId = @itemCID;
+SELECT a.itemCId, a.itemName, b.qnt FROM item a, itemstg b WHERE a.itemCId = b.itemCID AND a.itemCId = @itemCID;
 
-end;
-
-end;
+END;
+END;
+GO
 

@@ -7,6 +7,7 @@ uses
   Fr_kitchen,
   System.SysUtils,
   System.Classes,
+  System.IOUtils,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -52,7 +53,7 @@ begin
     procedure
     begin
 {$IFDEF RELEASE}
-      Sleep(3000);
+      Sleep(1500);
 {$ENDIF}
       TThread.Synchronize(nil,
         procedure
@@ -83,7 +84,11 @@ end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
 begin
-  UFilesystem.AnchorProjectRoot('stock-loader');
+{$IFDEF RELEASE}
+  TDirectory.SetCurrentDirectory('..\');
+{$ELSE}
+  TDirectory.SetCurrentDirectory('..\..\..\');
+{$ENDIF}
   ConnectDB;
 end;
 

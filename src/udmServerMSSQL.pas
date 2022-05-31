@@ -46,6 +46,7 @@ type
     QueryAddStockMove: TFDQuery;
     QueryDeleteStockOrder: TFDQuery;
     Query: TFDQuery;
+    Sproc: TFDStoredProc;
     private type
       TAfterFetch = Reference to procedure(Data: TDataSource);
       TAfterCommitOrder = Reference to procedure(StockOrderID: string;
@@ -67,6 +68,7 @@ type
       procedure AddStockMove(StockOrderID, ItemCID, StockIncrease,
           StockMoveID: string; Cb: TdmServerMSSQL.TAfterCommitMove);
       procedure DeleteStockOrder(StockOrderID: string);
+      procedure DeleteStockMove(StockMoveID: string);
   end;
 
 var
@@ -80,13 +82,6 @@ implementation
 const
   DBCONN_CONFIG_FILEPATH = './config/config.ini';
   DBCONN_CONFIG_INI_SECTION = 'DBCONN_MSSQL_RELEASE';
-  // {$IFDEF RELEASE}
-  // 'DBCONN_MSSQL_RELEASE';
-  // {$ELSEIF defined(BRATNET)}
-  // 'DBCONN_MSSQL_DEBUG_BRATNET';
-  // {$ELSE}
-  // 'DBCONN_MSSQL_DEBUG';
-  // {$IFEND}
 var
   Connected: Boolean;
   ErrMsg: string;
@@ -148,11 +143,11 @@ end;
 
 function TdmServerMSSQL.FetchItem(const ItemCID: string): TDataSource;
 begin
-query.Close;
-Query.open('fetchItem ' + itemCID.QuotedString);
-Query.Active;
-Datasource1.DataSet := Query;
-Result := DataSource1;
+  Query.Close;
+  Query.Open('fetchItem ' + ItemCID.QuotedString);
+  Query.Active;
+  Datasource1.DataSet := Query;
+  Result := DataSource1;
 end;
 
 procedure TdmServerMSSQL.FetchAsyncOrders(Cb: TAfterFetch);
@@ -224,6 +219,18 @@ begin
   Query := QueryDeleteStockOrder;
   Query.ExecSQL('deleteStockOrder ' + StockOrderID);
   Query.Close;
+end;
+
+procedure TdmServerMSSQL.DeleteStockMove(StockMoveID: string);
+begin
+  with Sproc do
+  begin
+    SchemaName := 'dbo';
+    StoredProcName := 'reverseStockMove';
+    Prepare;
+    ParamByName('@stockMoveID').Value := StockMoveID.ToInt64;
+    ExecProc;
+  end;
 end;
 
 procedure TdmServerMSSQL.FetchProduce(const OrderID: string; Cb: TAfterFetch);

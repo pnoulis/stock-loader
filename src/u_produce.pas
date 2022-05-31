@@ -70,7 +70,6 @@ type
       procedure RecordCurrentStockLevels(Data: TFields);
       procedure AskStockIncreaseAmount;
       procedure CacheUpdatedStockLevels;
-      procedure CommitUpdatedStockLevels;
       procedure DisplayError(const ErrMsg: string = '');
 
     public
@@ -108,8 +107,6 @@ var
   { TProduce }
 constructor TProduce.Create(StatusOrder: EStatusOrder; Template: TPanel;
     Data: TFields = nil);
-var
-  Edt: TEdit;
 begin
   inherited Create;
 
@@ -120,7 +117,7 @@ begin
   IsFetched := False;
   Graphic := Template;
 
-  if Assigned(Data) then
+  if Assigned(Data) and (StatusOrder = EStatusOrder.Served) then
   begin
     TEdit(Graphic.Components[6]).Text :=
         Data.FieldByName('stockMoveID').AsString;
@@ -132,37 +129,50 @@ begin
         Data.FieldByName('stockIncrease').AsString;
     TEdit(Graphic.Components[5]).Text := Data.FieldByName('stockAfter')
         .AsString;
+    Exit;
+  end;
+
+  FStockMoveID := TInputText.Create(Graphic);
+  FStockOrderID := TInputText.Create(Graphic);
+  FItemCID := TInputText.Create(Graphic);
+  FItemName := TInputText.Create(Graphic);
+  FStockBefore := TInputText.Create(Graphic);
+  FStockIncrease := TInputText.Create(Graphic);
+  FStockAfter := TInputText.Create(Graphic);
+  FError := TLabel.Create(Graphic);
+
+  if Assigned(Data) and (StatusOrder = EStatusOrder.Commited) then
+  begin
+    StatusProduce := EStatusOrder.Commited;
+    Graphic.OnClick := HandleGraphicClick;
+
+    SetStockMoveID(Data.FieldByName('stockMoveID').AsString);
+    SetStockOrderID(Data.FieldByName('stockOrderID').AsString);
+    SetItemCID(Data.FieldByName('itemCID').AsString);
+    SetItemName(Data.FieldByName('itemName').AsString);
+    SetStockBefore(Data.FieldByName('stockBefore').Value);
+    SetStockIncrease(Data.FieldByName('stockIncrease').Value);
+    SetStockAfter(Data.FieldByName('stockAfter').Value);
   end
   else
   begin
-    FStockMoveID := TInputText.Create(Graphic);
-    FStockOrderID := TInputText.Create(Graphic);
-    FItemCID := TInputText.Create(Graphic);
-    FItemName := TInputText.Create(Graphic);
-    FStockBefore := TInputText.Create(Graphic);
-    FStockIncrease := TInputText.Create(Graphic);
-    FStockAfter := TInputText.Create(Graphic);
-    FError := TLabel.Create(Graphic);
-
     StatusProduce := EStatusOrder.Scratch;
-
     SetStockMoveID('-');
     SetStockOrderID('-');
-    SetItemCID('itemCID');
+    SetItemCID('-');
     SetItemName('-');
     SetStockBefore(0);
     SetStockIncrease(0);
     SetStockAfter(0);
-
-    RenderStockAfter;
-    RenderStockIncrease;
-    RenderStockBefore;
-    RenderItemCID;
-    RenderStockMoveID;
-    RenderItemName;
-    RenderError;
   end;
 
+  RenderStockAfter;
+  RenderStockIncrease;
+  RenderStockBefore;
+  RenderItemCID;
+  RenderStockMoveID;
+  RenderItemName;
+  RenderError;
 end;
 
 destructor TProduce.Destroy;
@@ -208,6 +218,7 @@ begin
   Popup := TPopupMenu.Create(Graphic);
   Popup.OnPopup := HandleGraphicClick;
   Graphic.PopupMenu := Popup;
+  Graphic.OnClick := HandleGraphicClick;
 
   Target.OnKeyUp := Target.HandleKey;
   Target.Text := '';
@@ -270,10 +281,6 @@ begin
   OnProduceCached;
 end;
 
-procedure TProduce.CommitUpdatedStockLevels;
-begin
-end;
-
 procedure TProduce.DisplayError(const ErrMsg: string = '');
 begin
   var
@@ -315,13 +322,6 @@ begin
       FErrors[0] := 'Ο Κωδικος του ειδους δεν μπόρει να ειναι κενος!';
       IsValid := False;
     end;
-    {
-    else if (RegexpSnippets['!iNum'].Match) then
-    begin
-      FErrors[0] := 'Ο Κωδικος του ειδους αναγνωριζει μονο νουμερα';
-      IsValid := False;
-    end;
-    }
   end;
 end;
 
@@ -383,12 +383,14 @@ begin
     if IsSelected then
     begin
       Fill.Color := TAlphaColorRec.White;
+      Stroke.Color := TAlphaColorRec.White;
       IsSelected := False;
     end
     else
     begin
       Fill.Color := TAlphaColorRec.Cornflowerblue;
       IsSelected := True;
+      Stroke.Color := TAlphaColorRec.Cornflowerblue;
     end;
   end;
 end;

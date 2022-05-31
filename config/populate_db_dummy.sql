@@ -2,6 +2,7 @@ use dummy;
 GO
 
 INSERT INTO Store (storeId) VALUES (1);
+INSERT INTO Store (storeID) VALUES(5);
 GO
 
 INSERT INTO Item (itemCID, itemName)

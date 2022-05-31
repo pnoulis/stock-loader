@@ -227,6 +227,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_UnitSearchPath>C:\Users\pavlos\broot\TTextInput;C:\Users\pavlos\Documents\Embarcadero\Studio\Projects\Win32\Debug;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_UsePackage>packageTTextInput</DCC_UsePackage>
+        <Icon_MainIcon>..\data\stockLoader_x256.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>..\data\stockLoader_x256.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>..\data\stockLoader_x256.png</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -324,6 +327,13 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\data\stockLoader_x256.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

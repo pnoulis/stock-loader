@@ -50,7 +50,12 @@ object dmServerMSSQL: TdmServerMSSQL
   end
   object query: TFDQuery
     Connection = connection
-    Left = 272
-    Top = 320
+    Left = 16
+    Top = 264
+  end
+  object sproc: TFDStoredProc
+    Connection = connection
+    Left = 88
+    Top = 264
   end
 end

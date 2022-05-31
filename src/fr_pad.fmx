@@ -225,7 +225,8 @@ object Pad: TPad
         Size.Width = 774.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
-        Stroke.Color = claWhite
+        Stroke.Kind = None
+        Stroke.Thickness = 0.000000000000000000
         XRadius = 11.000000000000000000
         YRadius = 11.000000000000000000
         object edtStockBefore: TEdit

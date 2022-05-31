@@ -130,19 +130,26 @@ begin
 end;
 
 procedure TPad.HandleBtnProduceDeleteClick(Sender: TObject);
+var
+  ToBeRemoved: TListProduce;
 begin
   var
-  ToBeRemoved := TList<TProduce>.Create;
+  LnToBeRemoved := 0;
 
-  for var Produce in ListProduce do
-    if (Produce.IsSelected) and (Produce.StatusProduce <> EStatusOrder.Commited)
-    then
-      ToBeRemoved.Add(Produce);
+  for var Produce in Listproduce do
+    if Produce.IsSelected then
+    begin
+      Inc(LnToBeRemoved);
+      SetLength(ToBeRemoved, LnToBeRemoved);
+      ToBeRemoved[LnToBeRemoved - 1] := Produce;
+    end;
+
+  FOrder.Delete(ToBeRemoved);
 
   for var Produce in ToBeRemoved do
     ListProduce.Remove(Produce);
 
-  ToBeRemoved.Free;
+  SetLength(ToBeRemoved, 0);
   AddNewProduce;
 end;
 
@@ -248,7 +255,11 @@ const IndexRecord: Cardinal);
 var
   Template: TPanel;
 begin
-  Template := TPanel(PanelProduceTemplate.Clone(ScrollProduce));
+  if (FOrder.Status > EStatusOrder.Served) then
+    Template := TPanel(InputPanelTemplate.Clone(ScrollProduce))
+  else
+    Template := TPanel(PanelProduceTemplate.Clone(ScrollProduce));
+
   ListProduce.Add(TProduce.Create(FOrder.Status, Template, AProduceRecord));
   RenderNewProduce(Template);
 end;
